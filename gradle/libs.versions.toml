@@ -10,8 +10,37 @@ activityCompose = "1.12.1"
 composeBom = "2024.09.00"
 appcompat = "1.6.1"
 material = "1.10.0"
+androidGradlePlugin = "8.3.2"
+androidLifecycle = "2.9.2"
+
+#https://developer.android.com/develop/ui/compose/setup?hl=ko#kotlin_1
+composeBomVersion = "2025.07.00"
+activityComposeVersion = "1.10.1"
+lifecycleViewmodelComposeVersion = "2.9.2"
+
+# Plugins
+ksp = "2.0.10-1.0.24"
+# https://developer.android.com/guide/navigation
+navVersion = "2.8.3"
+# https://developer.android.com/training/dependency-injection/hilt-android
+hiltVersion = "2.52"
+hiltCompilerVersion = "1.2.0"
+# https://developer.android.com/topic/libraries/architecture/datastore?hl=ko
+dataStoreVersion = "1.1.1"
+# https://square.github.io/retrofit/
+retrofitVersion = "2.11.0"
+okhttp3Version = "4.12.0"
+okhttp3LoggingVersion = "4.12.0"
+# https://developer.android.com/training/data-storage/room
+roomVersion = "2.7.2"
+# https://github.com/JakeWharton/timber
+timberVersion = "5.0.1"
+jetbrainsKotlinJvm = "2.0.21"
 
 [libraries]
+android-gradlePlugin = { group = "com.android.tools.build", name = "gradle", version.ref = "androidGradlePlugin" }
+kotlin-gradlePlugin = { module = "org.jetbrains.kotlin:kotlin-gradle-plugin", version.ref = "kotlin" }
+
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
 junit = { group = "junit", name = "junit", version.ref = "junit" }
 androidx-junit = { group = "androidx.test.ext", name = "junit", version.ref = "junitVersion" }
@@ -28,10 +57,64 @@ androidx-compose-ui-test-junit4 = { group = "androidx.compose.ui", name = "ui-te
 androidx-compose-material3 = { group = "androidx.compose.material3", name = "material3" }
 androidx-appcompat = { group = "androidx.appcompat", name = "appcompat", version.ref = "appcompat" }
 material = { group = "com.google.android.material", name = "material", version.ref = "material" }
+androidx-lifecycle-livedata = { group = "androidx.lifecycle", name = "lifecycle-livedata-ktx", version.ref = "androidLifecycle" }
+androidx-lifecycle-viewmodel = { group = "androidx.lifecycle", name = "lifecycle-viewmodel-ktx", version.ref = "androidLifecycle" }
+
+#navigation
+andriodx-navigation-fragment = { group = "androidx.navigation", name = "navigation-fragment-ktx", version.ref = "navVersion" }
+andriodx-navigation-ui = { group = "androidx.navigation", name = "navigation-ui-ktx", version.ref = "navVersion" }
+androidx-navigation-safe-args = { group = "androidx.navigation", name = "navigation-safe-args-gradle-plugin", version.ref = "navVersion" }
+androidx-navigation = { group = "androidx.navigation", name = "navigation-compose", version.ref = "navVersion" }
+
+#hilt
+dagger-hilt-android = { group = "com.google.dagger", name = "hilt-android", version.ref = "hiltVersion" }
+dagger-hilt-android-compiler = { group = "com.google.dagger", name = "hilt-android-compiler", version.ref = "hiltVersion" }
+hilt-gradle-plugin = { group = "com.google.dagger", name = "hilt-android-gradle-plugin", version.ref = "hiltVersion" }
+androidx-hilt-navigation-compose = { group = "androidx.hilt", name = "hilt-navigation-compose", version.ref = "hiltCompilerVersion" }
+
+#dataStore
+androidx-datastore = { group = "androidx.datastore", name = "datastore-preferences", version.ref = "dataStoreVersion" }
+androidx-datastore-core = { group = "androidx.datastore", name = "datastore-core", version.ref = "dataStoreVersion" }
+
+#Retrofit
+squareup-retrofit = { group = "com.squareup.retrofit2", name = "retrofit", version.ref = "retrofitVersion" }
+squareup-retrofit-gson = { group = "com.squareup.retrofit2", name = "converter-gson", version.ref = "retrofitVersion" }
+squareup-retrofit-scalars = { group = "com.squareup.retrofit2", name = "converter-scalars", version.ref = "retrofitVersion" }
+squareup-okhttp3 = { group = "com.squareup.okhttp3", name = "okhttp", version.ref = "okhttp3Version" }
+squareup-okhttp3-logging = { group = "com.squareup.okhttp3", name = "logging-interceptor", version.ref = "okhttp3LoggingVersion" }
+
+#RoomDB
+androidx-room-runtime = { group = "androidx.room", name = "room-runtime", version.ref = "roomVersion" }
+androidx-room-compiler = { group = "androidx.room", name = "room-compiler", version.ref = "roomVersion" }
+androidx-room-compiler-processing = { group = "androidx.room", name = "room-compiler-processing", version.ref = "roomVersion" }
+androidx-room-ktx = { group = "androidx.room", name = "room-ktx", version.ref = "roomVersion" }
+
+#Timber
+logger-timber = { group = "com.jakewharton.timber", name = "timber", version.ref = "timberVersion" }
+
+#Compose
+compose-bom = { group = "androidx.compose", name = "compose-bom", version.ref = "composeBomVersion" }
+compose-material3 = { group = "androidx.compose.material3", name = "material3" }
+compose-ui-tooling-preview = { group = "androidx.compose.ui", name = "ui-tooling-preview" }
+compose-material3-adaptive = { group = "androidx.compose.material3.adaptive", name = "adaptive" }
+compose-foundation = { group = "androidx.compose.foundation", name = "foundation" }
+activity-compose = { group = "androidx.activity", name = "activity-compose", version.ref = "activityComposeVersion" }
+lifecycle-viewmodel-compose = { group = "androidx.lifecycle", name = "lifecycle-viewmodel-compose", version.ref = "lifecycleViewmodelComposeVersion" }
+androidx-ui-tooling = { group = "androidx.compose.ui", name = "ui-tooling" }
+
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
 kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
 kotlin-compose = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
 android-library = { id = "com.android.library", version.ref = "agp" }
+#hilt
+kotlin-ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }
+dagger-hilt-android = { id = "com.google.dagger.hilt.android", version.ref = "hiltVersion" }
+jetbrains-kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "jetbrainsKotlinJvm" }
 
+[bundles]
+androidx-navigation-bundle = ["andriodx-navigation-fragment", "andriodx-navigation-ui","androidx-navigation" ]
+
+squareup-retrofit-bundle = ["squareup-retrofit", "squareup-retrofit-gson","squareup-retrofit-scalars", "squareup-okhttp3", "squareup-okhttp3-logging"]
+androidx-datastore-bundle = ["androidx-datastore", "androidx-datastore-core"]

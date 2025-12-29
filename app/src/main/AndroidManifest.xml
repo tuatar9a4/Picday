@@ -15,6 +15,10 @@
             android:name=".MainActivity"
             android:exported="true"
             android:label="@string/app_name"
+            android:theme="@style/Theme.OneDayOneShot"/>
+        <activity
+            android:name="com.devd.intro.IntroActivity"
+            android:exported="true"
             android:theme="@style/Theme.OneDayOneShot">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
