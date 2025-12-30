@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="intro_title">"나만의 일기를 하루 한장!"</string>
+    <string name="intro_description">"나만의 일기장을 만들어 보세요!"</string>
+    <string name="make_diary_text">"일기장 만들기"</string>
+    <string name="already_diary_text">"이미 일기장을 가지고 계신가요?  "</string>
+    <string name="login_text">"로그인"</string>
+</resources>

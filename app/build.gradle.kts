@@ -49,6 +49,7 @@ dependencies {
     debugImplementation(libs.androidx.compose.ui.test.manifest)
 
 
+    implementation(projects.core.commonsystem)
     implementation(projects.feature.intro)
 
 }

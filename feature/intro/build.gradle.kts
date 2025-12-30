@@ -15,4 +15,6 @@ dependencies {
     implementation(libs.androidx.appcompat)
     implementation(libs.material)
     implementation(libs.androidx.lifecycle.runtime.ktx)
+
+    implementation(projects.core.commonsystem)
 }
