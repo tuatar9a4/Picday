@@ -11,10 +11,15 @@ val PurpleGrey40 = Color(0xFF625b71)
 val Pink40 = Color(0xFF7D5260)
 
 
-
+//https://kwongdevelop.tistory.com/5
 val PrimaryColor = Color(0xFFF5F1EB)
 val SecondaryColor = Color(0xFFC8B6A6)
 val TextDefaultColor = Color(0xFF2E2E2E)
+val TextOpacity80Color = Color(0xCC2E2E2E)
 val AccentColor = Color(0xFFC38EB4)
+val AccentOpacity40Color = Color(0x66C38EB4)
 val WhiteColor = Color(0xFFFFFFFF)
+val WhiteOpacity40Color = Color(0x66FFFFFF)
+val BlackColor = Color(0xFF000000)
+val RedColor = Color(0xFFE3242B)
 

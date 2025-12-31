@@ -2,7 +2,6 @@ import com.devd.build_logic.app.configTimberLogger
 import com.devd.build_logic.app.configureDaggerHilt
 import com.devd.build_logic.app.configureKotlinAndroid
 import com.devd.build_logic.app.libs
-import org.gradle.kotlin.dsl.get
 
 plugins {
     id("devd.android.library")
@@ -38,13 +37,18 @@ dependencies{
 //    navigation
     implementation(libs.findBundle("androidx.navigation.bundle").get())
 
-    implementation(platform(libs.findLibrary("compose.bom").get()))
-    implementation(libs.findLibrary("compose.material3").get())
-    implementation(libs.findLibrary("compose.ui.tooling.preview").get())
-    implementation(libs.findLibrary("compose.material3.adaptive").get())
-    implementation(libs.findLibrary("compose.foundation").get())
-    implementation(libs.findLibrary("activity.compose").get())
-    implementation(libs.findLibrary("lifecycle.viewmodel.compose").get())
-    debugImplementation(libs.findLibrary("androidx.ui.tooling").get())
+    implementation(platform(libs.findLibrary("androidx.compose.bom").get()))
+    implementation(libs.findLibrary("androidx.compose.ui").get())
+    implementation(libs.findLibrary("androidx.compose.ui.graphics").get())
+    implementation(libs.findLibrary("androidx.compose.ui.tooling.preview").get())
+    implementation(libs.findLibrary("androidx.compose.material3").get())
+    implementation(libs.findLibrary("androidx.activity.compose").get())
+    implementation(libs.findLibrary("androidx.compose.material3.adaptive").get())
+    implementation(libs.findLibrary("androidx.compose.foundation").get())
+    implementation(libs.findLibrary("androidx.lifecycle.viewmodel.compose").get())
+
+
+    debugImplementation(libs.findLibrary("androidx.compose.ui.tooling.preview").get())
+    debugImplementation(libs.findLibrary("androidx.compose.ui.tooling").get())
 
 }

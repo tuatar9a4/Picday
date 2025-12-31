@@ -5,4 +5,7 @@
     <string name="make_diary_text">"일기장 만들기"</string>
     <string name="already_diary_text">"이미 일기장을 가지고 계신가요?  "</string>
     <string name="login_text">"로그인"</string>
+    <string name="nickname_input_hint">"닉네임을 입력하세요"</string>
+    <string name="password_input_hint">"비밀번호를 입력하세요"</string>
+    <string name="password_repeat_input_hint">"비밀번호를 다시 입력하세요"</string>
 </resources>

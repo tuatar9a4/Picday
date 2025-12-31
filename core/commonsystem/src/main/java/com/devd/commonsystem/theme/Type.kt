@@ -14,12 +14,12 @@ val OneDayTypography = Typography(
     titleLarge = TextStyle(
         fontFamily = FontFamily(Font(R.font.suit_extra_bold)),
         fontWeight = FontWeight(700),
-        fontSize = 32.sp
+        fontSize = 22.sp
     ),
     titleMedium = TextStyle(
         fontFamily = FontFamily(Font(R.font.suit_semi_bold)),
         fontWeight = FontWeight(600),
-        fontSize = 24.sp
+        fontSize = 20.sp
     ),
     bodyLarge = TextStyle(
         fontFamily = FontFamily(Font(R.font.suit_semi_bold)),
