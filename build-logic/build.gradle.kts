@@ -12,11 +12,11 @@ dependencies {
 gradlePlugin{
     plugins {
         register("androidRoomDB"){
-            id ="vueroid.android.room"
+            id ="devd.android.room"
             implementationClass = "com.devd.build_logic.app.AndroidRoomPlugin"
         }
         register("androidRetrofit"){
-            id ="vueroid.android.retrofit"
+            id ="devd.android.retrofit"
             implementationClass = "com.devd.build_logic.app.AndroidRetrofitPlugin"
         }
     }

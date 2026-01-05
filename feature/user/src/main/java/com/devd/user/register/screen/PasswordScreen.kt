@@ -14,6 +14,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
+import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -22,23 +23,29 @@ import com.devd.commonsystem.theme.OneDayTypography
 import com.devd.commonsystem.theme.TextDefaultColor
 import com.devd.commonsystem.theme.TextOpacity80Color
 import com.devd.commonsystem.ui.SingleLineTextField
+import com.devd.commonsystem.utils.StringRexFormat.PASSWORD_REGEX
+import com.devd.commonsystem.utils.checkValidateRex
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Preview
 @Composable
 fun PasswordScreen(
+    modifier: Modifier = Modifier,
     passwordText: MutableState<String> = mutableStateOf(""),
-    rePasswordText: MutableState<String> = mutableStateOf(""),
+    onSnackBarMessage: (String) -> Unit = {},
     onDone: () -> Unit = {}
 ) {
 
+    val rePasswordText = remember { mutableStateOf("") }
     val passwordError = remember { mutableStateOf(false) }
     val rePasswordError = remember { mutableStateOf(false) }
-
     val rePasswordFocus = remember { FocusRequester() }
 
+    val focusManager = LocalFocusManager.current
+
     Column(
-        modifier = Modifier.fillMaxWidth()
+
+        modifier = modifier.then(Modifier.fillMaxWidth())
     ) {
         Text(
             modifier = Modifier.padding(horizontal = 20.dp),
@@ -50,7 +57,7 @@ fun PasswordScreen(
         Spacer(Modifier.height(10.dp))
         Text(
             modifier = Modifier.padding(horizontal = 20.dp),
-            text = "최소 7자 이상/ 공백 불가",
+            text = "영문 및 숫자 1자리 포함 8자 이상 20자 미만",
             style = OneDayTypography.labelLarge.copy(
                 color = TextOpacity80Color
             )
@@ -61,7 +68,7 @@ fun PasswordScreen(
                 .fillMaxWidth(),
             editText = passwordText,
             onTextChange = { text ->
-                passwordError.value = (passwordText.value.length < 7)
+                passwordError.value = !text.checkValidateRex(PASSWORD_REGEX)
                 passwordText.value = text
             },
             isError = passwordError.value,
@@ -79,14 +86,21 @@ fun PasswordScreen(
                 .fillMaxWidth(),
             editText = rePasswordText,
             onTextChange = { text ->
-                rePasswordError.value = rePasswordText.value != passwordText.value
+                rePasswordError.value = text != passwordText.value
                 rePasswordText.value = text
             },
             isError = rePasswordError.value,
             hintText = R.string.password_repeat_input_hint,
             isPassword = true,
             imeAction = ImeAction.Done,
-            onDone = onDone
+            onDone = {
+                if (passwordText.value.checkValidateRex(PASSWORD_REGEX) && rePasswordText.value == passwordText.value) {
+                    onDone.invoke()
+                } else {
+                    focusManager.clearFocus()
+                    onSnackBarMessage.invoke("비밀번호를 확인 해주세요")
+                }
+            }
         )
 
     }

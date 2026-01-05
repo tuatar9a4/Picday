@@ -11,11 +11,14 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.text.selection.LocalTextSelectionColors
+import androidx.compose.foundation.text.selection.TextSelectionColors
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -38,6 +41,7 @@ import com.devd.commonsystem.theme.OneDayTypography
 import com.devd.commonsystem.theme.RedColor
 import com.devd.commonsystem.theme.TextDefaultColor
 import com.devd.commonsystem.theme.TextOpacity80Color
+import com.devd.commonsystem.theme.WhiteOpacity40Color
 import com.devd.commonsystem.utils.bottomBorder
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -57,81 +61,95 @@ fun SingleLineTextField(
 ) {
     var usePasswordVisible by remember { mutableStateOf(!isPassword) }
 
+    val customTextSelectionColors = TextSelectionColors(
+        handleColor = BlackColor,
+        backgroundColor = WhiteOpacity40Color
+    )
 
-    BasicTextField(
-        modifier = modifier,
-        value = editText.value,
-        singleLine = true,
-        textStyle = OneDayTypography.bodyMedium.copy(color = if (isError) RedColor else textColor),
-        onValueChange = onTextChange,
-        visualTransformation = if (usePasswordVisible) VisualTransformation.None else PasswordVisualTransformation(),
-        keyboardOptions = KeyboardOptions(imeAction = imeAction),
-        keyboardActions = KeyboardActions(
-            onDone = { onDone?.invoke() },
-            onNext = { onNext?.invoke() }
-        ),
-        decorationBox = { innerTextField ->
-            TextFieldDefaults.DecorationBox(
-                value = editText.value,
-                innerTextField = { innerTextField() },
-                enabled = true,
-                singleLine = true,
-                placeholder = {
-                    hintText?.let {
-                        Text(
-                            modifier = Modifier,
-                            text = stringResource(it),
-                            style = OneDayTypography.bodyMedium.copy(color = hintColor)
-                        )
-                    }
-                },
-                trailingIcon = {
-                    if (isPassword) {
-                        if (usePasswordVisible) {
-                            Icon(
-                                modifier = Modifier.clickable(
-                                    onClick = {
-                                        usePasswordVisible = !usePasswordVisible
-                                    }
-                                ),
-                                painter = painterResource(R.drawable.icon_show_password_eye),
-                                tint = Color.Black,
-                                contentDescription = null
-                            )
-                        } else {
-                            Icon(
-                                modifier = Modifier.clickable(
-                                    onClick = {
-                                        usePasswordVisible = !usePasswordVisible
-                                    }
-                                ),
-                                painter = painterResource(R.drawable.icon_hide_password_eye),
-                                tint = Color.Black,
-                                contentDescription = null
+    CompositionLocalProvider(LocalTextSelectionColors provides customTextSelectionColors) {
+        BasicTextField(
+            modifier = modifier,
+            value = editText.value,
+            singleLine = true,
+            textStyle = OneDayTypography.bodyMedium.copy(color = if (isError) RedColor else textColor),
+            onValueChange = onTextChange,
+            visualTransformation = if (usePasswordVisible) VisualTransformation.None else PasswordVisualTransformation(),
+            keyboardOptions = KeyboardOptions(imeAction = imeAction),
+            keyboardActions = KeyboardActions(
+                onDone = { onDone?.invoke() },
+                onNext = { onNext?.invoke() }
+            ),
+            decorationBox = { innerTextField ->
+                TextFieldDefaults.DecorationBox(
+                    value = editText.value,
+                    innerTextField = { innerTextField() },
+                    enabled = true,
+                    singleLine = true,
+                    colors = TextFieldDefaults.colors().copy(
+                        focusedIndicatorColor = Color.Black,
+                        cursorColor = Color.Red
+                    ),
+                    placeholder = {
+                        hintText?.let {
+                            Text(
+                                modifier = Modifier,
+                                text = stringResource(it),
+                                style = OneDayTypography.bodyMedium.copy(color = hintColor)
                             )
                         }
+                    },
+                    trailingIcon = {
+                        if (isPassword) {
+                            if (usePasswordVisible) {
+                                Icon(
+                                    modifier = Modifier
+                                        .padding(end = 25.dp)
+                                        .clickable(
+                                            onClick = {
+                                                usePasswordVisible = !usePasswordVisible
+                                            }
+                                        ),
+                                    painter = painterResource(R.drawable.icon_show_password_eye),
+                                    tint = Color.Black,
+                                    contentDescription = null
+                                )
+                            } else {
+                                Icon(
+                                    modifier = Modifier
+                                        .padding(end = 25.dp)
+                                        .clickable(
+                                            onClick = {
+                                                usePasswordVisible = !usePasswordVisible
+                                            }
+                                        ),
+                                    painter = painterResource(R.drawable.icon_hide_password_eye),
+                                    tint = Color.Black,
+                                    contentDescription = null
+                                )
+                            }
+                        }
+                    },
+                    visualTransformation = PasswordVisualTransformation(),
+                    interactionSource = remember { MutableInteractionSource() },
+                    contentPadding = PaddingValues(vertical = 5.dp, horizontal = 25.dp),
+                    container = {
+                        Box(
+                            modifier = Modifier
+                                .padding(horizontal = 20.dp)
+                                .bottomBorder(1.dp, if (isError) RedColor else BlackColor)
+                                .padding(vertical = 8.dp, horizontal = 5.dp)
+                        )
                     }
-                },
-                visualTransformation = PasswordVisualTransformation(),
-                interactionSource = remember { MutableInteractionSource() },
-                contentPadding = PaddingValues(vertical = 5.dp, horizontal = 25.dp),
-                container = {
-                    Box(
-                        modifier = Modifier
-                            .padding(horizontal = 20.dp)
-                            .bottomBorder(1.dp, if (isError) RedColor else BlackColor)
-                            .padding(vertical = 10.dp, horizontal = 5.dp)
-                    )
-                }
-            )
-        }
-    )
+                )
+            }
+        )
+    }
 }
 
 @Preview
 @Composable
 fun SingleLineTextFieldPreview() {
-    val text = remember { mutableStateOf("") }
+    val text = remember { mutableStateOf("123") }
     val focusRequester = remember { FocusRequester() }
     val text2 = remember { mutableStateOf("") }
     val isError = remember { mutableStateOf(false) }

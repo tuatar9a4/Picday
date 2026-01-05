@@ -13,6 +13,7 @@ import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
+import androidx.lifecycle.lifecycleScope
 import com.devd.commonsystem.theme.OneDayOneShotTheme
 import com.devd.user.register.screen.RegisterRoute
 import dagger.hilt.android.AndroidEntryPoint
@@ -32,6 +33,7 @@ class RegisterActivity : ComponentActivity() {
                 val coroutineScope = rememberCoroutineScope()
                 val callSnack: (String) -> Unit = {
                     coroutineScope.launch {
+                        snackBarHostState.currentSnackbarData?.dismiss()
                         snackBarHostState.showSnackbar(it)
                     }
                 }
@@ -48,7 +50,18 @@ class RegisterActivity : ComponentActivity() {
                 }
             }
         }
+    }
 
+    fun collectFlow(){
+        lifecycleScope.launch {
+            regiViewModel.uiState.collect {
+                when(it){
+                    is RegisterUIState.SuccessMakeId -> {
+                        finish()
+                    }
+                }
+            }
+        }
     }
 
 }

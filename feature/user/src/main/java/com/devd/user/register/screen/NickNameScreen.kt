@@ -1,6 +1,8 @@
 package com.devd.user.register.screen
 
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -12,6 +14,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalFocusManager
@@ -20,23 +23,29 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.devd.commonsystem.R
 import com.devd.commonsystem.theme.OneDayTypography
+import com.devd.commonsystem.theme.RedColor
 import com.devd.commonsystem.theme.TextDefaultColor
 import com.devd.commonsystem.theme.TextOpacity80Color
 import com.devd.commonsystem.ui.SingleLineTextField
 import com.devd.commonsystem.ui.TextButton
+import com.devd.commonsystem.utils.StringRexFormat.ID_REGEX
+import com.devd.commonsystem.utils.StringRexFormat.ID_WORD_REGEX
 import com.devd.commonsystem.utils.checkValidateRex
+import kotlinx.coroutines.launch
 
 @Composable
 fun NickNameScreen(
+    modifier: Modifier = Modifier,
     editText: MutableState<String>,
-    checkValidateId: (String) -> Boolean = { true },
-    onSnackBarMessage: (String) -> Unit,
+    isCheckDuplicate: MutableState<Boolean>,
+    checkValidateId: suspend (String) -> Unit = { },
     onDone: () -> Unit = {}
 ) {
-    val validateId = remember { mutableStateOf(false) }
+    val isValidateId = remember { mutableStateOf(false) }
+    val scope = rememberCoroutineScope()
     val focusManager = LocalFocusManager.current
     Column(
-        modifier = Modifier.fillMaxWidth()
+        modifier = modifier.then(Modifier.fillMaxWidth())
     ) {
         Text(
             modifier = Modifier.padding(horizontal = 20.dp),
@@ -57,46 +66,61 @@ fun NickNameScreen(
         Row(
             verticalAlignment = Alignment.CenterVertically
         ) {
-            SingleLineTextField(
+            Box(
                 modifier = Modifier
-                    .weight(1f),
-                editText = editText,
-                onTextChange = { text ->
-                    if (!text.checkValidateRex("^[가-힣a-zA-Z0-9]{0,10}$"))
-                        return@SingleLineTextField
-                    validateId.value = false
-                    editText.value = text
-                },
-                hintText = R.string.nickname_input_hint,
-                imeAction = ImeAction.Done,
-                onDone = {
-                    focusManager.clearFocus()
-                    if (validateId.value) {
+                    .weight(1f)
+            ) {
+                SingleLineTextField(
+                    modifier = Modifier.fillMaxWidth(),
+                    editText = editText,
+                    onTextChange = { text ->
+                        if ((!text.checkValidateRex(ID_WORD_REGEX) && text.isEmpty()) || text.length > 10) return@SingleLineTextField
+                        isCheckDuplicate.value = false
+                        editText.value = text
+                    },
+                    hintText = R.string.nickname_input_hint,
+                    imeAction = ImeAction.Done,
+                    onDone = {
+                        focusManager.clearFocus()
                         onDone.invoke()
-                    } else {
-                        onSnackBarMessage.invoke("중복확인을 해주세요")
                     }
-                }
-            )
+                )
+                Text(
+                    modifier = Modifier
+                        .align(Alignment.CenterEnd)
+                        .padding(horizontal = 20.dp),
+                    text = "(${editText.value.length}/10)",
+                    style = OneDayTypography.labelLarge.copy(
+                        color = TextDefaultColor
+                    )
+                )
+            }
 
             TextButton(
                 text = "중복확인",
-                enable = !validateId.value,
+                enable = !isCheckDuplicate.value,
+                contentsPadding = PaddingValues(horizontal = 10.dp, vertical = 10.dp),
                 onClick = {
-                    validateId.value = checkValidateId.invoke(editText.value)
+                    if (editText.value.checkValidateRex(ID_REGEX)) {
+                        isValidateId.value = false
+                        scope.launch { checkValidateId.invoke(editText.value) }
+                    } else {
+                        isValidateId.value = true
+                    }
                 }
             )
             Spacer(Modifier.width(20.dp))
         }
-        Spacer(Modifier.height(10.dp))
-        Text(
-            modifier = Modifier
-                .padding(horizontal = 20.dp),
-            text = "(${editText.value.length}/10)",
-            style = OneDayTypography.labelLarge.copy(
-                color = TextDefaultColor
+        Spacer(Modifier.height(5.dp))
+        if (isValidateId.value) {
+            Text(
+                modifier = Modifier.padding(horizontal = 20.dp),
+                text = "한글,영문,숫자 최대 2~10자/ 공백,특수기호 불가",
+                style = OneDayTypography.labelLarge.copy(
+                    color = RedColor
+                )
             )
-        )
+        }
     }
 }
 
@@ -106,6 +130,6 @@ fun NickNameScreen(
 fun NickNameScreenPreview() {
     NickNameScreen(
         editText = mutableStateOf(""),
-        onSnackBarMessage = {}
+        isCheckDuplicate = mutableStateOf(false),
     )
 }

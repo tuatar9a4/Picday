@@ -3,6 +3,7 @@ package com.devd.commonsystem.ui
 import androidx.annotation.DrawableRes
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -39,7 +40,9 @@ fun Toolbar(
     ) {
         leftButtonClick?.let {
             Image(
-                modifier = Modifier.size(32.dp),
+                modifier = Modifier
+                    .size(32.dp)
+                    .clickable(onClick = leftButtonClick),
                 painter = painterResource(leftButtonIcon),
                 contentDescription = "Back"
             )
@@ -52,7 +55,9 @@ fun Toolbar(
         )
         rightButtonClick?.let {
             Image(
-                modifier = Modifier.size(32.dp),
+                modifier = Modifier
+                    .size(32.dp)
+                    .clickable(onClick = rightButtonClick),
                 painter = painterResource(rightButtonIcon),
                 contentDescription = "Back"
             )
