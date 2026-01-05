@@ -17,4 +17,5 @@ dependencies {
     implementation(libs.androidx.lifecycle.runtime.ktx)
 
     implementation(projects.core.commonsystem)
+    implementation(projects.core.datastore)
 }

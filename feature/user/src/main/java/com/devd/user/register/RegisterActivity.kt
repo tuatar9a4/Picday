@@ -1,5 +1,6 @@
 package com.devd.user.register
 
+import android.content.Intent
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -27,6 +28,7 @@ class RegisterActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
+        collectFlow()
         setContent {
             OneDayOneShotTheme {
                 val snackBarHostState = remember { SnackbarHostState() }
@@ -52,12 +54,21 @@ class RegisterActivity : ComponentActivity() {
         }
     }
 
-    fun collectFlow(){
+    fun collectFlow() {
         lifecycleScope.launch {
             regiViewModel.uiState.collect {
-                when(it){
+                when (it) {
                     is RegisterUIState.SuccessMakeId -> {
+                        val intent = Intent()
+                        intent.setClassName(
+                            this@RegisterActivity, "com.devd.onedayoneshot.MainActivity"
+                        )
+                        startActivity(intent)
                         finish()
+                    }
+
+                    is RegisterUIState.FailMakeDiary -> {
+
                     }
                 }
             }

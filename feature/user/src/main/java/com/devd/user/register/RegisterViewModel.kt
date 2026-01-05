@@ -3,7 +3,11 @@ package com.devd.user.register
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.devd.data.repository.DiaryBookRepository
 import com.devd.data.repository.UserRepository
+import com.devd.data.utils.CallResult
+import com.devd.datastore.DataStoreKey
+import com.devd.datastore.DataStoreRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
@@ -13,7 +17,9 @@ import javax.inject.Inject
 
 @HiltViewModel
 class RegisterViewModel @Inject constructor(
-    private val userRepository: UserRepository
+    private val userRepository: UserRepository,
+    private val dataStoreRepository: DataStoreRepository,
+    private val diaryBookRepository: DiaryBookRepository
 ) : ViewModel() {
 
     val id = mutableStateOf("")
@@ -24,19 +30,33 @@ class RegisterViewModel @Inject constructor(
 
     private val _uiState = MutableSharedFlow<RegisterUIState>()
     val uiState get() = _uiState.asSharedFlow()
+
+
     suspend fun checkValidateId(id: String) {
         isCheckDuplicate.value = userRepository.checkExistsId(id)
     }
 
-
     fun requestMakeId() {
         viewModelScope.launch {
             Timber.d("Finish : ${id.value} ${password.value} ${nickname.value} ${diaryName.value}")
-            _uiState.emit(RegisterUIState.SuccessMakeId)
+            dataStoreRepository.setPreferData(DataStoreKey.UserNickName, nickname.value)
+            diaryBookRepository.insertNewDiaryBook(diaryName.value, "").run {
+                when (this) {
+                    is CallResult.NetworkError -> {
+                        _uiState.emit(RegisterUIState.FailMakeDiary(this.message))
+                    }
+
+                    is CallResult.Success -> {
+                        Timber.d("CheckDiaryList => ${diaryBookRepository.fetchAllDairies()}")
+                        _uiState.emit(RegisterUIState.SuccessMakeId)
+                    }
+                }
+            }
         }
     }
 }
 
 sealed interface RegisterUIState {
-    object SuccessMakeId : RegisterUIState
+    data object SuccessMakeId : RegisterUIState
+    data class FailMakeDiary(val message: String) : RegisterUIState
 }

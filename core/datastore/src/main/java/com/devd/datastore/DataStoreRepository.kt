@@ -14,13 +14,43 @@ import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.map
 import java.lang.reflect.Type
 import javax.inject.Inject
+import javax.inject.Singleton
 
-
+@Singleton
 class DataStoreRepository @Inject constructor(
-    private val sharedPreferences: DataStore<Preferences>
-) {
+    val sharedPreferences: DataStore<Preferences>
+) : DatastoreRepositoryImpl {
 
-    suspend fun setPreferString(key: String, value: String) : Boolean {
+
+    override suspend fun <T> setPreferData(data: DataStoreKey<T>, value: T): Boolean {
+        val result = Result.runCatching {
+            sharedPreferences.edit { preferences ->
+                preferences[data.preferencesKey()] = value
+            }
+        }
+        return result.isSuccess
+    }
+
+    override suspend fun <T> getPreferData(data: DataStoreKey<T>): T? {
+        return Result.runCatching {
+            val flow = sharedPreferences.data
+                .catch { exception ->
+                    if (exception is IOException) {
+                        emit(emptyPreferences())
+                    } else {
+                        throw exception
+                    }
+                }
+                .map { preferences ->
+                    preferences[data.preferencesKey()]
+                }
+            val value = flow.firstOrNull()
+            value
+        }.getOrNull()
+    }
+
+
+    suspend fun setPreferString(key: String, value: String): Boolean {
         val result = Result.runCatching {
             sharedPreferences.edit { preferences ->
                 preferences[stringPreferencesKey(key)] = value
@@ -135,7 +165,7 @@ class DataStoreRepository @Inject constructor(
         val strObj = getPreferString(keyValue)
         return try {
             Gson().fromJson(strObj, objType)
-        }catch (e :Exception){
+        } catch (e: Exception) {
             null
         }
     }

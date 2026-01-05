@@ -1,10 +1,10 @@
 plugins {
     id("devd.android.library")
-    id("devd.android.retrofit")
+    id("devd.android.room")
 }
 
 android {
-    namespace = "com.devd.data"
+    namespace = "com.devd.database"
 }
 
 dependencies {
@@ -12,8 +12,5 @@ dependencies {
     implementation(libs.androidx.appcompat)
     implementation(libs.material)
 
-    implementation(projects.core.network)
-    implementation(projects.core.database)
     implementation(projects.core.model)
-
 }

@@ -4,7 +4,9 @@ import android.content.Context
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.preferencesDataStore
+import com.devd.datastore.BuildConfig
 import com.devd.datastore.DataStoreRepository
+import com.devd.datastore.DatastoreRepositoryImpl
 import dagger.Binds
 import dagger.Module
 import dagger.Provides
@@ -23,7 +25,7 @@ abstract class DataStoreModule {
     @Singleton
     abstract fun bindDiaryPreferencesRepository(
         dataStoreRepository: DataStoreRepository
-    ): DataStoreRepository
+    ): DatastoreRepositoryImpl
 
     companion object {
         @Provides

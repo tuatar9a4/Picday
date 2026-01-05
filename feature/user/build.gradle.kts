@@ -14,4 +14,7 @@ dependencies {
 
     implementation(projects.core.commonsystem)
     implementation(projects.core.data)
+    implementation(projects.core.datastore)
+    implementation(projects.core.model)
+
 }
