@@ -1,9 +1,10 @@
 plugins {
     id("devd.android.library")
+    id("devd.android.room")
 }
 
 android {
-    namespace = "com.devd.datastore"
+    namespace = "com.devd.room"
 }
 
 dependencies {

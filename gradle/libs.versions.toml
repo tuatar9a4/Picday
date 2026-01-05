@@ -35,6 +35,8 @@ roomVersion = "2.7.2"
 # https://github.com/JakeWharton/timber
 timberVersion = "5.0.1"
 jetbrainsKotlinJvm = "2.0.21"
+gsonVersion = "2.10.1"
+
 
 [libraries]
 android-gradlePlugin = { group = "com.android.tools.build", name = "gradle", version.ref = "androidGradlePlugin" }
@@ -96,6 +98,8 @@ androidx-compose-material3-adaptive = { group = "androidx.compose.material3.adap
 androidx-compose-foundation = { group = "androidx.compose.foundation", name = "foundation" }
 androidx-lifecycle-viewmodel-compose = { group = "androidx.lifecycle", name = "lifecycle-viewmodel-compose", version.ref = "lifecycleViewmodelComposeVersion" }
 
+#Gson
+google-gson = { group = "com.google.code.gson", name = "gson", version.ref = "gsonVersion" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
@@ -111,4 +115,4 @@ jetbrains-kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "jetbrai
 androidx-navigation-bundle = ["andriodx-navigation-fragment", "andriodx-navigation-ui","androidx-navigation" ]
 
 squareup-retrofit-bundle = ["squareup-retrofit", "squareup-retrofit-gson","squareup-retrofit-scalars", "squareup-okhttp3", "squareup-okhttp3-logging"]
-androidx-datastore-bundle = ["androidx-datastore", "androidx-datastore-core"]
+androidx-datastore-bundle = ["androidx-datastore", "androidx-datastore-core","google-gson"]
