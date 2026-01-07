@@ -16,6 +16,7 @@ import com.devd.commonsystem.theme.OneDayOneShotTheme
 import com.devd.intro.screen.IntroScreen
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
+import timber.log.Timber
 
 @AndroidEntryPoint
 class IntroActivity : ComponentActivity() {
@@ -54,8 +55,13 @@ class IntroActivity : ComponentActivity() {
     private fun tempCheckSavedID() {
         lifecycleScope.launch {
             viewModel.fetchSavedNickName()?.let {
-
+                Timber.d("saved nickName : $it")
+                val intent = Intent()
+                intent.setClassName(this@IntroActivity,"com.devd.onedayoneshot.MainActivity")
+                startActivity(intent)
+                finish()
             } ?: run {
+                Timber.d("saved nickName is null")
 
             }
         }

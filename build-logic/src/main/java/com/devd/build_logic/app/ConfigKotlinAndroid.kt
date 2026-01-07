@@ -17,6 +17,7 @@ fun Project.configureKotlinAndroid(){
 //    Plugins
     pluginManager.apply("org.jetbrains.kotlin.android")
     pluginManager.apply("org.jetbrains.kotlin.plugin.compose")
+    pluginManager.apply("org.jetbrains.kotlin.plugin.serialization")
 
     androidExtension.apply {
         compileSdk = 36
@@ -43,6 +44,7 @@ fun Project.configureKotlinAndroid(){
     val libs = project.extensions.libs
     dependencies{
         "implementation"(libs.findBundle("androidx.datastore.bundle").get())
+        "implementation"(libs.findLibrary("kotlinx.serialization.json").get())
     }
 
 }

@@ -5,6 +5,8 @@ import com.devd.build_logic.app.libs
 
 plugins {
     id("com.android.application")
+    id("kotlin-android")
+    id("kotlin-parcelize")
 }
 
 configureKotlinAndroid()

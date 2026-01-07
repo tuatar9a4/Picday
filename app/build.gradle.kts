@@ -35,6 +35,7 @@ dependencies {
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
 
+    implementation(libs.bundles.androidx.navigation.bundle)
     implementation(platform(libs.androidx.compose.bom))
     implementation(libs.androidx.compose.ui)
     implementation(libs.androidx.compose.ui.graphics)
@@ -58,5 +59,7 @@ dependencies {
     implementation(projects.core.commonsystem)
     implementation(projects.feature.intro)
     implementation(projects.feature.user)
+    implementation(projects.feature.home)
+    implementation(projects.feature.editor)
 
 }

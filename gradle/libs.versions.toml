@@ -12,6 +12,9 @@ material = "1.10.0"
 androidGradlePlugin = "8.3.2"
 androidLifecycle = "2.9.2"
 
+#https://github.com/Kotlin/kotlinx.serialization
+serializationVersion = "1.7.3"
+
 #https://developer.android.com/develop/ui/compose/setup?hl=ko#kotlin_1
 composeBomVersion = "2025.07.00"
 activityComposeVersion = "1.10.1"
@@ -101,11 +104,17 @@ androidx-lifecycle-viewmodel-compose = { group = "androidx.lifecycle", name = "l
 #Gson
 google-gson = { group = "com.google.code.gson", name = "gson", version.ref = "gsonVersion" }
 
+#serialization
+kotlinx-serialization-json ={group="org.jetbrains.kotlinx", name="kotlinx-serialization-json", version.ref="serializationVersion"}
+
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
 kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
 kotlin-compose = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
 android-library = { id = "com.android.library", version.ref = "agp" }
+koltin-jvm = { id = "org.jetbrains.kotlin.multiplatform", version.ref = "kotlin" }
+kotlin-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
+
 #hilt
 kotlin-ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }
 dagger-hilt-android = { id = "com.google.dagger.hilt.android", version.ref = "hiltVersion" }
