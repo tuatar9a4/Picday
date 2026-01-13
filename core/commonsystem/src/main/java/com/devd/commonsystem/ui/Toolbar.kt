@@ -2,7 +2,6 @@ package com.devd.commonsystem.ui
 
 import androidx.annotation.DrawableRes
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
@@ -20,10 +19,10 @@ import androidx.compose.ui.unit.dp
 import com.devd.commonsystem.R
 import com.devd.commonsystem.theme.OneDayTypography
 import com.devd.commonsystem.theme.TextDefaultColor
-import com.devd.commonsystem.theme.WhiteColor
 
 @Composable
 fun Toolbar(
+    modifier: Modifier = Modifier,
     title: String,
     @DrawableRes leftButtonIcon: Int = R.drawable.icon_back_arrow,
     leftButtonClick: (() -> Unit)? = null,
@@ -31,18 +30,20 @@ fun Toolbar(
     rightButtonClick: (() -> Unit)? = null,
 ) {
     Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .background(color = WhiteColor)
-            .padding(horizontal = 15.dp, vertical = 5.dp),
+        modifier = modifier.then(
+            Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 15.dp, vertical = 5.dp)
+        ),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.SpaceBetween
     ) {
         leftButtonClick?.let {
             Image(
                 modifier = Modifier
+                    .clickable(onClick = leftButtonClick)
                     .size(32.dp)
-                    .clickable(onClick = leftButtonClick),
+                    .padding(4.dp),
                 painter = painterResource(leftButtonIcon),
                 contentDescription = "Back"
             )
@@ -56,8 +57,9 @@ fun Toolbar(
         rightButtonClick?.let {
             Image(
                 modifier = Modifier
+                    .clickable(onClick = rightButtonClick)
                     .size(32.dp)
-                    .clickable(onClick = rightButtonClick),
+                    .padding(4.dp),
                 painter = painterResource(rightButtonIcon),
                 contentDescription = "Back"
             )
@@ -68,23 +70,23 @@ fun Toolbar(
 @Preview
 @Composable
 fun ToolbarPreview() {
-    Toolbar("Title")
+    Toolbar(title = "Title")
 }
 
 @Preview
 @Composable
 fun ToolbarUseLeftPreview() {
-    Toolbar("Title", leftButtonClick = {})
+    Toolbar(title = "Title", leftButtonClick = {})
 }
 
 @Preview
 @Composable
 fun ToolbarUseRightPreview() {
-    Toolbar("Title", rightButtonClick = {})
+    Toolbar(title = "Title", rightButtonClick = {})
 }
 
 @Preview
 @Composable
 fun ToolbarUseBothPreview() {
-    Toolbar("Title", leftButtonClick = {}, rightButtonClick = {})
+    Toolbar(title = "Title", leftButtonClick = {}, rightButtonClick = {})
 }

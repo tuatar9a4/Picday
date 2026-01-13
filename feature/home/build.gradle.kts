@@ -4,6 +4,9 @@ plugins {
 
 android {
     namespace = "com.devd.home"
+    buildFeatures {
+        compose = true
+    }
 }
 
 dependencies {

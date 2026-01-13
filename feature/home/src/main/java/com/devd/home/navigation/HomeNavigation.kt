@@ -1,9 +1,9 @@
 package com.devd.home.navigation
 
-import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.compose.ui.Modifier
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
-import com.devd.home.HomeScreenRoute
+import com.devd.home.screen.HomeScreenRoute
 import kotlinx.serialization.Serializable
 
 
@@ -11,11 +11,14 @@ import kotlinx.serialization.Serializable
 data object HomeRoute
 
 fun NavGraphBuilder.homeScreen(
+    modifier : Modifier = Modifier,
     onNavigateToEditor: () -> Unit
 ) {
     composable<HomeRoute> {
         HomeScreenRoute(
-            viewModel = hiltViewModel()
+//            viewModel = hiltViewModel()
+            modifier = modifier,
+            onEditorClick = onNavigateToEditor
         )
     }
 }

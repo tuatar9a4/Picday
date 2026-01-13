@@ -21,5 +21,7 @@ val AccentOpacity40Color = Color(0x66C38EB4)
 val WhiteColor = Color(0xFFFFFFFF)
 val WhiteOpacity40Color = Color(0x66FFFFFF)
 val BlackColor = Color(0xFF000000)
+val BlackOpacity40Color = Color(0x66000000)
 val RedColor = Color(0xFFE3242B)
+val GreyColor = Color(0xFF8F8A84)
 

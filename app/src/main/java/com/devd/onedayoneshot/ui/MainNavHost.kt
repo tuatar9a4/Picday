@@ -16,16 +16,21 @@ fun MyNavHost(
     navController: NavHostController = rememberNavController(),
     modifier: Modifier = Modifier
 ) {
+
     NavHost(
         navController = navController,
         startDestination = HomeRoute,
-    ){
-        homeScreen {
-            navController.navigate(EditorRoute)
-        }
+    ) {
+        homeScreen(
+            modifier = modifier,
+            onNavigateToEditor = {
+                navController.navigate(EditorRoute)
+            }
+        )
 
         editorScreen()
     }
+
 }
 
 

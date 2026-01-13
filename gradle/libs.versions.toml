@@ -16,7 +16,7 @@ androidLifecycle = "2.9.2"
 serializationVersion = "1.7.3"
 
 #https://developer.android.com/develop/ui/compose/setup?hl=ko#kotlin_1
-composeBomVersion = "2025.07.00"
+composeBomVersion = "2025.12.01"
 activityComposeVersion = "1.10.1"
 lifecycleViewmodelComposeVersion = "2.9.2"
 
@@ -97,8 +97,8 @@ androidx-room-ktx = { group = "androidx.room", name = "room-ktx", version.ref = 
 logger-timber = { group = "com.jakewharton.timber", name = "timber", version.ref = "timberVersion" }
 
 #Compose
-androidx-compose-material3-adaptive = { group = "androidx.compose.material3.adaptive", name = "adaptive" }
-androidx-compose-foundation = { group = "androidx.compose.foundation", name = "foundation" }
+androidx-compose-material3-adaptive = { group = "androidx.compose.material3.adaptive", name = "adaptive", version = "1.2.0" }
+androidx-compose-foundation = { group = "androidx.compose.foundation", name = "foundation", version = "1.10.0" }
 androidx-lifecycle-viewmodel-compose = { group = "androidx.lifecycle", name = "lifecycle-viewmodel-compose", version.ref = "lifecycleViewmodelComposeVersion" }
 
 #Gson

@@ -29,7 +29,12 @@ val OneDayTypography = Typography(
     bodyMedium = TextStyle(
         fontFamily = FontFamily(Font(R.font.suit_medium)),
         fontWeight = FontWeight(500),
-        fontSize = 15.sp,
+        fontSize = 14.sp,
+    ),
+    bodySmall = TextStyle(
+        fontFamily = FontFamily(Font(R.font.suit_medium)),
+        fontWeight = FontWeight(500),
+        fontSize = 12.sp,
     ),
     labelLarge = TextStyle(
         fontFamily = FontFamily(Font(R.font.suit_semi_bold)),

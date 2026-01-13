@@ -9,7 +9,7 @@ import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 import java.util.Properties
 
-fun Project.configureKotlinAndroid(){
+fun Project.configureKotlinAndroid() {
 
     val properties = Properties()
     properties.load(project.rootProject.file("local.properties").inputStream())
@@ -30,11 +30,14 @@ fun Project.configureKotlinAndroid(){
             targetCompatibility = JavaVersion.VERSION_11
         }
 
-        buildFeatures{
+        buildFeatures {
             buildConfig = true
             compose = true
         }
 
+        composeOptions {
+            kotlinCompilerExtensionVersion = "1.5.15"
+        }
 
     }
 
@@ -42,14 +45,14 @@ fun Project.configureKotlinAndroid(){
     configureKotlin()
 
     val libs = project.extensions.libs
-    dependencies{
+    dependencies {
         "implementation"(libs.findBundle("androidx.datastore.bundle").get())
         "implementation"(libs.findLibrary("kotlinx.serialization.json").get())
     }
 
 }
 
-internal fun Project.configureKotlin(){
+internal fun Project.configureKotlin() {
     tasks.withType<KotlinCompile>().configureEach {
         compilerOptions {
             jvmTarget.set(JvmTarget.JVM_11)

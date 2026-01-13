@@ -13,9 +13,6 @@
         </DropdownSelection>
         <DialogSelection />
       </SelectionState>
-      <SelectionState runConfigName="RegisterScreen">
-        <option name="selectionMode" value="DROPDOWN" />
-      </SelectionState>
       <SelectionState runConfigName="SingleLineTextFieldPreview">
         <option name="selectionMode" value="DROPDOWN" />
         <DropdownSelection timestamp="2025-12-31T05:59:14.963730800Z">
@@ -28,6 +25,15 @@
         <DialogSelection />
       </SelectionState>
       <SelectionState runConfigName="PasswordScreen">
+        <option name="selectionMode" value="DROPDOWN" />
+      </SelectionState>
+      <SelectionState runConfigName="YearCategoryPreview">
+        <option name="selectionMode" value="DROPDOWN" />
+      </SelectionState>
+      <SelectionState runConfigName="HomeScreenRoute">
+        <option name="selectionMode" value="DROPDOWN" />
+      </SelectionState>
+      <SelectionState runConfigName="DiaryListScreen">
         <option name="selectionMode" value="DROPDOWN" />
       </SelectionState>
     </selectionStates>
