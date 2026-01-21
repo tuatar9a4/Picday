@@ -1,6 +1,9 @@
 package com.devd.home.screen
 
-import android.annotation.SuppressLint
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.ActivityResultLauncher
+import androidx.activity.result.PickVisualMediaRequest
+import androidx.activity.result.contract.ActivityResultContracts.PickVisualMedia
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
@@ -22,22 +25,42 @@ import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
 import com.devd.commonsystem.R
 import com.devd.commonsystem.theme.AccentOpacity40Color
 import com.devd.commonsystem.theme.PrimaryColor
 import com.devd.commonsystem.theme.WhiteColor
 import com.devd.commonsystem.ui.Toolbar
+import com.devd.home.HomeViewModel
+import timber.log.Timber
 
 
-@SuppressLint("ConfigurationScreenWidthHeight")
-@Preview
 @Composable
 fun HomeScreenRoute(
     modifier: Modifier = Modifier,
-    onEditorClick: () -> Unit = {},
-//    viewModel: HomeViewModel = hiltViewModel()
+    onEditorMove: (uri: String) -> Unit = {},
+    viewModel: HomeViewModel = hiltViewModel()
 ) {
 
+    val pickMedia = rememberLauncherForActivityResult(PickVisualMedia()) { uri ->
+        Timber.d("CheckUri=>$uri")
+        uri?.let { onEditorMove(uri.toString()) }
+    }
+
+    HomeScreen(
+        modifier = modifier,
+        photoPickerLauncher = pickMedia
+//        onEditorClick = onEditorClick
+    )
+}
+
+@Preview
+@Composable
+fun HomeScreen(
+    modifier: Modifier = Modifier,
+    photoPickerLauncher: ActivityResultLauncher<PickVisualMediaRequest>? = null,
+    onEditorClick: () -> Unit = {},
+) {
     Box(
         modifier = modifier.then(
             Modifier
@@ -73,7 +96,9 @@ fun HomeScreenRoute(
             )   // DiaryList 스크린
         }
         Row(
-            modifier = Modifier.align(Alignment.BottomEnd).padding(bottom = 40.dp)
+            modifier = Modifier
+                .align(Alignment.BottomEnd)
+                .padding(bottom = 40.dp)
 
         ) {
             FloatingActionButton(
@@ -82,14 +107,16 @@ fun HomeScreenRoute(
                 shape = CircleShape,
                 containerColor = AccentOpacity40Color,
                 elevation = FloatingActionButtonDefaults.elevation(defaultElevation = 0.dp),
-                onClick = {},
+                onClick = {
+                    photoPickerLauncher?.launch(PickVisualMediaRequest(PickVisualMedia.ImageOnly))
+                },
             ) {
                 Image(
                     painter = painterResource(R.drawable.icon_pencil),
                     contentDescription = null,
                     colorFilter = ColorFilter.tint(WhiteColor)
                 )
-            }
+            }   // 일기장 작성 이동 버튼
             Spacer(Modifier.width(20.dp))
             FloatingActionButton(
                 modifier = Modifier
@@ -104,9 +131,8 @@ fun HomeScreenRoute(
                     contentDescription = null,
                     colorFilter = ColorFilter.tint(WhiteColor)
                 )
-            }
+            }   // 달력 이동 번튼
             Spacer(Modifier.width(20.dp))
         }
     }
 }
-

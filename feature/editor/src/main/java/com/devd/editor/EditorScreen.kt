@@ -2,6 +2,7 @@ package com.devd.editor
 
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
+import android.net.Uri
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.scrollBy
@@ -45,6 +46,7 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.layout.FirstBaseline
@@ -58,7 +60,6 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.core.net.toUri
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.devd.commonsystem.R
 import com.devd.commonsystem.theme.BlackOpacity40Color
@@ -68,6 +69,7 @@ import com.devd.commonsystem.theme.OneDayTypography
 import com.devd.commonsystem.theme.WhiteColor
 import com.devd.commonsystem.ui.Toolbar
 import com.devd.commonsystem.utils.convertWeekStr
+import timber.log.Timber
 import java.util.Calendar
 
 
@@ -85,12 +87,18 @@ fun rememberImeBottomSize(): Int {
 @Composable
 fun EditorScreenRoute(
     modifier: Modifier = Modifier,
-    viewModel: EditorViewModel = hiltViewModel()
+    viewModel: EditorViewModel = hiltViewModel(),
+    currentTime: Long,
+    diaryImage: Uri,
 ) {
+    Timber.d("NavData => currentTime : $currentTime , diaryImage :$diaryImage")
+    val calendar = Calendar.getInstance().clone() as Calendar
+    calendar.timeInMillis = currentTime
     EditorScreen(
         modifier = modifier,
-        onChangeDiaryText = viewModel::setDiaryText
-
+        writeDate = calendar,
+        diaryImage = diaryImage,
+        onChangeDiaryText = viewModel::setDiaryText,
     )
 }
 
@@ -98,7 +106,9 @@ fun EditorScreenRoute(
 @Composable
 fun EditorScreen(
     modifier: Modifier = Modifier,
-    onChangeDiaryText : (String) -> Unit = {}
+    writeDate: Calendar = Calendar.getInstance(),
+    diaryImage: Uri? = null,
+    onChangeDiaryText: (String) -> Unit = {}
 ) {
 
     val textFieldState = rememberTextFieldState("")
@@ -136,12 +146,13 @@ fun EditorScreen(
             title = "Editor",
             leftButtonIcon = R.drawable.icon_back_arrow,
             leftButtonClick = {})
-        Spacer(Modifier.height(20.dp))
-        EditorDateItem(
-
-        )   // 날짜 View
         Spacer(Modifier.height(10.dp))
+        EditorDateItem(
+            writeDate = writeDate
+        )   // 날짜 View
+        Spacer(Modifier.height(20.dp))
         CardPreviewItem(
+            imageUrl = diaryImage,
             diaryText = textFieldState.text.toString(), diaryTag = hashTagList
         )   // 일기 미리보기
         Spacer(Modifier.height(10.dp))
@@ -158,12 +169,12 @@ fun EditorScreen(
 
 @Composable
 fun EditorDateItem(
-    date: Calendar = Calendar.getInstance()
+    writeDate: Calendar = Calendar.getInstance()
 ) {
-    val day = date.get(Calendar.DAY_OF_MONTH)
-    val month = date.get(Calendar.MONTH) + 1
-    val year = date.get(Calendar.YEAR)
-    val week = date.get(Calendar.DAY_OF_WEEK).convertWeekStr()
+    val day = writeDate.get(Calendar.DAY_OF_MONTH)
+    val month = writeDate.get(Calendar.MONTH) + 1
+    val year = writeDate.get(Calendar.YEAR)
+    val week = writeDate.get(Calendar.DAY_OF_WEEK).convertWeekStr()
     Row(
         modifier = Modifier.padding(start = 15.dp),
         verticalAlignment = Alignment.CenterVertically
@@ -194,30 +205,32 @@ fun EditorDateItem(
 
 @Composable
 fun CardPreviewItem(
-    imageUrl: String? = null, diaryText: String = "", diaryTag: List<String> = listOf()
+    imageUrl: Uri? = null,
+    diaryText: String = "",
+    diaryTag: List<String> = listOf()
 ) {
     val context = LocalContext.current
 
     val bitmap: Bitmap? = remember(imageUrl) {
         imageUrl?.let {
-            context.contentResolver.openInputStream(it.toUri())?.use { stream ->
+            context.contentResolver.openInputStream(it)?.use { stream ->
                 BitmapFactory.decodeStream(stream)
             }
         }
     }
 
-
     Box(
         modifier = Modifier
             .fillMaxWidth()
             .padding(horizontal = 80.dp)
-            .background(color = GreyColor, shape = RoundedCornerShape(5.dp))
+            .background(color = GreyColor, shape = RoundedCornerShape(10.dp))
             .aspectRatio(9 / 16f)
     ) {
         bitmap?.let {
             Image(
                 modifier = Modifier
                     .align(Alignment.Center)
+                    .clip(RoundedCornerShape(10.dp))
                     .fillMaxSize(),
                 contentScale = ContentScale.Crop,
                 bitmap = it.asImageBitmap(),
@@ -225,7 +238,8 @@ fun CardPreviewItem(
             )
         } ?: run {
             Image(
-                modifier = Modifier.align(Alignment.Center),
+                modifier = Modifier
+                    .align(Alignment.Center),
                 painter = painterResource(R.drawable.icon_photo),
                 contentDescription = null
             )
@@ -234,7 +248,10 @@ fun CardPreviewItem(
             modifier = Modifier
                 .align(Alignment.BottomCenter)
                 .fillMaxWidth()
-                .background(BlackOpacity40Color)
+                .background(
+                    color = BlackOpacity40Color,
+                    shape = RoundedCornerShape(bottomEnd = 10.dp, bottomStart = 10.dp)
+                )
                 .padding(start = 5.dp, end = 5.dp, top = 5.dp, bottom = 10.dp),
 
             ) {
@@ -273,7 +290,7 @@ fun CardPreviewItem(
 fun EditorItem(
     modifier: Modifier = Modifier,
     textFieldState: TextFieldState,
-    onChangeDiaryText : (String) -> Unit = {},
+    onChangeDiaryText: (String) -> Unit = {},
     hashList: SnapshotStateList<String> = mutableStateListOf()
 ) {
 

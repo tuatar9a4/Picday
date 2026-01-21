@@ -7,6 +7,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.rememberNavController
 import com.devd.editor.navigation.EditorRoute
 import com.devd.editor.navigation.editorScreen
+import com.devd.home.navigation.HomeRoute
 import com.devd.home.navigation.homeScreen
 
 
@@ -15,15 +16,20 @@ fun MyNavHost(
     navController: NavHostController = rememberNavController(),
     modifier: Modifier = Modifier
 ) {
-
+    //HomeRoute, EditorRoute
     NavHost(
         navController = navController,
-        startDestination = EditorRoute,
+        startDestination = HomeRoute,
     ) {
         homeScreen(
             modifier = modifier,
-            onNavigateToEditor = {
-                navController.navigate(EditorRoute)
+            onNavigateToEditor = { uri ->
+                navController.navigate(
+                    EditorRoute(
+                        currentTime = System.currentTimeMillis(),
+                        imageUrl = uri
+                    )
+                )
             }
         )
 

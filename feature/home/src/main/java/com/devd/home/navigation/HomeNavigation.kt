@@ -12,13 +12,13 @@ data object HomeRoute
 
 fun NavGraphBuilder.homeScreen(
     modifier : Modifier = Modifier,
-    onNavigateToEditor: () -> Unit
+    onNavigateToEditor: (String) -> Unit
 ) {
     composable<HomeRoute> {
         HomeScreenRoute(
 //            viewModel = hiltViewModel()
             modifier = modifier,
-            onEditorClick = onNavigateToEditor
+            onEditorMove = onNavigateToEditor
         )
     }
 }
