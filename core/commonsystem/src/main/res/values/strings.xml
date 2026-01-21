@@ -8,4 +8,11 @@
     <string name="nickname_input_hint">"닉네임을 입력하세요"</string>
     <string name="password_input_hint">"비밀번호를 입력하세요"</string>
     <string name="password_repeat_input_hint">"비밀번호를 다시 입력하세요"</string>
+    <string name="sunday_text">SUN</string>
+    <string name="monday_text">MON</string>
+    <string name="tuesday_text">TUE</string>
+    <string name="wednesday_text">WED</string>
+    <string name="thursday_text">THU</string>
+    <string name="friday_text">FRI</string>
+    <string name="saturday_text">SAT</string>
 </resources>

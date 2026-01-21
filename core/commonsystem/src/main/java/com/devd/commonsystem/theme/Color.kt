@@ -1,5 +1,8 @@
 package com.devd.commonsystem.theme
 
+import androidx.compose.foundation.text.selection.TextSelectionColors
+import androidx.compose.material3.TextFieldDefaults
+import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
 
 val Purple80 = Color(0xFFD0BCFF)
@@ -25,3 +28,18 @@ val BlackOpacity40Color = Color(0x66000000)
 val RedColor = Color(0xFFE3242B)
 val GreyColor = Color(0xFF8F8A84)
 
+
+
+
+val OneDayTextFieldColors
+    @Composable
+    get() = TextFieldDefaults.colors().copy(
+    focusedIndicatorColor = Color.Transparent,
+    unfocusedIndicatorColor = Color.Transparent,
+    focusedContainerColor = PrimaryColor,
+    unfocusedContainerColor = PrimaryColor,
+    cursorColor = AccentColor,
+    textSelectionColors = TextSelectionColors(
+        handleColor = Color.Black, backgroundColor = AccentOpacity40Color
+    )
+)

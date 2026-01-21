@@ -7,7 +7,6 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.rememberNavController
 import com.devd.editor.navigation.EditorRoute
 import com.devd.editor.navigation.editorScreen
-import com.devd.home.navigation.HomeRoute
 import com.devd.home.navigation.homeScreen
 
 
@@ -19,7 +18,7 @@ fun MyNavHost(
 
     NavHost(
         navController = navController,
-        startDestination = HomeRoute,
+        startDestination = EditorRoute,
     ) {
         homeScreen(
             modifier = modifier,
@@ -28,7 +27,9 @@ fun MyNavHost(
             }
         )
 
-        editorScreen()
+        editorScreen(
+            modifier = modifier,
+        )
     }
 
 }

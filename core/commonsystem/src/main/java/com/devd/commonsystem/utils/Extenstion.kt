@@ -1,6 +1,15 @@
 package com.devd.commonsystem.utils
 
-object StringRexFormat{
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.ime
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.State
+import androidx.compose.runtime.rememberUpdatedState
+import androidx.compose.ui.platform.LocalDensity
+import com.devd.commonsystem.R
+import java.util.Calendar
+
+object StringRexFormat {
     const val ID_REGEX = "^[a-zA-Z0-9]{2,10}$"
     const val ID_WORD_REGEX = "^[a-zA-Z0-9]+$"
     const val PASSWORD_WORD_REGEX = "^[A-Za-z\\d!@#$%^&*]+$"
@@ -10,4 +19,23 @@ object StringRexFormat{
 
 fun String.checkValidateRex(regexFormat: String): Boolean {
     return Regex(regexFormat).matches(this)
+}
+
+
+fun Int.convertWeekStr(): Int {
+    return when (this) {
+        Calendar.SUNDAY -> R.string.sunday_text
+        Calendar.MONDAY -> R.string.monday_text
+        Calendar.TUESDAY -> R.string.tuesday_text
+        Calendar.WEDNESDAY -> R.string.wednesday_text
+        Calendar.THURSDAY -> R.string.thursday_text
+        Calendar.FRIDAY -> R.string.friday_text
+        else -> R.string.saturday_text
+    }
+}
+
+@Composable
+fun keyboardAsState(): State<Boolean> {
+    val isImeVisible = WindowInsets.ime.getBottom(LocalDensity.current) > 0
+    return rememberUpdatedState(isImeVisible)
 }
