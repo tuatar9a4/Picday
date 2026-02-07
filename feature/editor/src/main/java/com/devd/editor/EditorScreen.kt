@@ -29,11 +29,9 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.foundation.text.input.InputTransformation
 import androidx.compose.foundation.text.input.TextFieldLineLimits
 import androidx.compose.foundation.text.input.TextFieldState
 import androidx.compose.foundation.text.input.clearText
-import androidx.compose.foundation.text.input.maxLength
 import androidx.compose.foundation.text.input.rememberTextFieldState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Text
@@ -42,7 +40,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -68,7 +65,9 @@ import com.devd.commonsystem.theme.OneDayTextFieldColors
 import com.devd.commonsystem.theme.OneDayTypography
 import com.devd.commonsystem.theme.WhiteColor
 import com.devd.commonsystem.ui.Toolbar
+import com.devd.commonsystem.ui.calendar.CustomDatePickerDialog
 import com.devd.commonsystem.utils.convertWeekStr
+import com.devd.commonsystem.utils.noRippleClickable
 import timber.log.Timber
 import java.util.Calendar
 
@@ -92,22 +91,34 @@ fun EditorScreenRoute(
     diaryImage: Uri,
 ) {
     Timber.d("NavData => currentTime : $currentTime , diaryImage :$diaryImage")
-    val calendar = Calendar.getInstance().clone() as Calendar
-    calendar.timeInMillis = currentTime
+    LaunchedEffect(Unit) {
+        viewModel.initSelectDate(currentTime)
+    }
+    val customDatePickerDialogState = viewModel.customDatePickerDialogState.value
+
     EditorScreen(
         modifier = modifier,
-        writeDate = calendar,
+        writeDate = customDatePickerDialogState?.selectedDate ?: currentTime,
         diaryImage = diaryImage,
+        onChangeCalendar = viewModel::showDatePickerDialog,
         onChangeDiaryText = viewModel::setDiaryText,
     )
+    if (customDatePickerDialogState?.isShowDialog == true) {
+        CustomDatePickerDialog(
+            initDateMillis = customDatePickerDialogState.selectedDate,
+            onSelectDate = customDatePickerDialogState.onClickConfirm,
+            onClickCancel = customDatePickerDialogState.onClickCancel
+        )
+    }
 }
 
 @Preview
 @Composable
 fun EditorScreen(
     modifier: Modifier = Modifier,
-    writeDate: Calendar = Calendar.getInstance(),
+    writeDate: Long = System.currentTimeMillis(),
     diaryImage: Uri? = null,
+    onChangeCalendar: () -> Unit = {},
     onChangeDiaryText: (String) -> Unit = {}
 ) {
 
@@ -143,17 +154,16 @@ fun EditorScreen(
         )
     ) {
         Toolbar(
-            title = "Editor",
-            leftButtonIcon = R.drawable.icon_back_arrow,
-            leftButtonClick = {})
+            title = "Editor", leftButtonIcon = R.drawable.icon_back_arrow, leftButtonClick = {})
         Spacer(Modifier.height(10.dp))
         EditorDateItem(
-            writeDate = writeDate
+            writeDate = writeDate, onChangeCalendar = onChangeCalendar
         )   // 날짜 View
         Spacer(Modifier.height(20.dp))
         CardPreviewItem(
             imageUrl = diaryImage,
-            diaryText = textFieldState.text.toString(), diaryTag = hashTagList
+            diaryText = textFieldState.text.toString(),
+            diaryTag = hashTagList
         )   // 일기 미리보기
         Spacer(Modifier.height(10.dp))
         EditorItem(
@@ -169,14 +179,19 @@ fun EditorScreen(
 
 @Composable
 fun EditorDateItem(
-    writeDate: Calendar = Calendar.getInstance()
+    writeDate: Long = System.currentTimeMillis(),
+    onChangeCalendar: () -> Unit = {},
 ) {
-    val day = writeDate.get(Calendar.DAY_OF_MONTH)
-    val month = writeDate.get(Calendar.MONTH) + 1
-    val year = writeDate.get(Calendar.YEAR)
-    val week = writeDate.get(Calendar.DAY_OF_WEEK).convertWeekStr()
+    val dairyDate = Calendar.getInstance().clone() as Calendar
+    dairyDate.timeInMillis = writeDate
+    val day = dairyDate.get(Calendar.DAY_OF_MONTH)
+    val month = dairyDate.get(Calendar.MONTH) + 1
+    val year = dairyDate.get(Calendar.YEAR)
+    val week = dairyDate.get(Calendar.DAY_OF_WEEK).convertWeekStr()
     Row(
-        modifier = Modifier.padding(start = 15.dp),
+        modifier = Modifier
+            .padding(start = 15.dp)
+            .noRippleClickable(onClick = onChangeCalendar),
         verticalAlignment = Alignment.CenterVertically
     ) {
         Text(
@@ -205,9 +220,7 @@ fun EditorDateItem(
 
 @Composable
 fun CardPreviewItem(
-    imageUrl: Uri? = null,
-    diaryText: String = "",
-    diaryTag: List<String> = listOf()
+    imageUrl: Uri? = null, diaryText: String = "", diaryTag: List<String> = listOf()
 ) {
     val context = LocalContext.current
 
@@ -238,8 +251,7 @@ fun CardPreviewItem(
             )
         } ?: run {
             Image(
-                modifier = Modifier
-                    .align(Alignment.Center),
+                modifier = Modifier.align(Alignment.Center),
                 painter = painterResource(R.drawable.icon_photo),
                 contentDescription = null
             )
@@ -275,9 +287,10 @@ fun CardPreviewItem(
             ) {
                 items(diaryTag) {
                     Text(
-                        text = "#$it", style = OneDayTypography.labelLarge.copy(
+                        text = "#$it",
+                        style = OneDayTypography.labelLarge.copy(
                             color = WhiteColor
-                        )
+                        ),
                     )
                 }
             }
@@ -293,21 +306,18 @@ fun EditorItem(
     onChangeDiaryText: (String) -> Unit = {},
     hashList: SnapshotStateList<String> = mutableStateListOf()
 ) {
-
     val hashTextField = rememberTextFieldState()
-    val scope = rememberCoroutineScope()
-
     Column(
         modifier = modifier.then(Modifier)
     ) {
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .background(color = WhiteColor)
-                .padding(horizontal = 15.dp, vertical = 5.dp)
-        ) {
-            Text(text = "Bold", style = OneDayTypography.bodySmall)
-        } // HTML 설정
+//        Row(
+//            modifier = Modifier
+//                .fillMaxWidth()
+//                .background(color = WhiteColor)
+//                .padding(horizontal = 15.dp, vertical = 5.dp)
+//        ) {
+//            Text(text = "Bold", style = OneDayTypography.bodySmall)
+//        } // HTML 설정
         Spacer(Modifier.height(5.dp))
         TextField(
             modifier = Modifier
@@ -344,7 +354,13 @@ fun EditorItem(
                         .heightIn(min = 15.dp),
                     state = hashTextField,
                     lineLimits = TextFieldLineLimits.MultiLine(1, 1),
-                    inputTransformation = InputTransformation.maxLength(8),
+                    inputTransformation = { 
+                        if(length > 8) revertAllChanges()
+                        if(asCharSequence().toString().contains(" ")) {
+                            hashList.add(hashTextField.text.toString())
+                            hashTextField.clearText()
+                        }
+                    },
                     keyboardOptions = KeyboardOptions.Default.copy(
                         imeAction = ImeAction.Done
                     ),

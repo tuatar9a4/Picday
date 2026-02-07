@@ -12,4 +12,7 @@ dependencies {
     implementation(libs.material)
 
     implementation(projects.core.commonsystem)
+
+    implementation(libs.compose.rich.editor)
+
 }

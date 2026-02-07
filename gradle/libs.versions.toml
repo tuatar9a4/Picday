@@ -40,6 +40,8 @@ timberVersion = "5.0.1"
 jetbrainsKotlinJvm = "2.0.21"
 gsonVersion = "2.10.1"
 
+# https://github.com/MohamedRejeb/Compose-Rich-Editor
+composeRichEditorVersion = "1.0.4"
 
 [libraries]
 android-gradlePlugin = { group = "com.android.tools.build", name = "gradle", version.ref = "androidGradlePlugin" }
@@ -106,6 +108,9 @@ google-gson = { group = "com.google.code.gson", name = "gson", version.ref = "gs
 
 #serialization
 kotlinx-serialization-json ={group="org.jetbrains.kotlinx", name="kotlinx-serialization-json", version.ref="serializationVersion"}
+
+#rich-editor
+compose-rich-editor = { group = "com.github.donald-okara", name = "TextieMDLibrary", version.ref = "composeRichEditorVersion" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
