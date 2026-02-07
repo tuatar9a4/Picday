@@ -12,9 +12,11 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.devd.commonsystem.R
 import com.devd.commonsystem.theme.OneDayTypography
 import com.devd.commonsystem.theme.TextDefaultColor
 import com.devd.commonsystem.theme.TextOpacity80Color
@@ -26,7 +28,7 @@ import com.devd.commonsystem.utils.checkValidateRex
 @Preview
 @Composable
 fun InfoScreen(
-    modifier: Modifier= Modifier,
+    modifier: Modifier = Modifier,
     nickName: MutableState<String> = mutableStateOf(""),
     diaryName: MutableState<String> = mutableStateOf(""),
     onDone: () -> Unit = {}
@@ -39,7 +41,7 @@ fun InfoScreen(
     ) {
         Text(
             modifier = Modifier.padding(horizontal = 20.dp),
-            text = "제가 뭐라고 불러드려야 할까요?",
+            text = stringResource(R.string.introduce_ask_text),
             style = OneDayTypography.titleMedium.copy(
                 color = TextDefaultColor
             )
@@ -47,7 +49,7 @@ fun InfoScreen(
         Spacer(Modifier.height(10.dp))
         Text(
             modifier = Modifier.padding(horizontal = 20.dp),
-            text = "한글,영문,숫자 최대 2~10자/ 공백,특수기호 불가",
+            text = stringResource(R.string.diary_book_reg_message),
             style = OneDayTypography.labelLarge.copy(
                 color = TextOpacity80Color
             )
@@ -69,7 +71,7 @@ fun InfoScreen(
         Spacer(Modifier.height(15.dp))
         Text(
             modifier = Modifier.padding(horizontal = 20.dp),
-            text = "첫번째 일기장의 이름을 지어주세요!",
+            text = stringResource(R.string.diary_book_make_message),
             style = OneDayTypography.titleMedium.copy(
                 color = TextDefaultColor
             )

@@ -8,11 +8,14 @@
     <string name="nickname_input_hint">"닉네임을 입력하세요"</string>
     <string name="password_input_hint">"비밀번호를 입력하세요"</string>
     <string name="password_repeat_input_hint">"비밀번호를 다시 입력하세요"</string>
-    <string name="sunday_text">SUN</string>
-    <string name="monday_text">MON</string>
-    <string name="tuesday_text">TUE</string>
-    <string name="wednesday_text">WED</string>
-    <string name="thursday_text">THU</string>
-    <string name="friday_text">FRI</string>
-    <string name="saturday_text">SAT</string>
+    <string name="sunday_text">"SUN"</string>
+    <string name="monday_text">"MON"</string>
+    <string name="tuesday_text">"TUE"</string>
+    <string name="wednesday_text">"WED"</string>
+    <string name="thursday_text">"THU"</string>
+    <string name="friday_text">"FRI"</string>
+    <string name="saturday_text">"SAT"</string>
+    <string name="introduce_ask_text">"제가 뭐라고 불러드려야 할까요?"</string>
+    <string name="diary_book_reg_message">"한글,영문,숫자 최대 2~10자/ 공백,특수기호 불가"</string>
+    <string name="diary_book_make_message">"첫번째 일기장의 이름을 지어주세요!"</string>
 </resources>

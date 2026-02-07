@@ -18,4 +18,5 @@ dependencies {
     androidTestImplementation(libs.androidx.espresso.core)
 
     implementation(projects.core.commonsystem)
+    implementation(projects.core.data)
 }

@@ -15,13 +15,17 @@ class DiaryBookRepository @Inject constructor(
 
     suspend fun insertNewDiaryBook(
         bookTitle: String,
+        uuid: String,
         bookDescription: String
     ) = safeApiCall(Dispatchers.IO) {
+        val isFirstBook = diaryBookDao.selectAllDiaryBook(uuid).isEmpty()
         val currentMillis = Date().time
         diaryBookDao.insertDiaryBook(
             DiaryBookEntity(
                 title = bookTitle,
+                userLocalUUId = uuid,
                 description = bookDescription,
+                isMain = isFirstBook,
                 createdAt = currentMillis,
                 updatedAt = currentMillis
             )
@@ -29,13 +33,18 @@ class DiaryBookRepository @Inject constructor(
     }
 
 
-    suspend fun fetchAllDairies() =
-        safeApiCall(Dispatchers.IO) { diaryBookDao.selectAllDiaryBook() }.run {
+    suspend fun fetchAllDairies(uuid: String) =
+        safeApiCall(Dispatchers.IO) { diaryBookDao.selectAllDiaryBook(uuid) }.run {
             return@run when (this) {
                 is CallResult.Success -> this.res.map { it.transToModel() }
-
                 is CallResult.NetworkError -> emptyList()
-
             }
         }
+
+    suspend fun hasDiaryBook(uuid: String) = safeApiCall(Dispatchers.IO) {
+        diaryBookDao.selectAllDiaryBook(uuid).isNotEmpty()
+    }.run {
+        return@run this is CallResult.Success && this.res
+    }
+
 }

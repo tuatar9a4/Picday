@@ -13,6 +13,7 @@ import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.launch
 import timber.log.Timber
+import java.util.UUID
 import javax.inject.Inject
 
 @HiltViewModel
@@ -39,15 +40,23 @@ class RegisterViewModel @Inject constructor(
     fun requestMakeId() {
         viewModelScope.launch {
             Timber.d("Finish : ${id.value} ${password.value} ${nickname.value} ${diaryName.value}")
+            val userUUID = dataStoreRepository.getPreferData(DataStoreKey.UserUID)
+                ?: UUID.randomUUID().toString()
+
             dataStoreRepository.setPreferData(DataStoreKey.UserNickName, nickname.value)
-            diaryBookRepository.insertNewDiaryBook(diaryName.value, "").run {
+            dataStoreRepository.setPreferData(DataStoreKey.UserUID, userUUID)
+            diaryBookRepository.insertNewDiaryBook(
+                bookTitle = diaryName.value,
+                uuid = userUUID,
+                bookDescription = ""
+            ).run {
                 when (this) {
                     is CallResult.NetworkError -> {
                         _uiState.emit(RegisterUIState.FailMakeDiary(this.message))
                     }
 
                     is CallResult.Success -> {
-                        Timber.d("CheckDiaryList => ${diaryBookRepository.fetchAllDairies()}")
+                        Timber.d("CheckDiaryList => ${diaryBookRepository.fetchAllDairies(userUUID)}")
                         _uiState.emit(RegisterUIState.SuccessMakeId)
                     }
                 }

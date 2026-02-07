@@ -16,10 +16,11 @@ data class DiaryBookEntity(
 
     val remoteID: Long? = null,
 
-    val userId: Long? = null,
+    val userLocalUUId: String? = null,
     val title: String,        // 맛집 일기장, 여행 일기장 등
     val description: String?,
 
+    val isMain: Boolean = false,
     val createdAt: Long,
     val updatedAt: Long?
 ) {

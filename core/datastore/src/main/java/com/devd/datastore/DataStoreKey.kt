@@ -10,7 +10,10 @@ sealed class DataStoreKey<T>(
 
     object UserNickName : DataStoreKey<String>("user_nick_name") {
         override fun preferencesKey() = stringPreferencesKey(key)
+    }
 
+    object UserUID : DataStoreKey<String>("user_uuid") {
+        override fun preferencesKey() = stringPreferencesKey(key)
     }
 
 
