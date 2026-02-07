@@ -31,6 +31,7 @@ class IntroViewModel @Inject constructor(
             _introUiState.emit(Loading(true))
             delay(3000)
             if (existsUid()) {
+                changeLoadingState(false)
                 _introUiState.emit(MoveToHome)
             } else {
                 _introUiState.emit(Loading(false))
@@ -41,7 +42,6 @@ class IntroViewModel @Inject constructor(
     suspend fun changeLoadingState(state: Boolean) {
         isLoading.emit(state)
     }
-
 
 
     suspend fun fetchSavedNickName(): Boolean {

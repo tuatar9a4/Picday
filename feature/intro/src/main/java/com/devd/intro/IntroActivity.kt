@@ -27,7 +27,9 @@ class IntroActivity : ComponentActivity() {
 
     val registerResult =
         registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
-
+            when (it.resultCode) {
+                RESULT_OK -> finish()
+            }
         }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -48,16 +50,13 @@ class IntroActivity : ComponentActivity() {
         }
     }
 
-    private fun collectData(){
+    private fun collectData() {
         lifecycleScope.launch {
             viewModel.introUiState.collect {
                 Timber.d("Check -> $it")
-                when(it){
+                when (it) {
                     is Loading -> viewModel.changeLoadingState(it.isShow)
-                    MoveToHome -> {
-                        return@collect
-                        moveToHomePage()
-                    }
+                    MoveToHome -> moveToHomePage()
                 }
             }
         }
