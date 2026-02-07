@@ -22,6 +22,11 @@ configureDaggerHilt()
 configTimberLogger()
 
 dependencies{
+    implementation(project(":core:model"))
+    implementation(project(":core:data"))
+    implementation(project(":core:datastore"))
+    implementation(project(":core:commonsystem"))
+
 
     val libs = project.extensions.libs
     implementation(libs.findLibrary("androidx.appcompat").get())
@@ -50,5 +55,6 @@ dependencies{
 
     debugImplementation(libs.findLibrary("androidx.compose.ui.tooling.preview").get())
     debugImplementation(libs.findLibrary("androidx.compose.ui.tooling").get())
+
 
 }

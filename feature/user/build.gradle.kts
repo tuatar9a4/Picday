@@ -12,9 +12,4 @@ dependencies {
     implementation(libs.material)
     implementation(libs.androidx.lifecycle.runtime.ktx)
 
-    implementation(projects.core.commonsystem)
-    implementation(projects.core.data)
-    implementation(projects.core.datastore)
-    implementation(projects.core.model)
-
 }

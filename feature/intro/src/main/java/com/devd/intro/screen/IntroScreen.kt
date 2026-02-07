@@ -15,6 +15,10 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
@@ -28,13 +32,35 @@ import com.devd.commonsystem.theme.OneDayTypography
 import com.devd.commonsystem.theme.PrimaryColor
 import com.devd.commonsystem.theme.TextDefaultColor
 import com.devd.commonsystem.theme.WhiteColor
+import com.devd.commonsystem.ui.loading.LoadingDialog
 import com.devd.commonsystem.utils.noRippleClickable
+import com.devd.intro.IntroViewModel
+
+@Composable
+fun IntroScreenRoute(
+    modifier: Modifier,
+    viewModel: IntroViewModel,
+    onMakeDiaryClick: () -> Unit = {},
+    onLoginClick: () -> Unit = {}
+) {
+
+    val isShowLoading by viewModel.isLoading.collectAsState()
+
+    IntroScreen(
+        modifier = modifier,
+        onMakeDiaryClick = onMakeDiaryClick,
+        onLoginClick = onLoginClick
+    )
+
+    isShowLoading.LoadingDialog(message = "Checking ID...")
+}
 
 
 @Preview
 @Composable
 fun IntroScreen(
     modifier: Modifier = Modifier,
+    uiState : MutableState<String> = mutableStateOf(""),
     onMakeDiaryClick: () -> Unit = {},
     onLoginClick: () -> Unit = {}
 ) {

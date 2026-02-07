@@ -11,8 +11,6 @@ dependencies {
     implementation(libs.androidx.appcompat)
     implementation(libs.material)
 
-    implementation(projects.core.commonsystem)
-
     implementation(libs.compose.rich.editor)
 
 }

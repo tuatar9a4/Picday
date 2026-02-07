@@ -13,9 +13,12 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.lifecycleScope
 import com.devd.commonsystem.theme.OneDayOneShotTheme
-import com.devd.intro.screen.IntroScreen
+import com.devd.intro.data.Loading
+import com.devd.intro.data.MoveToHome
+import com.devd.intro.screen.IntroScreenRoute
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
+import timber.log.Timber
 
 @AndroidEntryPoint
 class IntroActivity : ComponentActivity() {
@@ -30,19 +33,35 @@ class IntroActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
+        collectData()
         setContent {
             OneDayOneShotTheme {
                 Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-                    IntroScreen(
+                    IntroScreenRoute(
                         modifier = Modifier.padding(innerPadding),
+                        viewModel = viewModel,
                         onMakeDiaryClick = ::moveToRegisterPage,
-                        onLoginClick = ::tempCheckSavedID
+                        onLoginClick = ::moveToHomePage
                     )
                 }
             }
         }
     }
 
+    private fun collectData(){
+        lifecycleScope.launch {
+            viewModel.introUiState.collect {
+                Timber.d("Check -> $it")
+                when(it){
+                    is Loading -> viewModel.changeLoadingState(it.isShow)
+                    MoveToHome -> {
+                        return@collect
+                        moveToHomePage()
+                    }
+                }
+            }
+        }
+    }
 
     private fun moveToRegisterPage() {
         val intent = Intent()
@@ -51,7 +70,7 @@ class IntroActivity : ComponentActivity() {
     }
 
 
-    private fun tempCheckSavedID() {
+    private fun moveToHomePage() {
         lifecycleScope.launch {
             if (!viewModel.fetchSavedNickName()) return@launch
             val intent = Intent()

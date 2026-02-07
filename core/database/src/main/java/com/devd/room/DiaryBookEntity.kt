@@ -7,7 +7,7 @@ import com.devd.model.local.DiaryBookInfo
 
 @Entity(
     tableName = "diary_books",
-    indices = [Index("userId")]
+    indices = [Index("userLocalUUId")]
 )
 data class DiaryBookEntity(
 
