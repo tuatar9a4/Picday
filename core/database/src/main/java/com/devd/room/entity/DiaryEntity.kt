@@ -24,7 +24,7 @@ data class DiaryEntity(
 
     val remoteId: Long? = null,
 
-    val diaryBookId: String,     // ⭐ 어느 일기장에 속하는지
+    val diaryBookId: Long,     // ⭐ 어느 일기장에 속하는지
 
     val content: String,
 

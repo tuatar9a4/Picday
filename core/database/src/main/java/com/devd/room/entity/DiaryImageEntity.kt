@@ -11,7 +11,7 @@ import androidx.room.PrimaryKey
     foreignKeys = [
         ForeignKey(
             entity = DiaryEntity::class,
-            parentColumns = ["id"],
+            parentColumns = ["localId"],
             childColumns = ["diaryId"],
             onDelete = CASCADE
         )

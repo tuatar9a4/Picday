@@ -18,4 +18,7 @@
     <string name="introduce_ask_text">"제가 뭐라고 불러드려야 할까요?"</string>
     <string name="diary_book_reg_message">"한글,영문,숫자 최대 2~10자/ 공백,특수기호 불가"</string>
     <string name="diary_book_make_message">"첫번째 일기장의 이름을 지어주세요!"</string>
+    <string name="confirm">"확인"</string>
+    <string name="cancel">"취소"</string>
+    <string name="fail_fetch_diary_book">"일기장을 불러오는데 실패했습니다."</string>
 </resources>

@@ -72,7 +72,7 @@ fun BookCardScreen(
                     Column() {
                         Text(
                             modifier = Modifier.padding(end =  30.dp),
-                            text = diaryTitle,
+                            text = diaryTitle.ifEmpty { "---" },
                             maxLines = 1,
                             overflow = TextOverflow.Ellipsis,
                             style = OneDayTypography.bodyLarge.copy(

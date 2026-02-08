@@ -6,8 +6,8 @@ import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Transaction
 import androidx.room.Update
+import com.devd.room.data.DiaryWithExtras
 import com.devd.room.entity.DiaryEntity
-import com.devd.room.entity.DiaryWithExtras
 
 @Dao
 interface DiaryDao {
@@ -58,7 +58,7 @@ interface DiaryDao {
     """
     )
     suspend fun getDiariesWithExtras(
-        diaryBookId: String
+        diaryBookId: Long
     ): List<DiaryWithExtras>
 
     @Query(
@@ -71,7 +71,7 @@ interface DiaryDao {
     """
     )
     suspend fun getDiariesByDateRange(
-        diaryBookId: String,
+        diaryBookId: Long,
         from: Long,
         to: Long
     ): List<DiaryEntity>

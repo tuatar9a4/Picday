@@ -32,6 +32,8 @@ import com.devd.commonsystem.theme.AccentOpacity40Color
 import com.devd.commonsystem.theme.PrimaryColor
 import com.devd.commonsystem.theme.WhiteColor
 import com.devd.commonsystem.ui.Toolbar
+import com.devd.commonsystem.ui.dialog.ShowMessageDialog
+import com.devd.commonsystem.ui.loading.LoadingDialog
 import com.devd.home.HomeViewModel
 import com.devd.model.local.DiaryBookInfo
 import timber.log.Timber
@@ -55,21 +57,19 @@ fun HomeScreenRoute(
 
     HomeScreen(
         modifier = modifier,
-        bookInfo = viewModel.
+        bookInfo = viewModel.bookInfo.value,
         photoPickerLauncher = pickMedia
 //        onEditorClick = onEditorClick
     )
+    viewModel.messageDialog.value?.ShowMessageDialog(onLeftButtonClick = viewModel::dismissDialog)
+    viewModel.isLoading.value.LoadingDialog()
 }
 
 @Preview
 @Composable
 fun HomeScreen(
     modifier: Modifier = Modifier,
-    bookInfo : DiaryBookInfo = DiaryBookInfo(
-        bookId = 6668,
-        title = "deseruisse",
-        description = "an"
-    ),
+    bookInfo: DiaryBookInfo? = null,
     photoPickerLauncher: ActivityResultLauncher<PickVisualMediaRequest>? = null,
     onEditorClick: () -> Unit = {},
 ) {
@@ -92,9 +92,9 @@ fun HomeScreen(
             BookCardScreen(
                 modifier = Modifier
                     .align(Alignment.CenterHorizontally),
-                diaryTitle = "Diary Title",
-                diaryDescription = "",
-                diaryMonthPercent = 0.5f,
+                diaryTitle = bookInfo?.title ?: "",
+                diaryDescription = bookInfo?.description ?: "",
+                diaryMonthPercent = bookInfo?.monthWritePercent ?: 0f,
             )   // 일기장 카드
             Spacer(Modifier.height(20.dp))
             YearCategory(

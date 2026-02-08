@@ -16,5 +16,6 @@ dependencies {
     implementation(projects.core.network)
     implementation(projects.core.database)
     implementation(projects.core.model)
+    implementation(projects.core.commonsystem)
 
 }

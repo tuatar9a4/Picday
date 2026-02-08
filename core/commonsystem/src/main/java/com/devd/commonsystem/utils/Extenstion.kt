@@ -7,6 +7,10 @@ import androidx.compose.runtime.State
 import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.ui.platform.LocalDensity
 import com.devd.commonsystem.R
+import java.time.LocalDate
+import java.time.LocalTime
+import java.time.ZoneId
+import java.time.temporal.TemporalAdjusters
 import java.util.Calendar
 
 object StringRexFormat {
@@ -38,4 +42,18 @@ fun Int.convertWeekStr(): Int {
 fun keyboardAsState(): State<Boolean> {
     val isImeVisible = WindowInsets.ime.getBottom(LocalDensity.current) > 0
     return rememberUpdatedState(isImeVisible)
+}
+
+fun LocalDate.getCurrentMonthRangeMillis(): Pair<Long, Long> {
+    val zoneId = ZoneId.systemDefault()
+    val start = this.withDayOfMonth(1)
+        .atStartOfDay(zoneId)
+        .toInstant()
+
+    val end = this.with(TemporalAdjusters.lastDayOfMonth())
+        .atTime(LocalTime.MAX)
+        .atZone(zoneId)
+        .toInstant()
+
+    return start.toEpochMilli() to end.toEpochMilli()
 }

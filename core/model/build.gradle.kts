@@ -1,5 +1,6 @@
 plugins {
     id("devd.android.library")
+    id("devd.android.room")
 }
 
 android {
