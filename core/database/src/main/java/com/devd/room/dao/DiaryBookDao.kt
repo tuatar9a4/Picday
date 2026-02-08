@@ -4,17 +4,44 @@ import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
-import com.devd.room.DiaryBookEntity
+import androidx.room.Update
+import com.devd.room.entity.DiaryBookEntity
 
 @Dao
 interface DiaryBookDao {
-    @Insert(onConflict = OnConflictStrategy.ABORT)
-    suspend fun insertDiaryBook(diaryBook: DiaryBookEntity): Long
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun insertDiaryBook(diaryBook: DiaryBookEntity)
 
-    @Query("SELECT * FROM diary_books WHERE userLocalUUId = :uuid")
+    @Update
+    suspend fun updateDiaryBook(diaryBook: DiaryBookEntity)
+
+    @Query(
+        """
+        SELECT * FROM diary_book 
+        WHERE userLocalUUId = :uuid AND isDeleted = 0 
+        ORDER BY createdAt ASC
+        """
+    )
     suspend fun selectAllDiaryBook(uuid: String): List<DiaryBookEntity>
 
-    @Query("SELECT * FROM diary_books WHERE isMain = :isMain")
-    suspend fun selectMainDiaryBook(isMain : Boolean): List<DiaryBookEntity>
+    @Query("SELECT * FROM diary_book WHERE userLocalUUId = :uuid AND isMajor = 1")
+    suspend fun selectMainDiaryBook(uuid: String): DiaryBookEntity
 
+
+    /* =====================
+     * Delete (Soft Delete)
+     * ===================== */
+
+    @Query(
+        """
+        UPDATE diary_book
+        SET isDeleted = 1,
+            updatedAt = :deletedAt
+        WHERE localId = :diaryBookId
+    """
+    )
+    suspend fun softDeleteDiaryBook(
+        diaryBookId: String,
+        deletedAt: Long = System.currentTimeMillis()
+    )
 }

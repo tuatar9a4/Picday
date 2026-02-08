@@ -3,6 +3,10 @@ package com.devd.room.di
 import android.content.Context
 import com.devd.room.DiaryDatabase
 import com.devd.room.dao.DiaryBookDao
+import com.devd.room.dao.DiaryDao
+import com.devd.room.dao.DiaryImageDao
+import com.devd.room.dao.DiaryTagDao
+import com.devd.room.dao.TagDao
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -21,6 +25,22 @@ class DatabaseModule {
 
 
     @Provides
-    fun provideDriveDao(historyDatabase: DiaryDatabase): DiaryBookDao =
+    fun provideDriveBookDao(historyDatabase: DiaryDatabase): DiaryBookDao =
         historyDatabase.diaryBookDao()
+
+    @Provides
+    fun provideDriveDao(historyDatabase: DiaryDatabase): DiaryDao =
+        historyDatabase.diaryDao()
+
+    @Provides
+    fun provideDiaryImageDao(historyDatabase: DiaryDatabase): DiaryImageDao =
+        historyDatabase.diaryImageDao()
+
+    @Provides
+    fun provideDiaryTagDao(historyDatabase: DiaryDatabase): DiaryTagDao =
+        historyDatabase.diaryTagDao()
+
+    @Provides
+    fun provideTagDao(historyDatabase: DiaryDatabase): TagDao =
+        historyDatabase.tagDao()
 }

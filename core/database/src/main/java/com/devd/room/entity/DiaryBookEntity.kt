@@ -1,4 +1,4 @@
-package com.devd.room
+package com.devd.room.entity
 
 import androidx.room.Entity
 import androidx.room.Index
@@ -6,7 +6,7 @@ import androidx.room.PrimaryKey
 import com.devd.model.local.DiaryBookInfo
 
 @Entity(
-    tableName = "diary_books",
+    tableName = "diary_book",
     indices = [Index("userLocalUUId")]
 )
 data class DiaryBookEntity(
@@ -20,9 +20,12 @@ data class DiaryBookEntity(
     val title: String,        // 맛집 일기장, 여행 일기장 등
     val description: String?,
 
-    val isMain: Boolean = false,
+    val isMajor: Boolean = false,
+
     val createdAt: Long,
-    val updatedAt: Long?
+    val updatedAt: Long?,
+
+    val isDeleted : Boolean = false
 ) {
     fun transToModel() = DiaryBookInfo(
         bookId = localId,

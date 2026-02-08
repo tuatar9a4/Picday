@@ -1,6 +1,7 @@
 plugins {
     id("devd.android.library")
     id("devd.android.retrofit")
+    id("devd.android.room")
 }
 
 android {

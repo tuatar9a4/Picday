@@ -1,17 +1,31 @@
 package com.devd.data.repository
 
+import androidx.room.Transaction
 import com.devd.data.utils.CallResult
 import com.devd.data.utils.SafeNetCall
-import com.devd.room.DiaryBookEntity
 import com.devd.room.dao.DiaryBookDao
+import com.devd.room.dao.DiaryDao
+import com.devd.room.dao.DiaryImageDao
+import com.devd.room.dao.DiaryTagDao
+import com.devd.room.dao.TagDao
+import com.devd.room.entity.DiaryBookEntity
+import com.devd.room.entity.DiaryEntity
+import com.devd.room.entity.DiaryImageEntity
+import com.devd.room.entity.DiaryTagCrossEntity
+import com.devd.room.entity.TagEntity
 import kotlinx.coroutines.Dispatchers
 import java.util.Date
 import javax.inject.Inject
 
 class DiaryBookRepository @Inject constructor(
-    private val diaryBookDao: DiaryBookDao
+    private val diaryBookDao: DiaryBookDao,
+    private val diaryDao: DiaryDao,
+    private val diaryImageDao: DiaryImageDao,
+    private val diaryTagDao: DiaryTagDao,
+    private val tagDao: TagDao,
 ) : SafeNetCall() {
 
+    /* Diary Book */
 
     suspend fun insertNewDiaryBook(
         bookTitle: String,
@@ -25,7 +39,7 @@ class DiaryBookRepository @Inject constructor(
                 title = bookTitle,
                 userLocalUUId = uuid,
                 description = bookDescription,
-                isMain = isFirstBook,
+                isMajor = isFirstBook,
                 createdAt = currentMillis,
                 updatedAt = currentMillis
             )
@@ -41,10 +55,49 @@ class DiaryBookRepository @Inject constructor(
             }
         }
 
+    suspend fun fetchMajorDiaryBook(uuid: String) =
+        safeApiCall(Dispatchers.IO) { diaryBookDao.selectMainDiaryBook(uuid) }.run {
+            return@run when (this) {
+                is CallResult.Success -> this.res.transToModel()
+                is CallResult.NetworkError -> null
+            }
+        }
+
     suspend fun hasDiaryBook(uuid: String) = safeApiCall(Dispatchers.IO) {
         diaryBookDao.selectAllDiaryBook(uuid).isNotEmpty()
     }.run {
         return@run this is CallResult.Success && this.res
     }
+
+    /* Diary */
+
+    @Transaction
+    suspend fun saveDairyWithExtras(
+        diary: DiaryEntity,
+        images: List<DiaryImageEntity>,
+        tags: List<String>
+    ) {
+
+        val diaryId = diaryDao.insertDiary(diary)
+
+        diaryImageDao.deleteImagesByDiary(diaryId)
+        diaryImageDao.insertImages(images)
+
+        diaryTagDao.deleteByDiary(diaryId)
+
+        tags.forEach { tagName ->
+            val tagId = tagDao.getTagByName(tagName)?.id
+                ?: tagDao.insertTag(TagEntity(name = tagName))
+
+            diaryTagDao.insertCross(
+                DiaryTagCrossEntity(
+                    diaryId = diaryId,
+                    tagId = tagId
+                )
+            )
+        }
+
+    }
+
 
 }

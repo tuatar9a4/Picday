@@ -19,6 +19,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.FloatingActionButtonDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.ColorFilter
@@ -32,6 +33,7 @@ import com.devd.commonsystem.theme.PrimaryColor
 import com.devd.commonsystem.theme.WhiteColor
 import com.devd.commonsystem.ui.Toolbar
 import com.devd.home.HomeViewModel
+import com.devd.model.local.DiaryBookInfo
 import timber.log.Timber
 
 
@@ -43,12 +45,17 @@ fun HomeScreenRoute(
 ) {
 
     val pickMedia = rememberLauncherForActivityResult(PickVisualMedia()) { uri ->
-        Timber.d("CheckUri=>$uri")
         uri?.let { onEditorMove(uri.toString()) }
+    }
+
+    LaunchedEffect(Unit) {
+        Timber.d("LaunchEffect 이거 한번 만 호출되는거 맞지..?")
+        viewModel.fetchMainDiaryBook()
     }
 
     HomeScreen(
         modifier = modifier,
+        bookInfo = viewModel.
         photoPickerLauncher = pickMedia
 //        onEditorClick = onEditorClick
     )
@@ -58,6 +65,11 @@ fun HomeScreenRoute(
 @Composable
 fun HomeScreen(
     modifier: Modifier = Modifier,
+    bookInfo : DiaryBookInfo = DiaryBookInfo(
+        bookId = 6668,
+        title = "deseruisse",
+        description = "an"
+    ),
     photoPickerLauncher: ActivityResultLauncher<PickVisualMediaRequest>? = null,
     onEditorClick: () -> Unit = {},
 ) {
