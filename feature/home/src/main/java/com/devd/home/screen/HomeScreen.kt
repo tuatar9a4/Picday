@@ -34,9 +34,11 @@ import com.devd.commonsystem.theme.WhiteColor
 import com.devd.commonsystem.ui.Toolbar
 import com.devd.commonsystem.ui.dialog.ShowMessageDialog
 import com.devd.commonsystem.ui.loading.LoadingDialog
+import com.devd.commonsystem.utils.isCurrentMonth
 import com.devd.home.HomeViewModel
 import com.devd.model.local.DiaryBookInfo
-import timber.log.Timber
+import com.devd.model.local.DiaryInfo
+import java.time.ZonedDateTime
 
 
 @Composable
@@ -51,13 +53,14 @@ fun HomeScreenRoute(
     }
 
     LaunchedEffect(Unit) {
-        Timber.d("LaunchEffect 이거 한번 만 호출되는거 맞지..?")
         viewModel.fetchMainDiaryBook()
     }
 
     HomeScreen(
         modifier = modifier,
         bookInfo = viewModel.bookInfo.value,
+        diaryInfo = viewModel.diaryList.value,
+        searchDate = viewModel.searchDate.value,
         photoPickerLauncher = pickMedia
 //        onEditorClick = onEditorClick
     )
@@ -70,6 +73,8 @@ fun HomeScreenRoute(
 fun HomeScreen(
     modifier: Modifier = Modifier,
     bookInfo: DiaryBookInfo? = null,
+    diaryInfo: List<DiaryInfo> = emptyList(),
+    searchDate: ZonedDateTime = ZonedDateTime.now(),
     photoPickerLauncher: ActivityResultLauncher<PickVisualMediaRequest>? = null,
     onEditorClick: () -> Unit = {},
 ) {
@@ -80,7 +85,9 @@ fun HomeScreen(
                 .background(color = PrimaryColor)
         )
     ) {
-        Column() {
+        Column(
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
             Toolbar(
                 modifier = Modifier.background(color = PrimaryColor),
                 title = "",
@@ -99,12 +106,14 @@ fun HomeScreen(
             Spacer(Modifier.height(20.dp))
             YearCategory(
                 modifier = Modifier.align(Alignment.CenterHorizontally),
-                year = 2021,
+                searchDate = searchDate,
                 onClick = { year -> }
             )   // 년도 선택 스크린
             Spacer(Modifier.height(15.dp))
             DiaryListScreen(
-                modifier = Modifier
+                modifier = Modifier,
+                diaryList = diaryInfo,
+                isCurrentMonth = searchDate.isCurrentMonth()
             )   // DiaryList 스크린
         }
         Row(

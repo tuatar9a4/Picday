@@ -16,22 +16,23 @@ import androidx.compose.ui.unit.dp
 import com.devd.commonsystem.R
 import com.devd.commonsystem.theme.BlackColor
 import com.devd.commonsystem.theme.OneDayTypography
+import java.time.ZonedDateTime
 
 @Composable
 fun YearCategory(
     modifier: Modifier = Modifier,
-    year: Int,
-    onClick: (Int) -> Unit
+    searchDate: ZonedDateTime = ZonedDateTime.now(),
+    onClick: (Long) -> Unit
 ) {
     Row(
         modifier = modifier.then(
             Modifier
-                .clickable(onClick = { onClick.invoke(year) })
+                .clickable(onClick = { onClick.invoke(searchDate.toInstant().toEpochMilli()) })
         ),
         verticalAlignment = Alignment.CenterVertically,
     ) {
         Text(
-            text = "2026",
+            text = "${searchDate.year}/${searchDate.monthValue}",
             style = OneDayTypography.bodyMedium.copy(
                 color = BlackColor
             )
@@ -43,7 +44,6 @@ fun YearCategory(
             contentDescription = null
         )
     }
-
 }
 
 @Preview
@@ -51,6 +51,6 @@ fun YearCategory(
 fun YearCategoryPreview() {
     YearCategory(
         modifier = Modifier,
-        year = 2021
+        searchDate = ZonedDateTime.now()
     ) { }
 }

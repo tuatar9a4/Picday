@@ -74,7 +74,7 @@ interface DiaryDao {
         diaryBookId: Long,
         from: Long,
         to: Long
-    ): List<DiaryEntity>
+    ): List<DiaryWithExtras>
 
     /* Delete */
 

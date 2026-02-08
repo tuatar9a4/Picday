@@ -89,6 +89,15 @@ class DiaryBookRepository @Inject constructor(
         return@run if (this is CallResult.Success) this.res else emptyList()
     }
 
+    suspend fun fetchMonthDairiesByDiaryBook(
+        diaryBookId: Long,
+        start: Long,
+        end: Long
+    ) = safeApiCall(Dispatchers.IO) {
+        diaryDao.getDiariesByDateRange(diaryBookId, start, end).map { it.transToModel() }
+    }.run {
+        return@run if (this is CallResult.Success) this.res else emptyList()
+    }
 
     @Transaction
     suspend fun saveDairyWithExtras(

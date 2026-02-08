@@ -16,7 +16,6 @@ import androidx.compose.material3.Card
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.res.painterResource
@@ -92,14 +91,6 @@ fun BookCardScreen(
                         )
                     }
                 }
-                Image(
-                    modifier = Modifier
-                        .size(16.dp)
-                        .align(Alignment.TopEnd),
-                    painter = painterResource(R.drawable.icon_diary),
-                    contentDescription = null
-                )
-
             }
             LinearProgressIndicator(
                 modifier = Modifier

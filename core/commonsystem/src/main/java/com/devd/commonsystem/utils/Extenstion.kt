@@ -9,7 +9,9 @@ import androidx.compose.ui.platform.LocalDensity
 import com.devd.commonsystem.R
 import java.time.LocalDate
 import java.time.LocalTime
+import java.time.YearMonth
 import java.time.ZoneId
+import java.time.ZonedDateTime
 import java.time.temporal.TemporalAdjusters
 import java.util.Calendar
 
@@ -56,4 +58,11 @@ fun LocalDate.getCurrentMonthRangeMillis(): Pair<Long, Long> {
         .toInstant()
 
     return start.toEpochMilli() to end.toEpochMilli()
+}
+
+fun ZonedDateTime.isCurrentMonth(): Boolean {
+    val targetMonth = YearMonth.from(this)
+    val currentMonth = YearMonth.now(ZoneId.systemDefault())
+
+    return targetMonth == currentMonth
 }

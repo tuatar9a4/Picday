@@ -40,13 +40,16 @@ import com.devd.commonsystem.theme.BlackColor
 import com.devd.commonsystem.theme.BlackOpacity40Color
 import com.devd.commonsystem.theme.OneDayTypography
 import com.devd.commonsystem.theme.WhiteColor
+import com.devd.commonsystem.utils.noRippleClickable
+import com.devd.model.local.DiaryInfo
 import kotlin.math.absoluteValue
 import kotlin.math.max
 
-@Preview
 @Composable
 fun DiaryListScreen(
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    isCurrentMonth: Boolean = true,
+    diaryList: List<DiaryInfo> = emptyList(),
 ) {
 
     val configuration = LocalConfiguration.current
@@ -54,30 +57,37 @@ fun DiaryListScreen(
 
     val diaryListState = rememberLazyListState()
     val flingBehavior = rememberSnapFlingBehavior(lazyListState = diaryListState)
-
-    println("displayWidth   [$displayWidth] : ${130.dp} ")
-    LazyRow(
-        modifier = modifier.then(Modifier.fillMaxWidth()),
-        state = diaryListState,
-        reverseLayout = true,
-        flingBehavior = flingBehavior,
-        contentPadding = PaddingValues(horizontal = (displayWidth / 2) - 130.dp),
-        horizontalArrangement = Arrangement.spacedBy(30.dp)
-    ) {
-        itemsIndexed(listOf<String>("", "", "", "", "", "")) { index, item ->
-            val scale = calculateItemScale(diaryListState, index)
-
-            DiaryCardScreen(
-                modifier = Modifier.graphicsLayer {
-                    scaleX = scale
-                    scaleY = scale
-                },
-                diaryDate = "appareat",
-                diaryTitle = "principes[$index]",
-                diaryTag = listOf(),
-                diarySticker = "animal"
-
-            )
+    if (diaryList.isEmpty()) {
+        AddDiaryCardScreen(
+            modifier = modifier,
+            onClick = {}
+        )
+    } else {
+        LazyRow(
+            modifier = modifier.then(Modifier.fillMaxWidth()),
+            state = diaryListState,
+            reverseLayout = true,
+            flingBehavior = flingBehavior,
+            contentPadding = PaddingValues(horizontal = (displayWidth / 2) - 130.dp),
+            horizontalArrangement = Arrangement.spacedBy(30.dp)
+        ) {
+            itemsIndexed(diaryList) { index, item ->
+                val scale = calculateItemScale(diaryListState, index)
+                if (index == 0 && isCurrentMonth && !item.isTodayItem) {
+                    AddDiaryCardScreen(
+                        onClick = {}
+                    )
+                }
+                DiaryCardScreen(
+                    modifier = Modifier.graphicsLayer {
+                        scaleX = scale
+                        scaleY = scale
+                    },
+                    diaryDate = item.createDay.toString(),
+                    diaryTitle = item.content,
+                    diaryTag = item.tagList,
+                )
+            }
         }
     }
 }
@@ -88,18 +98,22 @@ fun DiaryCardScreen(
     diaryDate: String,
     diaryTitle: String,
     diaryTag: List<String>,
+    diaryImage: String? = null,
     diarySticker: String? = null,
 ) {
     Card(
         modifier = modifier.then(
             Modifier
                 .width(260.dp)
+                .background(color = WhiteColor)
                 .aspectRatio(ratio = 9 / 16f)
         ),
         shape = RoundedCornerShape(20.dp),
     ) {
         Box(
             modifier = Modifier
+                .background(color = WhiteColor)
+                .fillMaxSize()
         ) {
             Text(
                 modifier = Modifier
@@ -110,11 +124,13 @@ fun DiaryCardScreen(
                     color = BlackColor
                 )
             )
-            Image(
-                modifier = Modifier.fillMaxSize(),
-                painter = painterResource(R.drawable.icon_diary),
-                contentDescription = null
-            )
+            diaryImage?.let {
+                Image(
+                    modifier = Modifier.fillMaxSize(),
+                    painter = painterResource(R.drawable.icon_diary),
+                    contentDescription = null
+                )
+            }
             Column(
                 modifier = Modifier
                     .align(Alignment.BottomCenter)
@@ -159,15 +175,56 @@ fun DiaryCardScreen(
                         )
                     }
                 }
-                Spacer(Modifier.height(6.dp))
-                Image(
-                    modifier = Modifier.size(20.dp),
-                    painter = painterResource(R.drawable.icon_show_password_eye),
-                    contentDescription = null
-                )
+                diarySticker.let {
+                    Spacer(Modifier.height(6.dp))
+                    Image(
+                        modifier = Modifier.size(20.dp),
+                        painter = painterResource(R.drawable.icon_show_password_eye),
+                        contentDescription = null
+                    )
+                }
             }
         }
 
+    }
+}
+
+@Composable
+fun AddDiaryCardScreen(
+    modifier: Modifier = Modifier,
+    onClick: () -> Unit
+) {
+    Card(
+        modifier = modifier.then(
+            Modifier
+                .width(260.dp)
+                .aspectRatio(ratio = 9 / 16f)
+                .noRippleClickable(onClick = onClick)
+        ),
+        shape = RoundedCornerShape(20.dp),
+    ) {
+        Box(
+            modifier = Modifier
+                .background(color = WhiteColor)
+                .fillMaxSize()
+        ) {
+            Column(
+                modifier = Modifier.align(Alignment.Center),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                Image(
+                    modifier = Modifier.size(40.dp),
+                    painter = painterResource(R.drawable.icon_pencil),
+                    contentDescription = null
+                )
+                Spacer(modifier = Modifier.size(20.dp))
+                Text(
+                    text = "오늘의 한 컷을 남겨주세요",
+                    style = OneDayTypography.bodyLarge
+                )
+
+            }
+        }
     }
 }
 
@@ -175,10 +232,69 @@ fun DiaryCardScreen(
 @Composable
 fun DiaryCardScreenPreview() {
     DiaryCardScreen(
-        diaryDate = "12/1",
+        diaryDate = "1",
         diaryTitle = "다이어리 타이틀",
         diaryTag = listOf("123", "321")
     )
+}
+
+@Preview
+@Composable
+fun DiaryListScreenPreview() {
+    DiaryListScreen(
+        diaryList = listOf(
+            DiaryInfo(
+                diaryId = 9704,
+                diaryBookId = 4218,
+                content = "ac",
+                mood = 9955,
+                weather = 2682,
+                createdAt = 4071,
+                updatedAt = 2301,
+                imageUrlList = listOf(),
+                tagList = listOf()
+            ),
+            DiaryInfo(
+                diaryId = 12,
+                diaryBookId = 4218,
+                content = "Goof",
+                mood = 9955,
+                weather = 2682,
+                createdAt = 4071,
+                updatedAt = 2301,
+                imageUrlList = listOf(),
+                tagList = listOf()
+            ),
+            DiaryInfo(
+                diaryId = 154,
+                diaryBookId = 4218,
+                content = "124124",
+                mood = 9955,
+                weather = 2682,
+                createdAt = 4071,
+                updatedAt = 2301,
+                imageUrlList = listOf(),
+                tagList = listOf()
+            ),
+            DiaryInfo(
+                diaryId = 26,
+                diaryBookId = 4218,
+                content = "xcvxcv",
+                mood = 9955,
+                weather = 2682,
+                createdAt = 4071,
+                updatedAt = 2301,
+                imageUrlList = listOf(),
+                tagList = listOf()
+            )
+        )
+    )
+}
+
+@Preview
+@Composable
+fun DiaryListScreenEmptyPreview() {
+    DiaryListScreen()
 }
 
 
