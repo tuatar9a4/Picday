@@ -51,12 +51,7 @@ fun CustomDatePickerDialog(
             initialSelectedDateMillis = initDateMillis,
             selectableDates = object : SelectableDates {
                 override fun isSelectableDate(utcTimeMillis: Long): Boolean {
-                    val cloneCalendar = Calendar.getInstance().clone() as Calendar
-                    cloneCalendar.timeInMillis = initDateMillis
-                    cloneCalendar.set(Calendar.HOUR, 0)
-                    cloneCalendar.set(Calendar.MINUTE, 0)
-                    cloneCalendar.set(Calendar.SECOND, 0)
-                    return utcTimeMillis < cloneCalendar.timeInMillis
+                    return utcTimeMillis < System.currentTimeMillis()
 
                 }
             }
