@@ -1,5 +1,6 @@
 package com.devd.home.screen
 
+import android.annotation.SuppressLint
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.snapping.rememberSnapFlingBehavior
@@ -45,11 +46,13 @@ import com.devd.model.local.DiaryInfo
 import kotlin.math.absoluteValue
 import kotlin.math.max
 
+@SuppressLint("ConfigurationScreenWidthHeight")
 @Composable
 fun DiaryListScreen(
     modifier: Modifier = Modifier,
     isCurrentMonth: Boolean = true,
     diaryList: List<DiaryInfo> = emptyList(),
+    onAddCardClick: () -> Unit = {}
 ) {
 
     val configuration = LocalConfiguration.current
@@ -60,7 +63,7 @@ fun DiaryListScreen(
     if (diaryList.isEmpty()) {
         AddDiaryCardScreen(
             modifier = modifier,
-            onClick = {}
+            onClick = onAddCardClick
         )
     } else {
         LazyRow(
@@ -74,9 +77,7 @@ fun DiaryListScreen(
             itemsIndexed(diaryList) { index, item ->
                 val scale = calculateItemScale(diaryListState, index)
                 if (index == 0 && isCurrentMonth && !item.isTodayItem) {
-                    AddDiaryCardScreen(
-                        onClick = {}
-                    )
+                    AddDiaryCardScreen(onClick = onAddCardClick)
                 }
                 DiaryCardScreen(
                     modifier = Modifier.graphicsLayer {

@@ -18,8 +18,10 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.rememberDatePickerState
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.devd.commonsystem.R
 import com.devd.commonsystem.theme.AccentColor
 import com.devd.commonsystem.theme.AccentOpacity40Color
 import com.devd.commonsystem.theme.BlackColor
@@ -32,6 +34,7 @@ import java.util.Calendar
 @Preview
 @Composable
 fun CustomDatePickerDialog(
+    title: String = "",
     initDateMillis: Long = Calendar.getInstance().timeInMillis,
     onSelectDate: (dateMillis: Long) -> Unit = {},
     onClickCancel: () -> Unit = {}
@@ -71,7 +74,7 @@ fun CustomDatePickerDialog(
                 title = {
                     Text(
                         modifier = Modifier.padding(start = 20.dp, top = 10.dp),
-                        text = "일기 작성 날짜를 선택하세요",
+                        text = title,
                         style = OneDayTypography.bodyLarge.copy(
                             color = BlackColor
                         )
@@ -91,7 +94,7 @@ fun CustomDatePickerDialog(
                         .fillMaxHeight(),
                     enableButtonColor = GreyColor,
                     disableButtonColor = GreyOpacity40Color,
-                    text = "Cancel",
+                    text = stringResource(R.string.cancel),
                     onClick = onClickCancel,
                 )
                 Spacer(modifier = Modifier.width(5.dp))
@@ -99,7 +102,7 @@ fun CustomDatePickerDialog(
                     modifier = Modifier
                         .weight(1f)
                         .fillMaxHeight(),
-                    text = "Confirm",
+                    text = stringResource(R.string.confirm),
                     onClick = {
                         val selectMillis = datePickerState.selectedDateMillis ?: return@TextButton
                         onSelectDate.invoke(selectMillis)

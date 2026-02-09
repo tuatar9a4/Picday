@@ -1,7 +1,6 @@
 package com.devd.home.screen
 
 import androidx.activity.compose.rememberLauncherForActivityResult
-import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts.PickVisualMedia
 import androidx.compose.foundation.Image
@@ -20,6 +19,7 @@ import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.FloatingActionButtonDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.ColorFilter
@@ -27,18 +27,18 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.devd.commonsystem.R
 import com.devd.commonsystem.theme.AccentOpacity40Color
 import com.devd.commonsystem.theme.PrimaryColor
 import com.devd.commonsystem.theme.WhiteColor
 import com.devd.commonsystem.ui.Toolbar
+import com.devd.commonsystem.ui.calendar.CustomDatePickerDialog
 import com.devd.commonsystem.ui.dialog.ShowMessageDialog
 import com.devd.commonsystem.ui.loading.LoadingDialog
 import com.devd.commonsystem.utils.isCurrentMonth
+import com.devd.home.HomeUiState
 import com.devd.home.HomeViewModel
-import com.devd.model.local.DiaryBookInfo
-import com.devd.model.local.DiaryInfo
-import java.time.ZonedDateTime
 
 
 @Composable
@@ -48,6 +48,7 @@ fun HomeScreenRoute(
     viewModel: HomeViewModel = hiltViewModel()
 ) {
 
+    val uiState by viewModel.homeUiState.collectAsStateWithLifecycle()
     val pickMedia = rememberLauncherForActivityResult(PickVisualMedia()) { uri ->
         uri?.let { onEditorMove(uri.toString()) }
     }
@@ -58,24 +59,30 @@ fun HomeScreenRoute(
 
     HomeScreen(
         modifier = modifier,
-        bookInfo = viewModel.bookInfo.value,
-        diaryInfo = viewModel.diaryList.value,
-        searchDate = viewModel.searchDate.value,
-        photoPickerLauncher = pickMedia
-//        onEditorClick = onEditorClick
+        uiState = uiState,
+        onClickDate = viewModel::showCalendarDialog,
+        onEditorClick = {
+            pickMedia.launch(PickVisualMediaRequest(PickVisualMedia.ImageOnly))
+        }
     )
-    viewModel.messageDialog.value?.ShowMessageDialog(onLeftButtonClick = viewModel::dismissDialog)
-    viewModel.isLoading.value.LoadingDialog()
+    uiState.dialogMessage?.ShowMessageDialog(onLeftButtonClick = viewModel::dismissDialog)
+    uiState.isLoading.LoadingDialog()
+    if (uiState.isShowCalendar) {
+        CustomDatePickerDialog(
+            title = "검색할 날짜를 선택해주세요",
+            initDateMillis = uiState.searchDate.toInstant().toEpochMilli(),
+            onSelectDate = viewModel::changeSearchMonth,
+            onClickCancel = viewModel::dismissCalendar
+        )
+    }
 }
 
 @Preview
 @Composable
 fun HomeScreen(
     modifier: Modifier = Modifier,
-    bookInfo: DiaryBookInfo? = null,
-    diaryInfo: List<DiaryInfo> = emptyList(),
-    searchDate: ZonedDateTime = ZonedDateTime.now(),
-    photoPickerLauncher: ActivityResultLauncher<PickVisualMediaRequest>? = null,
+    uiState: HomeUiState = HomeUiState(),
+    onClickDate: () -> Unit = {},
     onEditorClick: () -> Unit = {},
 ) {
     Box(
@@ -99,21 +106,24 @@ fun HomeScreen(
             BookCardScreen(
                 modifier = Modifier
                     .align(Alignment.CenterHorizontally),
-                diaryTitle = bookInfo?.title ?: "",
-                diaryDescription = bookInfo?.description ?: "",
-                diaryMonthPercent = bookInfo?.monthWritePercent ?: 0f,
+                diaryTitle = uiState.bookInfo?.title ?: "",
+                diaryDescription = uiState.bookInfo?.description ?: "",
+                diaryMonthPercent = uiState.bookInfo?.monthWritePercent ?: 0f,
             )   // 일기장 카드
             Spacer(Modifier.height(20.dp))
             YearCategory(
                 modifier = Modifier.align(Alignment.CenterHorizontally),
-                searchDate = searchDate,
-                onClick = { year -> }
+                searchDate = uiState.searchDate,
+                onClick = { time ->
+                    onClickDate.invoke()
+                }
             )   // 년도 선택 스크린
             Spacer(Modifier.height(15.dp))
             DiaryListScreen(
                 modifier = Modifier,
-                diaryList = diaryInfo,
-                isCurrentMonth = searchDate.isCurrentMonth()
+                diaryList = uiState.diaryList,
+                isCurrentMonth = uiState.searchDate.isCurrentMonth(),
+                onAddCardClick = onEditorClick
             )   // DiaryList 스크린
         }
         Row(
@@ -128,9 +138,7 @@ fun HomeScreen(
                 shape = CircleShape,
                 containerColor = AccentOpacity40Color,
                 elevation = FloatingActionButtonDefaults.elevation(defaultElevation = 0.dp),
-                onClick = {
-                    photoPickerLauncher?.launch(PickVisualMediaRequest(PickVisualMedia.ImageOnly))
-                },
+                onClick = onEditorClick
             ) {
                 Image(
                     painter = painterResource(R.drawable.icon_pencil),
@@ -145,7 +153,7 @@ fun HomeScreen(
                 shape = CircleShape,
                 containerColor = AccentOpacity40Color,
                 elevation = FloatingActionButtonDefaults.elevation(defaultElevation = 0.dp),
-                onClick = onEditorClick,
+                onClick = { },
             ) {
                 Image(
                     painter = painterResource(R.drawable.icon_calendar),

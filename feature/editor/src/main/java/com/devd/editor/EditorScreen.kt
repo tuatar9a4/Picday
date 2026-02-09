@@ -105,6 +105,7 @@ fun EditorScreenRoute(
     )
     if (customDatePickerDialogState?.isShowDialog == true) {
         CustomDatePickerDialog(
+            title = "일기 작성 날짜를 선택하세요",
             initDateMillis = customDatePickerDialogState.selectedDate,
             onSelectDate = customDatePickerDialogState.onClickConfirm,
             onClickCancel = customDatePickerDialogState.onClickCancel
