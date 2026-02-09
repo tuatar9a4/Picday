@@ -26,6 +26,7 @@ rootProject.name = "oneDayOneShot"
 include(":app")
 include(":core")
 include(":core:commonsystem")
+include(":core:permission")
 include(":feature")
 include(":feature:intro")
 include(":feature:user")

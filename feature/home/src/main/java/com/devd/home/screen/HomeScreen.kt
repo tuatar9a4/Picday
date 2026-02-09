@@ -1,8 +1,12 @@
 package com.devd.home.screen
 
+import android.app.Activity.RESULT_CANCELED
+import android.content.Context
+import android.content.Intent
+import android.net.Uri
+import android.provider.MediaStore
 import androidx.activity.compose.rememberLauncherForActivityResult
-import androidx.activity.result.PickVisualMediaRequest
-import androidx.activity.result.contract.ActivityResultContracts.PickVisualMedia
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
@@ -20,12 +24,18 @@ import androidx.compose.material3.FloatingActionButtonDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.ColorFilter
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.core.content.FileProvider
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.devd.commonsystem.R
@@ -39,6 +49,11 @@ import com.devd.commonsystem.ui.loading.LoadingDialog
 import com.devd.commonsystem.utils.isCurrentMonth
 import com.devd.home.HomeUiState
 import com.devd.home.HomeViewModel
+import com.devd.permission.Consts
+import com.devd.permission.IPermissionHandler
+import com.devd.permission.rememberPermissionHandler
+import kotlinx.coroutines.launch
+import java.io.File
 
 
 @Composable
@@ -47,11 +62,18 @@ fun HomeScreenRoute(
     onEditorMove: (uri: String) -> Unit = {},
     viewModel: HomeViewModel = hiltViewModel()
 ) {
+    val context = LocalContext.current
+    val permissionHandler: IPermissionHandler = rememberPermissionHandler()
+    var cameraUri by remember { mutableStateOf<Uri?>(null) }
+    val scope = rememberCoroutineScope()
 
     val uiState by viewModel.homeUiState.collectAsStateWithLifecycle()
-    val pickMedia = rememberLauncherForActivityResult(PickVisualMedia()) { uri ->
-        uri?.let { onEditorMove(uri.toString()) }
-    }
+
+    val pickMedia =
+        rememberLauncherForActivityResult(ActivityResultContracts.StartActivityForResult()) { uri ->
+            if (uri.resultCode == RESULT_CANCELED) return@rememberLauncherForActivityResult
+            uri.data?.data ?: cameraUri?.let { onEditorMove.invoke(it.toString()) }
+        }
 
     LaunchedEffect(Unit) {
         viewModel.fetchMainDiaryBook()
@@ -62,7 +84,15 @@ fun HomeScreenRoute(
         uiState = uiState,
         onClickDate = viewModel::showCalendarDialog,
         onEditorClick = {
-            pickMedia.launch(PickVisualMediaRequest(PickVisualMedia.ImageOnly))
+            scope.launch {
+                val grant = permissionHandler.requestPermissionIfNeeded(Consts.CAMERA_PERMISSION)
+                if (grant.any { !it.value }) {
+                    viewModel.showMessageDialog(R.string.need_camera_permission)
+                } else {
+                    cameraUri = createCameraUri(context)
+                    pickMedia.launch(createImageChooserIntent(cameraUri!!))
+                }
+            }
         }
     )
     uiState.dialogMessage?.ShowMessageDialog(onLeftButtonClick = viewModel::dismissDialog)
@@ -163,5 +193,41 @@ fun HomeScreen(
             }   // 달력 이동 번튼
             Spacer(Modifier.width(20.dp))
         }
+    }
+}
+
+
+private fun createCameraUri(context: Context): Uri {
+    val file = File(
+        context.cacheDir,
+        "camera_${System.currentTimeMillis()}.jpg"
+    )
+    return FileProvider.getUriForFile(
+        context,
+        "${context.packageName}.fileprovider",
+        file
+    )
+}
+
+private fun createImageChooserIntent(cameraUri: Uri): Intent {
+
+    val cameraIntent = Intent(MediaStore.ACTION_IMAGE_CAPTURE).apply {
+        putExtra(MediaStore.EXTRA_OUTPUT, cameraUri)
+        addFlags(Intent.FLAG_GRANT_WRITE_URI_PERMISSION)
+    }
+
+    val galleryIntent = Intent(Intent.ACTION_GET_CONTENT).apply {
+        type = "image/*"
+        addCategory(Intent.CATEGORY_OPENABLE)
+    }
+
+    return Intent.createChooser(
+        galleryIntent,
+        "이미지 선택"
+    ).apply {
+        putExtra(
+            Intent.EXTRA_INITIAL_INTENTS,
+            arrayOf(cameraIntent)
+        )
     }
 }
