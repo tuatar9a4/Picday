@@ -61,10 +61,16 @@ fun DiaryListScreen(
     val diaryListState = rememberLazyListState()
     val flingBehavior = rememberSnapFlingBehavior(lazyListState = diaryListState)
     if (diaryList.isEmpty()) {
-        AddDiaryCardScreen(
-            modifier = modifier,
-            onClick = onAddCardClick
-        )
+        if (isCurrentMonth) {
+            AddDiaryCardScreen(
+                modifier = modifier,
+                onClick = onAddCardClick
+            ) // 날짜가 이번달이면 작성 Card
+        } else {
+            EmptyDiaryCardScreen(
+                modifier = modifier
+            ) // 날짜가 이번달이 아니면 Empty Card
+        }
     } else {
         LazyRow(
             modifier = modifier.then(Modifier.fillMaxWidth()),
@@ -221,6 +227,45 @@ fun AddDiaryCardScreen(
                 Spacer(modifier = Modifier.size(20.dp))
                 Text(
                     text = "오늘의 한 컷을 남겨주세요",
+                    style = OneDayTypography.bodyLarge
+                )
+
+            }
+        }
+    }
+}
+
+@Preview
+@Composable
+fun EmptyDiaryCardScreen(
+    modifier: Modifier = Modifier,
+) {
+    Card(
+        modifier = modifier.then(
+            Modifier
+                .width(260.dp)
+                .aspectRatio(ratio = 9 / 16f)
+        ),
+        shape = RoundedCornerShape(20.dp),
+    ) {
+        Box(
+            modifier = Modifier
+                .background(color = WhiteColor)
+                .padding(horizontal = 20.dp)
+                .fillMaxSize()
+        ) {
+            Column(
+                modifier = Modifier.align(Alignment.Center),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                Image(
+                    modifier = Modifier.size(40.dp),
+                    painter = painterResource(R.drawable.icon_empty_diary),
+                    contentDescription = null
+                )
+                Spacer(modifier = Modifier.size(20.dp))
+                Text(
+                    text = "해당 달에는 일기를 하나도 쓰지 않았아요...",
                     style = OneDayTypography.bodyLarge
                 )
 
