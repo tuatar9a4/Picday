@@ -9,8 +9,8 @@ data class DiaryInfo(
     val diaryId: Long,
     val diaryBookId: Long,
     val content: String,
-    val mood: Int?,
-    val weather: Int?,
+    val mood: Int? = null,
+    val weather: Int? = null,
     val createdAt: Long,
     val updatedAt: Long,
     val imageUrlList: List<String> = emptyList(),
@@ -23,7 +23,7 @@ data class DiaryInfo(
             return date.get(Calendar.DAY_OF_MONTH)
         }
 
-    val isTodayItem : Boolean
+    val isTodayItem: Boolean
         get() {
             val targetDate = Instant.ofEpochMilli(createdAt)
                 .atZone(ZoneId.systemDefault())

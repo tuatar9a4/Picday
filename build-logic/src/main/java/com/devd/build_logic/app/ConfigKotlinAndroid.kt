@@ -14,6 +14,8 @@ fun Project.configureKotlinAndroid() {
     val properties = Properties()
     properties.load(project.rootProject.file("local.properties").inputStream())
 
+    val ociBuketKey = properties.getProperty("oracle.buket.key")
+
 //    Plugins
     pluginManager.apply("org.jetbrains.kotlin.android")
     pluginManager.apply("org.jetbrains.kotlin.plugin.compose")
@@ -23,6 +25,7 @@ fun Project.configureKotlinAndroid() {
         compileSdk = 36
         defaultConfig {
             minSdk = 29
+            resValue("string", "ociBuketKey", ociBuketKey)
         }
 
         compileOptions {

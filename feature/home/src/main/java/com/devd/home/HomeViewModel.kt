@@ -1,7 +1,6 @@
 package com.devd.home
 
 import androidx.annotation.StringRes
-import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.devd.commonsystem.R
@@ -24,7 +23,7 @@ import javax.inject.Inject
 
 data class HomeUiState(
     var isLoading: Boolean = false,
-    var isShowCalendar : Boolean = false,
+    var isShowCalendar: Boolean = false,
     var bookInfo: DiaryBookInfo? = null,
     var diaryList: List<DiaryInfo> = emptyList(),
     var searchDate: ZonedDateTime = Instant.now().atZone(ZoneId.systemDefault()),
@@ -39,9 +38,6 @@ class HomeViewModel @Inject constructor(
 
     private val _homeUiState = MutableStateFlow(HomeUiState())
     val homeUiState: StateFlow<HomeUiState> get() = _homeUiState.asStateFlow()
-
-    val messageDialog = mutableStateOf<Int?>(null)
-    val isLoading = mutableStateOf(false)
 
     fun fetchMainDiaryBook() {
         viewModelScope.launch {
@@ -61,6 +57,19 @@ class HomeViewModel @Inject constructor(
                 .getCurrentMonthRangeMillis()
             val monthDiaries =
                 diaryBookRepository.fetchMonthDairiesByDiaryBook(diaryBook.bookId, start, end)
+                    .toMutableList()
+            if (monthDiaries.isEmpty() || !monthDiaries.first().isTodayItem) {
+                monthDiaries.add(
+                    0,
+                    DiaryInfo(
+                        diaryId = -1,
+                        diaryBookId = -1,
+                        content = "",
+                        createdAt = -1,
+                        updatedAt = -1
+                    )
+                )
+            }
             _homeUiState.update {
                 it.copy(
                     isLoading = false,
@@ -71,7 +80,7 @@ class HomeViewModel @Inject constructor(
         }
     }
 
-    fun showCalendarDialog(){
+    fun showCalendarDialog() {
         _homeUiState.update { it.copy(isShowCalendar = true) }
     }
 

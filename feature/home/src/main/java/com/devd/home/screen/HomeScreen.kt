@@ -18,6 +18,8 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.lazy.LazyListState
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.FloatingActionButtonDefaults
@@ -46,6 +48,7 @@ import com.devd.commonsystem.ui.Toolbar
 import com.devd.commonsystem.ui.calendar.CustomDatePickerDialog
 import com.devd.commonsystem.ui.dialog.ShowMessageDialog
 import com.devd.commonsystem.ui.loading.LoadingDialog
+import com.devd.commonsystem.utils.centerItemIndex
 import com.devd.commonsystem.utils.isCurrentMonth
 import com.devd.home.HomeUiState
 import com.devd.home.HomeViewModel
@@ -53,27 +56,42 @@ import com.devd.permission.Consts
 import com.devd.permission.IPermissionHandler
 import com.devd.permission.rememberPermissionHandler
 import kotlinx.coroutines.launch
+import timber.log.Timber
 import java.io.File
 
 
 @Composable
 fun HomeScreenRoute(
     modifier: Modifier = Modifier,
-    onEditorMove: (uri: String) -> Unit = {},
+    onEditorMove: (imageUrl: String, bookId: Long, diaryId: Long?) -> Unit = { _, _, _ -> },
     viewModel: HomeViewModel = hiltViewModel()
 ) {
+    val uiState by viewModel.homeUiState.collectAsStateWithLifecycle()
+
     val context = LocalContext.current
     val permissionHandler: IPermissionHandler = rememberPermissionHandler()
     var cameraUri by remember { mutableStateOf<Uri?>(null) }
     val scope = rememberCoroutineScope()
 
-    val uiState by viewModel.homeUiState.collectAsStateWithLifecycle()
+    val diaryState = rememberLazyListState()
 
     val pickMedia =
         rememberLauncherForActivityResult(ActivityResultContracts.StartActivityForResult()) { uri ->
             if (uri.resultCode == RESULT_CANCELED) return@rememberLauncherForActivityResult
-            uri.data?.data ?: cameraUri?.let { onEditorMove.invoke(it.toString()) }
+            Timber.d("Check Uri => ${uri.data?.data}")
+            Timber.d("cameraUri => ${cameraUri}")
+            (uri.data?.data ?: cameraUri)?.let {
+                val selectIndex = diaryState.centerItemIndex() ?: -1
+                val selectDiary = uiState.diaryList.getOrNull(selectIndex)
+                onEditorMove.invoke(
+                    it.toString(),
+                    uiState.bookInfo?.bookId ?: 0,
+                    selectDiary?.diaryId?.takeIf { id -> id != -1L }
+                )
+            }
         }
+
+
 
     LaunchedEffect(Unit) {
         viewModel.fetchMainDiaryBook()
@@ -82,6 +100,7 @@ fun HomeScreenRoute(
     HomeScreen(
         modifier = modifier,
         uiState = uiState,
+        diaryState = diaryState,
         onClickDate = viewModel::showCalendarDialog,
         onEditorClick = {
             scope.launch {
@@ -112,6 +131,7 @@ fun HomeScreenRoute(
 fun HomeScreen(
     modifier: Modifier = Modifier,
     uiState: HomeUiState = HomeUiState(),
+    diaryState: LazyListState = rememberLazyListState(),
     onClickDate: () -> Unit = {},
     onEditorClick: () -> Unit = {},
 ) {
@@ -151,6 +171,7 @@ fun HomeScreen(
             Spacer(Modifier.height(15.dp))
             DiaryListScreen(
                 modifier = Modifier,
+                diaryState = diaryState,
                 diaryList = uiState.diaryList,
                 isCurrentMonth = uiState.searchDate.isCurrentMonth(),
                 onAddCardClick = onEditorClick

@@ -40,6 +40,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -57,7 +58,9 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.core.net.toUri
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.navigation.compose.rememberNavController
 import com.devd.commonsystem.R
 import com.devd.commonsystem.theme.BlackOpacity40Color
 import com.devd.commonsystem.theme.GreyColor
@@ -68,6 +71,8 @@ import com.devd.commonsystem.ui.Toolbar
 import com.devd.commonsystem.ui.calendar.CustomDatePickerDialog
 import com.devd.commonsystem.utils.convertWeekStr
 import com.devd.commonsystem.utils.noRippleClickable
+import com.devd.commonsystem.utils.uriToFile
+import kotlinx.coroutines.launch
 import timber.log.Timber
 import java.util.Calendar
 
@@ -87,10 +92,15 @@ fun rememberImeBottomSize(): Int {
 fun EditorScreenRoute(
     modifier: Modifier = Modifier,
     viewModel: EditorViewModel = hiltViewModel(),
+    backListner : ()->Unit,
     currentTime: Long,
-    diaryImage: Uri,
+    diaryImage: String,
+    bookId: Long,
+    diaryId: Long?,
 ) {
     Timber.d("NavData => currentTime : $currentTime , diaryImage :$diaryImage")
+    val context = LocalContext.current
+    val scope = rememberCoroutineScope()
     LaunchedEffect(Unit) {
         viewModel.initSelectDate(currentTime)
     }
@@ -100,6 +110,13 @@ fun EditorScreenRoute(
         modifier = modifier,
         writeDate = customDatePickerDialogState?.selectedDate ?: currentTime,
         diaryImage = diaryImage,
+        onSaveDairy = {
+            scope.launch {
+                val file = context.uriToFile(diaryImage.toUri())
+                viewModel.uploadImageToBuket(fileUrl = file)
+            }
+        },
+        backListner= backListner,
         onChangeCalendar = viewModel::showDatePickerDialog,
         onChangeDiaryText = viewModel::setDiaryText,
     )
@@ -118,7 +135,9 @@ fun EditorScreenRoute(
 fun EditorScreen(
     modifier: Modifier = Modifier,
     writeDate: Long = System.currentTimeMillis(),
-    diaryImage: Uri? = null,
+    diaryImage: String = "",
+    onSaveDairy: () -> Unit = {},
+    backListner: () -> Unit = {},
     onChangeCalendar: () -> Unit = {},
     onChangeDiaryText: (String) -> Unit = {}
 ) {
@@ -127,6 +146,8 @@ fun EditorScreen(
     val hashTagList = remember { mutableStateListOf<String>() }
     val focusManger = LocalFocusManager.current
     val scrollState = rememberScrollState()
+    val navController = rememberNavController()
+
 
     //Keyboard 노출에 따른 Bottom Size
     val imeBottom = rememberImeBottomSize()
@@ -155,14 +176,18 @@ fun EditorScreen(
         )
     ) {
         Toolbar(
-            title = "Editor", leftButtonIcon = R.drawable.icon_back_arrow, leftButtonClick = {})
+            title = "Editor",
+            leftButtonIcon = R.drawable.icon_back_arrow,
+            leftButtonClick = backListner,
+            rightButtonClick = onSaveDairy
+        )
         Spacer(Modifier.height(10.dp))
         EditorDateItem(
             writeDate = writeDate, onChangeCalendar = onChangeCalendar
         )   // 날짜 View
         Spacer(Modifier.height(20.dp))
         CardPreviewItem(
-            imageUrl = diaryImage,
+            imageUrl = diaryImage.toUri(),
             diaryText = textFieldState.text.toString(),
             diaryTag = hashTagList
         )   // 일기 미리보기
@@ -355,9 +380,9 @@ fun EditorItem(
                         .heightIn(min = 15.dp),
                     state = hashTextField,
                     lineLimits = TextFieldLineLimits.MultiLine(1, 1),
-                    inputTransformation = { 
-                        if(length > 8) revertAllChanges()
-                        if(asCharSequence().toString().contains(" ")) {
+                    inputTransformation = {
+                        if (length > 8) revertAllChanges()
+                        if (asCharSequence().toString().contains(" ")) {
                             hashList.add(hashTextField.text.toString())
                             hashTextField.clearText()
                         }

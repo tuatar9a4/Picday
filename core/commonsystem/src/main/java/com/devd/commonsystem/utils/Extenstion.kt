@@ -2,6 +2,7 @@ package com.devd.commonsystem.utils
 
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.ime
+import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.State
 import androidx.compose.runtime.rememberUpdatedState
@@ -65,4 +66,19 @@ fun ZonedDateTime.isCurrentMonth(): Boolean {
     val currentMonth = YearMonth.now(ZoneId.systemDefault())
 
     return targetMonth == currentMonth
+}
+
+
+fun LazyListState.centerItemIndex(): Int? {
+    val layoutInfo = layoutInfo
+    val visibleItems = layoutInfo.visibleItemsInfo
+    if (visibleItems.isEmpty()) return null
+
+    val viewportCenter = layoutInfo.viewportStartOffset +
+            layoutInfo.viewportEndOffset / 2
+
+    return visibleItems.minByOrNull { item ->
+        val itemCenter = item.offset + item.size / 2
+        kotlin.math.abs(itemCenter - viewportCenter)
+    }?.index
 }

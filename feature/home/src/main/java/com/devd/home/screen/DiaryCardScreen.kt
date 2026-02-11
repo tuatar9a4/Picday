@@ -51,6 +51,7 @@ import kotlin.math.max
 fun DiaryListScreen(
     modifier: Modifier = Modifier,
     isCurrentMonth: Boolean = true,
+    diaryState: LazyListState = rememberLazyListState(),
     diaryList: List<DiaryInfo> = emptyList(),
     onAddCardClick: () -> Unit = {}
 ) {
@@ -58,33 +59,21 @@ fun DiaryListScreen(
     val configuration = LocalConfiguration.current
     val displayWidth = configuration.screenWidthDp.dp
 
-    val diaryListState = rememberLazyListState()
-    val flingBehavior = rememberSnapFlingBehavior(lazyListState = diaryListState)
-    if (diaryList.isEmpty()) {
-        if (isCurrentMonth) {
-            AddDiaryCardScreen(
-                modifier = modifier,
-                onClick = onAddCardClick
-            ) // 날짜가 이번달이면 작성 Card
-        } else {
-            EmptyDiaryCardScreen(
-                modifier = modifier
-            ) // 날짜가 이번달이 아니면 Empty Card
-        }
-    } else {
-        LazyRow(
-            modifier = modifier.then(Modifier.fillMaxWidth()),
-            state = diaryListState,
-            reverseLayout = true,
-            flingBehavior = flingBehavior,
-            contentPadding = PaddingValues(horizontal = (displayWidth / 2) - 130.dp),
-            horizontalArrangement = Arrangement.spacedBy(30.dp)
-        ) {
-            itemsIndexed(diaryList) { index, item ->
-                val scale = calculateItemScale(diaryListState, index)
-                if (index == 0 && isCurrentMonth && !item.isTodayItem) {
-                    AddDiaryCardScreen(onClick = onAddCardClick)
-                }
+    val flingBehavior = rememberSnapFlingBehavior(lazyListState = diaryState)
+    LazyRow(
+        modifier = modifier.then(Modifier.fillMaxWidth()),
+        state = diaryState,
+        reverseLayout = true,
+        flingBehavior = flingBehavior,
+        contentPadding = PaddingValues(horizontal = (displayWidth / 2) - 130.dp),
+        horizontalArrangement = Arrangement.spacedBy(30.dp)
+    ) {
+        itemsIndexed(diaryList) { index, item ->
+            val scale = calculateItemScale(diaryState, index)
+            if (item.diaryId == -1L) {
+                if (isCurrentMonth) AddDiaryCardScreen(onClick = onAddCardClick)
+                else EmptyDiaryCardScreen()
+            } else {
                 DiaryCardScreen(
                     modifier = Modifier.graphicsLayer {
                         scaleX = scale
@@ -119,7 +108,6 @@ fun DiaryCardScreen(
     ) {
         Box(
             modifier = Modifier
-                .background(color = WhiteColor)
                 .fillMaxSize()
         ) {
             Text(

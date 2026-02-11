@@ -2,6 +2,7 @@ package com.devd.network.di
 
 import com.devd.network.BuildConfig
 import com.devd.network.service.DiaryService
+import com.devd.network.service.OracleService
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -24,11 +25,20 @@ class NetworkModule {
 
     @Qualifier
     @Retention(AnnotationRetention.BINARY)
+    annotation class OciServer
+
+    @Qualifier
+    @Retention(AnnotationRetention.BINARY)
     annotation class DiaryClient
 
     @DiaryServer
     @Provides
     fun provideDiaryServerUri() = "http://10.0.2.2:8080/"
+
+    @OciServer
+    @Provides
+    fun provideOciServerUri() =
+        "https://cnud835pjoeg.objectstorage.ap-seoul-1.oci.customer-oci.com/"
 
     @DiaryClient
     @Singleton
@@ -52,7 +62,7 @@ class NetworkModule {
             .build()
     }
 
-    @DiaryClient
+    @DiaryServer
     @Singleton
     @Provides
     fun provideDiaryRetrofit(
@@ -66,11 +76,32 @@ class NetworkModule {
             .build()
     }
 
+    @OciServer
+    @Singleton
+    @Provides
+    fun provideOciRetrofit(
+        @OciServer url: String,
+        @DiaryClient client: OkHttpClient
+    ): Retrofit {
+        return Retrofit.Builder()
+            .addConverterFactory(GsonConverterFactory.create())
+            .client(client)
+            .baseUrl(url)
+            .build()
+    }
+
     @DiaryServer
     @Singleton
     @Provides
     fun provideDiaryService(
-        @DiaryClient retrofit: Retrofit
+        @DiaryServer retrofit: Retrofit
     ): DiaryService = retrofit.create(DiaryService::class.java)
+
+    @OciServer
+    @Singleton
+    @Provides
+    fun provideOciService(
+        @OciServer retrofit: Retrofit
+    ): OracleService = retrofit.create(OracleService::class.java)
 
 }
