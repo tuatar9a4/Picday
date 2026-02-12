@@ -4,7 +4,7 @@ import androidx.compose.ui.Modifier
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
 import androidx.navigation.toRoute
-import com.devd.editor.EditorScreenRoute
+import com.devd.editor.screen.EditorScreenRoute
 import kotlinx.serialization.Serializable
 
 
@@ -26,7 +26,7 @@ fun NavGraphBuilder.editorScreen(
 
         EditorScreenRoute(
             modifier = modifier,
-            backListner = backListner,
+            onBackIconClick = backListner,
             currentTime = route.currentTime,
             diaryImage = route.imageUrl,
             bookId = route.bookId,

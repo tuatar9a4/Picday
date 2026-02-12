@@ -8,13 +8,13 @@ import androidx.compose.runtime.State
 import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.ui.platform.LocalDensity
 import com.devd.commonsystem.R
+import java.time.DayOfWeek
 import java.time.LocalDate
 import java.time.LocalTime
 import java.time.YearMonth
 import java.time.ZoneId
 import java.time.ZonedDateTime
 import java.time.temporal.TemporalAdjusters
-import java.util.Calendar
 
 object StringRexFormat {
     const val ID_REGEX = "^[a-zA-Z0-9]{2,10}$"
@@ -29,15 +29,15 @@ fun String.checkValidateRex(regexFormat: String): Boolean {
 }
 
 
-fun Int.convertWeekStr(): Int {
+fun DayOfWeek.convertWeekStr(): Int {
     return when (this) {
-        Calendar.SUNDAY -> R.string.sunday_text
-        Calendar.MONDAY -> R.string.monday_text
-        Calendar.TUESDAY -> R.string.tuesday_text
-        Calendar.WEDNESDAY -> R.string.wednesday_text
-        Calendar.THURSDAY -> R.string.thursday_text
-        Calendar.FRIDAY -> R.string.friday_text
-        else -> R.string.saturday_text
+        DayOfWeek.SUNDAY -> R.string.sunday_text
+        DayOfWeek.MONDAY -> R.string.monday_text
+        DayOfWeek.TUESDAY -> R.string.tuesday_text
+        DayOfWeek.WEDNESDAY -> R.string.wednesday_text
+        DayOfWeek.THURSDAY -> R.string.thursday_text
+        DayOfWeek.FRIDAY -> R.string.friday_text
+        DayOfWeek.SATURDAY -> R.string.saturday_text
     }
 }
 

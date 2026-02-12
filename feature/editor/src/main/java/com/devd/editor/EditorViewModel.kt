@@ -1,12 +1,15 @@
 package com.devd.editor
 
-import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import com.devd.commonsystem.ui.calendar.CustomDatePickerDialogState
 import com.devd.data.repository.OracleRepository
 import com.devd.datastore.DataStoreKey
 import com.devd.datastore.DataStoreRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.update
 import timber.log.Timber
 import java.io.File
 import javax.inject.Inject
@@ -19,33 +22,36 @@ class EditorViewModel @Inject constructor(
 
     var editorText = ""
 
-    val customDatePickerDialogState = mutableStateOf<CustomDatePickerDialogState?>(null)
+    private val _customDatePickerDialogState = MutableStateFlow(CustomDatePickerDialogState())
+    val customDatePickerDialogState: StateFlow<CustomDatePickerDialogState> get() = _customDatePickerDialogState.asStateFlow()
+
 
     fun initSelectDate(initDate: Long) {
-        customDatePickerDialogState.value = CustomDatePickerDialogState(
-            selectedDate = initDate,
-            onClickConfirm = { dateMillis ->
-                customDatePickerDialogState.value = customDatePickerDialogState.value?.copy(
-                    isShowDialog = false,
-                    selectedDate = dateMillis
-                )
-            },
-            onClickCancel = {
-                customDatePickerDialogState.value = customDatePickerDialogState.value?.copy(
-                    isShowDialog = false,
-                )
-            }
-        )
+        _customDatePickerDialogState.update {
+            it.copy(
+                selectedDate = initDate,
+                onClickConfirm = ::changeSelectData,
+                onClickCancel = ::dismissDatePickerDialog
+            )
+        }
+    }
+
+    fun changeSelectData(dateMillis: Long) {
+        _customDatePickerDialogState.update {
+            it.copy(isShowDialog = false, selectedDate = dateMillis)
+        }
+    }
+
+    fun showDatePickerDialog() {
+        _customDatePickerDialogState.update { it.copy(isShowDialog = true) }
+    }
+
+    fun dismissDatePickerDialog() {
+        _customDatePickerDialogState.update { it.copy(isShowDialog = false) }
     }
 
     fun setDiaryText(text: String) {
         editorText = text
-    }
-
-    fun showDatePickerDialog() {
-        customDatePickerDialogState.value = customDatePickerDialogState.value?.copy(
-            isShowDialog = true
-        )
     }
 
     suspend fun uploadImageToBuket(fileUrl: File) {
