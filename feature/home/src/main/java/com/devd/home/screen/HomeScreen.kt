@@ -95,12 +95,8 @@ fun HomeScreenRoute(
     )
     uiState.dialogMessage?.ShowMessageDialog(onLeftButtonClick = viewModel::dismissMessageDialog)
     uiState.isShowImagePicker.ShowImagePicker(
-        onCameraClick = {
-            imagePicker.launchCamera.invoke()
-        },
-        onGalleryClick = {
-            imagePicker.launchGallery.invoke()
-        },
+        onCameraClick = imagePicker.launchCamera,
+        onGalleryClick = imagePicker.launchGallery,
         onDismiss = viewModel::dismissImagePickerDialog
     )
     uiState.isLoading.LoadingDialog()

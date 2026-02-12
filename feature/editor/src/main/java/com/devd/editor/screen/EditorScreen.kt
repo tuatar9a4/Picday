@@ -16,8 +16,10 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
@@ -30,6 +32,8 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import com.devd.commonsystem.R
 import com.devd.commonsystem.ui.Toolbar
 import com.devd.commonsystem.ui.calendar.CustomDatePickerDialog
+import com.devd.commonsystem.ui.dialog.ShowImagePicker
+import com.devd.commonsystem.utils.rememberImagePicker
 import com.devd.commonsystem.utils.uriToFile
 import com.devd.editor.EditorViewModel
 import kotlinx.coroutines.launch
@@ -91,14 +95,22 @@ fun EditorScreenRoute(
 fun EditorScreen(
     modifier: Modifier = Modifier,
     writeDate: Long = System.currentTimeMillis(),
-    diaryImage: String = "",
+    diaryImage: String? = null,
     onSaveDairy: () -> Unit = {},
     onBackIconClick: () -> Unit = {},
     onChangeCalendar: () -> Unit = {},
     onChangeDiaryText: (String) -> Unit = {}
 ) {
 
-    val textFieldState = rememberTextFieldState("")
+    var imageUrl by remember { mutableStateOf(diaryImage?.toUri()) }
+    var isShowPickerDialog by remember { mutableStateOf(false) }
+    val imagePicker = rememberImagePicker { uri ->
+        uri?.let { imageUrl = it }
+    }
+
+
+    val contentsTextState = rememberTextFieldState("")
+
     val hashTagList = remember { mutableStateListOf<String>() }
     val focusManger = LocalFocusManager.current
     val scrollState = rememberScrollState()
@@ -130,18 +142,25 @@ fun EditorScreen(
         )   // 날짜 View
         Spacer(Modifier.height(20.dp))
         CardPreviewItem(
-            imageUrl = diaryImage.ifEmpty { null }?.toUri(),
-            diaryText = textFieldState.text.toString(),
-            diaryTag = hashTagList
+            imageUrl = imageUrl,
+            diaryText = contentsTextState.text.toString(),
+            diaryTag = hashTagList,
+            onChangeImage = { isShowPickerDialog = true }
         )   // 일기 미리보기
         Spacer(Modifier.height(10.dp))
         EditorItem(
             modifier = Modifier,
-            textFieldState = textFieldState,
+            textFieldState = contentsTextState,
             onChangeDiaryText = onChangeDiaryText,
             hashList = hashTagList
         )   // 일기 작성
         Spacer(Modifier.height(20.dp))
     }
+
+    isShowPickerDialog.ShowImagePicker(
+        onCameraClick = imagePicker.launchCamera,
+        onGalleryClick = imagePicker.launchGallery,
+        onDismiss = { isShowPickerDialog = false }
+    )
 
 }
