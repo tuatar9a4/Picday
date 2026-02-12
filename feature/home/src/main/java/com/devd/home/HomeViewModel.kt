@@ -24,6 +24,7 @@ import javax.inject.Inject
 data class HomeUiState(
     var isLoading: Boolean = false,
     var isShowCalendar: Boolean = false,
+    var isShowImagePicker: Boolean = false,
     var bookInfo: DiaryBookInfo? = null,
     var diaryList: List<DiaryInfo> = emptyList(),
     var searchDate: ZonedDateTime = Instant.now().atZone(ZoneId.systemDefault()),
@@ -88,12 +89,20 @@ class HomeViewModel @Inject constructor(
         _homeUiState.update { it.copy(isShowCalendar = false) }
     }
 
-    fun dismissDialog() {
+    fun showMessageDialog(@StringRes message: Int) {
+        _homeUiState.update { it.copy(dialogMessage = message) }
+    }
+
+    fun dismissMessageDialog() {
         _homeUiState.update { it.copy(dialogMessage = null) }
     }
 
-    fun showMessageDialog(@StringRes message: Int) {
-        _homeUiState.update { it.copy(dialogMessage = message) }
+    fun showImagePickerDialog() {
+        _homeUiState.update { it.copy(isShowImagePicker = true) }
+    }
+
+    fun dismissImagePickerDialog() {
+        _homeUiState.update { it.copy(isShowImagePicker = false) }
     }
 
     fun changeSearchMonth(changeTime: Long) {

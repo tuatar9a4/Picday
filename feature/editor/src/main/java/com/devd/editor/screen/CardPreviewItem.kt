@@ -29,19 +29,23 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.devd.commonsystem.R
 import com.devd.commonsystem.theme.BlackOpacity40Color
 import com.devd.commonsystem.theme.GreyColor
 import com.devd.commonsystem.theme.OneDayTypography
 import com.devd.commonsystem.theme.WhiteColor
+import com.devd.commonsystem.utils.noRippleClickable
 
 @Composable
 fun CardPreviewItem(
-    imageUrl: Uri? = null, diaryText: String = "", diaryTag: List<String> = listOf()
+    imageUrl: Uri? = null,
+    onChangeImage: () -> Unit = {},
+    diaryText: String = "",
+    diaryTag: List<String> = listOf()
 ) {
     val context = LocalContext.current
-
     val bitmap: Bitmap? = remember(imageUrl) {
         imageUrl?.let {
             context.contentResolver.openInputStream(it)?.use { stream ->
@@ -62,14 +66,17 @@ fun CardPreviewItem(
                 modifier = Modifier
                     .align(Alignment.Center)
                     .clip(RoundedCornerShape(10.dp))
-                    .fillMaxSize(),
+                    .fillMaxSize()
+                    .noRippleClickable(onClick = onChangeImage),
                 contentScale = ContentScale.Crop,
                 bitmap = it.asImageBitmap(),
                 contentDescription = null
             )
         } ?: run {
             Image(
-                modifier = Modifier.align(Alignment.Center),
+                modifier = Modifier
+                    .align(Alignment.Center)
+                    .noRippleClickable(onClick = onChangeImage),
                 painter = painterResource(R.drawable.icon_photo),
                 contentDescription = null
             )
@@ -114,4 +121,10 @@ fun CardPreviewItem(
             }
         }
     }
+}
+
+@Preview
+@Composable
+fun CardPreviewScreenPreview(){
+    CardPreviewItem()
 }
