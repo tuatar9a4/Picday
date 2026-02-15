@@ -32,10 +32,10 @@ import com.devd.commonsystem.ui.TextButton
 @Composable
 fun MessageDialog(
     message: String? = "Message",
-    @StringRes leftButtonMessage: Int = R.string.confirm,
-    onLeftButtonClick: () -> Unit = {},
-    @StringRes rightButtonMessage: Int? = null,
-    onRightButtonClick: (() -> Unit)? = null
+    @StringRes leftButtonMessage: Int? = null,
+    onLeftButtonClick: (() -> Unit)? = null,
+    @StringRes rightButtonMessage: Int = R.string.confirm,
+    onRightButtonClick: () -> Unit = {}
 ) {
     Dialog(
         onDismissRequest = {},
@@ -62,23 +62,22 @@ fun MessageDialog(
             )
             Spacer(Modifier.height(30.dp))
             Row() {
-                TextButton(
-                    modifier = Modifier.weight(1f),
-                    contentsPadding = PaddingValues(vertical = 10.dp),
-                    text = stringResource(leftButtonMessage),
-                    onClick = onLeftButtonClick
-                )
-                rightButtonMessage?.let {
-                    Spacer(Modifier.width(10.dp))
+                leftButtonMessage?.let {
                     TextButton(
                         modifier = Modifier.weight(1f),
                         enableButtonColor = GreyColor,
                         contentsPadding = PaddingValues(vertical = 10.dp),
                         text = stringResource(it),
-                        onClick = onRightButtonClick?:{}
+                        onClick = onLeftButtonClick ?: {}
                     )
+                    Spacer(Modifier.width(10.dp))
                 }
-
+                TextButton(
+                    modifier = Modifier.weight(1f),
+                    contentsPadding = PaddingValues(vertical = 10.dp),
+                    text = stringResource(rightButtonMessage),
+                    onClick = onRightButtonClick
+                )
             }
             Spacer(Modifier.height(20.dp))
         }
@@ -86,18 +85,18 @@ fun MessageDialog(
 }
 
 @Composable
-fun Int?.ShowMessageDialog(
-    @StringRes leftButtonMessage: Int? = null,
-    onLeftButtonClick: () -> Unit,
+fun String?.ShowMessageDialog(
+    onRightButtonClick: (() -> Unit),
     @StringRes rightButtonMessage: Int? = null,
-    onRightButtonClick: (() -> Unit)? = null
+    onLeftButtonClick: (() -> Unit)? = null,
+    @StringRes leftButtonMessage: Int? = null
 ) {
     if (this == null) return
     MessageDialog(
-        message = stringResource(this),
-        leftButtonMessage = leftButtonMessage ?: R.string.confirm,
+        message = this,
+        leftButtonMessage = leftButtonMessage,
         onLeftButtonClick = onLeftButtonClick,
-        rightButtonMessage = rightButtonMessage,
+        rightButtonMessage = rightButtonMessage ?: R.string.confirm,
         onRightButtonClick = onRightButtonClick
     )
 }

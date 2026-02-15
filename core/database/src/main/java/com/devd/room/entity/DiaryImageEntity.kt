@@ -19,8 +19,8 @@ import androidx.room.PrimaryKey
     indices = [Index("diaryId")]
 )
 data class DiaryImageEntity(
-    @PrimaryKey val id: String,
-    val diaryId: String,
+    @PrimaryKey(autoGenerate = true) val id: Long = 0L,
+    val diaryId: Long,
     val uri: String,        // 로컬 URI or S3 URL
     val order: Int          // 이미지 순서
 )

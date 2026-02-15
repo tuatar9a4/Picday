@@ -36,12 +36,14 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import coil3.compose.AsyncImage
 import com.devd.commonsystem.R
 import com.devd.commonsystem.theme.BlackColor
 import com.devd.commonsystem.theme.BlackOpacity40Color
 import com.devd.commonsystem.theme.OneDayTypography
 import com.devd.commonsystem.theme.WhiteColor
 import com.devd.commonsystem.utils.noRippleClickable
+import com.devd.commonsystem.utils.rememberImageUrl
 import com.devd.model.local.DiaryInfo
 import kotlin.math.absoluteValue
 import kotlin.math.max
@@ -82,6 +84,7 @@ fun DiaryListScreen(
                     diaryDate = item.createDay.toString(),
                     diaryTitle = item.content,
                     diaryTag = item.tagList,
+                    diaryImage = item.imageUrlList.firstOrNull()
                 )
             }
         }
@@ -93,10 +96,11 @@ fun DiaryCardScreen(
     modifier: Modifier = Modifier,
     diaryDate: String,
     diaryTitle: String,
-    diaryTag: List<String>,
     diaryImage: String? = null,
-    diarySticker: String? = null,
+    diaryTag: List<String>,
+    diarySticker: String? = null
 ) {
+    val prefixImageUrl = diaryImage?.rememberImageUrl()
     Card(
         modifier = modifier.then(
             Modifier
@@ -119,10 +123,12 @@ fun DiaryCardScreen(
                     color = BlackColor
                 )
             )
-            diaryImage?.let {
-                Image(
-                    modifier = Modifier.fillMaxSize(),
-                    painter = painterResource(R.drawable.icon_diary),
+            prefixImageUrl?.let {
+                AsyncImage(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .background(color = BlackColor, shape = RoundedCornerShape(20.dp)),
+                    model = it,
                     contentDescription = null
                 )
             }
@@ -170,7 +176,7 @@ fun DiaryCardScreen(
                         )
                     }
                 }
-                diarySticker.let {
+                diarySticker?.let {
                     Spacer(Modifier.height(6.dp))
                     Image(
                         modifier = Modifier.size(20.dp),

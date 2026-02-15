@@ -56,5 +56,9 @@ dependencies{
     debugImplementation(libs.findLibrary("androidx.compose.ui.tooling.preview").get())
     debugImplementation(libs.findLibrary("androidx.compose.ui.tooling").get())
 
+//    Coil
+    debugImplementation(libs.findLibrary("coil.image.compose").get())
+    debugImplementation(libs.findLibrary("coil.http.compose").get())
+
 
 }

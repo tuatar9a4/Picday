@@ -35,7 +35,7 @@ interface DiaryDao {
         LIMIT 1
     """
     )
-    suspend fun getDiaryById(diaryId: String): DiaryEntity?
+    suspend fun getDiaryById(diaryId: Long): DiaryWithExtras?
 
     @Query(
         """

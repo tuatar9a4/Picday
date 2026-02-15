@@ -1,6 +1,8 @@
 package com.devd.home
 
 import androidx.annotation.StringRes
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.res.stringResource
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.devd.commonsystem.R
@@ -29,7 +31,10 @@ data class HomeUiState(
     var diaryList: List<DiaryInfo> = emptyList(),
     var searchDate: ZonedDateTime = Instant.now().atZone(ZoneId.systemDefault()),
     @param:StringRes var dialogMessage: Int? = null
-)
+){
+    @Composable
+    fun getDialogMessage() = dialogMessage?.let { stringResource(it) }
+}
 
 @HiltViewModel
 class HomeViewModel @Inject constructor(

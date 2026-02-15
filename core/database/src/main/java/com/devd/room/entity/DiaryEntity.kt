@@ -31,8 +31,8 @@ data class DiaryEntity(
     val createdAt: Long,
     val updatedAt: Long,
 
-    val mood: Int?,
-    val weather: Int?,
+    val mood: Int? = null,
+    val weather: Int? = null,
 
     val isDeleted: Boolean = false
 )

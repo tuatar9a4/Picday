@@ -39,20 +39,20 @@ fun EditorItem(
     modifier: Modifier = Modifier,
     textFieldState: TextFieldState,
     onChangeDiaryText: (String) -> Unit = {},
+    onChangeTagItem: (List<String>) -> Unit = {},
     hashList: SnapshotStateList<String> = mutableStateListOf()
 ) {
     val hashTextField = rememberTextFieldState()
+
+    fun addHashTag(hashTag: String) {
+        hashList.add(hashTag)
+        hashTextField.clearText()
+        onChangeTagItem.invoke(hashList)
+    }
+
     Column(
         modifier = modifier.then(Modifier)
     ) {
-//        Row(
-//            modifier = Modifier
-//                .fillMaxWidth()
-//                .background(color = WhiteColor)
-//                .padding(horizontal = 15.dp, vertical = 5.dp)
-//        ) {
-//            Text(text = "Bold", style = OneDayTypography.bodySmall)
-//        } // HTML 설정
         Spacer(Modifier.height(5.dp))
         TextField(
             modifier = Modifier
@@ -92,16 +92,14 @@ fun EditorItem(
                     inputTransformation = {
                         if (length > 8) revertAllChanges()
                         if (asCharSequence().toString().contains(" ")) {
-                            hashList.add(hashTextField.text.toString())
-                            hashTextField.clearText()
+                            addHashTag(hashTextField.text.toString())
                         }
                     },
                     keyboardOptions = KeyboardOptions.Default.copy(
                         imeAction = ImeAction.Done
                     ),
                     onKeyboardAction = {
-                        hashList.add(hashTextField.text.toString())
-                        hashTextField.clearText()
+                        addHashTag(hashTextField.text.toString())
                     },
                     shape = RoundedCornerShape(5.dp),
                     colors = OneDayTextFieldColors,

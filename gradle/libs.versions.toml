@@ -43,6 +43,9 @@ gsonVersion = "2.10.1"
 # https://github.com/MohamedRejeb/Compose-Rich-Editor
 composeRichEditorVersion = "1.0.4"
 
+# https://github.com/coil-kt/coil#jetpack-compose
+coilVersion = "3.1.0"
+
 [libraries]
 android-gradlePlugin = { group = "com.android.tools.build", name = "gradle", version.ref = "androidGradlePlugin" }
 kotlin-gradlePlugin = { module = "org.jetbrains.kotlin:kotlin-gradle-plugin", version.ref = "kotlin" }
@@ -111,6 +114,11 @@ kotlinx-serialization-json ={group="org.jetbrains.kotlinx", name="kotlinx-serial
 
 #rich-editor
 compose-rich-editor = { group = "com.github.donald-okara", name = "TextieMDLibrary", version.ref = "composeRichEditorVersion" }
+
+#Coil-Image
+coil-image-compose = { group = "io.coil-kt.coil3", name = "coil-compose", version.ref = "coilVersion" }
+coil-http-compose = { group = "io.coil-kt.coil3", name = "coil-network-okhttp", version.ref = "coilVersion" }
+
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

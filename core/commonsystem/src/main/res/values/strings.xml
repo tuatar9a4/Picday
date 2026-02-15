@@ -23,4 +23,6 @@
     <string name="fail_fetch_diary_book">"일기장을 불러오는데 실패했습니다."</string>
     <string name="need_camera_permission">"일기의 사용할 이미지를 가져오기 위해 카메라 권한이 필요합니다."</string>
     <string name="editor_page_title">"Editor"</string>
+    <string name="success_save_diary_message">"일기 저장에 성공하였습니다!"</string>
+    <string name="ask_save_diary_message">"일기를 저장하시겠습니까?"</string>
 </resources>

@@ -35,8 +35,8 @@ val GreyOpacity40Color = Color(0x668F8A84)
 val OneDayTextFieldColors
     @Composable
     get() = TextFieldDefaults.colors().copy(
-    focusedIndicatorColor = Color.Transparent,
-    unfocusedIndicatorColor = Color.Transparent,
+    focusedIndicatorColor = Color.White,
+    unfocusedIndicatorColor = Color.White,
     focusedContainerColor = PrimaryColor,
     unfocusedContainerColor = PrimaryColor,
     cursorColor = AccentColor,

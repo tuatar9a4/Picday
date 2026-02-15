@@ -41,9 +41,9 @@ import com.devd.commonsystem.utils.noRippleClickable
 @Composable
 fun CardPreviewItem(
     imageUrl: Uri? = null,
+    diaryContents: String = "",
+    diaryTag: List<String> = listOf(),
     onChangeImage: () -> Unit = {},
-    diaryText: String = "",
-    diaryTag: List<String> = listOf()
 ) {
     val context = LocalContext.current
     val bitmap: Bitmap? = remember(imageUrl) {
@@ -100,7 +100,7 @@ fun CardPreviewItem(
                     maxLines = 2,
                     minLines = 2,
                     overflow = TextOverflow.Ellipsis,
-                    text = diaryText,
+                    text = diaryContents,
                     style = OneDayTypography.bodySmall.copy(
                         color = WhiteColor
                     )
@@ -125,6 +125,6 @@ fun CardPreviewItem(
 
 @Preview
 @Composable
-fun CardPreviewScreenPreview(){
+fun CardPreviewScreenPreview() {
     CardPreviewItem()
 }

@@ -4,6 +4,7 @@ import androidx.room.Transaction
 import com.devd.commonsystem.utils.getCurrentMonthRangeMillis
 import com.devd.data.utils.CallResult
 import com.devd.data.utils.SafeNetCall
+import com.devd.model.local.CreateDiaryRequest
 import com.devd.room.dao.DiaryBookDao
 import com.devd.room.dao.DiaryDao
 import com.devd.room.dao.DiaryImageDao
@@ -101,19 +102,31 @@ class DiaryBookRepository @Inject constructor(
 
     @Transaction
     suspend fun saveDairyWithExtras(
-        diary: DiaryEntity,
-        images: List<DiaryImageEntity>,
-        tags: List<String>
+        diaryInfo: CreateDiaryRequest,
     ) {
-
+        val createTime = System.currentTimeMillis()
+        val diary = DiaryEntity(
+            diaryBookId = diaryInfo.bookId,
+            content = diaryInfo.content,
+            createdAt = createTime,
+            updatedAt = createTime,
+        )
         val diaryId = diaryDao.insertDiary(diary)
 
+        val imageRequest = diaryInfo.imageUrls.mapIndexed { index, string ->
+            DiaryImageEntity(
+                diaryId = diaryId,
+                uri = string,
+                order = index
+            )
+        }
+
         diaryImageDao.deleteImagesByDiary(diaryId)
-        diaryImageDao.insertImages(images)
+        diaryImageDao.insertImages(imageRequest)
 
         diaryTagDao.deleteByDiary(diaryId)
 
-        tags.forEach { tagName ->
+        diaryInfo.tags.forEach { tagName ->
             val tagId = tagDao.getTagByName(tagName)?.id
                 ?: tagDao.insertTag(TagEntity(name = tagName))
 
@@ -124,7 +137,6 @@ class DiaryBookRepository @Inject constructor(
                 )
             )
         }
-
     }
 
 

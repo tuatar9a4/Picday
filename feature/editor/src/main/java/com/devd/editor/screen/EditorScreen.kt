@@ -1,5 +1,6 @@
 package com.devd.editor.screen
 
+import android.net.Uri
 import androidx.compose.foundation.gestures.scrollBy
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -29,20 +30,19 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.core.net.toUri
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.devd.commonsystem.R
 import com.devd.commonsystem.ui.Toolbar
 import com.devd.commonsystem.ui.calendar.CustomDatePickerDialog
 import com.devd.commonsystem.ui.dialog.ShowImagePicker
+import com.devd.commonsystem.ui.dialog.ShowMessageDialog
+import com.devd.commonsystem.ui.loading.LoadingDialog
 import com.devd.commonsystem.utils.rememberImagePicker
 import com.devd.commonsystem.utils.uriToFile
 import com.devd.editor.EditorViewModel
+import com.devd.editor.data.ASK_SAVE
+import com.devd.editor.data.SAVE_SUCCESS
 import kotlinx.coroutines.launch
-
-
-@Composable
-fun rememberImeVisible(): Boolean {
-    return WindowInsets.ime.getBottom(LocalDensity.current) > 0
-}
 
 @Composable
 fun rememberImeBottomSize(): Int {
@@ -60,25 +60,38 @@ fun EditorScreenRoute(
     diaryId: Long?,
     onBackIconClick: () -> Unit
 ) {
-
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
-    LaunchedEffect(Unit) { viewModel.initSelectDate(currentTime) }
+    LaunchedEffect(Unit) {
+        viewModel.initSelectDate(currentTime)
+        viewModel.initDiaryInfo(bookId, diaryId, diaryImage.toUri())
+    }
+    /* UiState */
+    val uiState by viewModel.editorUiState.collectAsStateWithLifecycle()
+
+    /* MessageDialog */
+    val messageDialog by viewModel.messageDialog.collectAsStateWithLifecycle(null)
+
+    /* ImagePicker */
+    var isShowPickerDialog by remember { mutableStateOf(false) }
+    val imagePicker = rememberImagePicker { uri ->
+        uri?.let { viewModel.updateImageUrl(it) }
+    }
+
+    /* CalendarDialog */
     val customDatePickerDialogState by viewModel.customDatePickerDialogState.collectAsState()
+    val diaryInfoState by viewModel.diaryInfoState.collectAsState()
 
     EditorScreen(
         modifier = modifier,
         writeDate = customDatePickerDialogState.selectedDate,
-        diaryImage = diaryImage,
-        onSaveDairy = {
-            scope.launch {
-                val file = context.uriToFile(diaryImage.toUri())
-                viewModel.uploadImageToBuket(fileUrl = file)
-            }
-        },
+        diaryImage = diaryInfoState.imageUrl,
+        onShowImagePicker = { isShowPickerDialog = true },
+        onChangeDiaryText = viewModel::setDiaryText,
+        onChangeHashTag = viewModel::changeHashTag,
+        onSaveDairy = viewModel::showAskSavePopup,
         onBackIconClick = onBackIconClick,
         onChangeCalendar = viewModel::showDatePickerDialog,
-        onChangeDiaryText = viewModel::setDiaryText,
     )
     if (customDatePickerDialogState.isShowDialog) {
         CustomDatePickerDialog(
@@ -88,6 +101,28 @@ fun EditorScreenRoute(
             onClickCancel = customDatePickerDialogState.onClickCancel
         )
     }
+
+    isShowPickerDialog.ShowImagePicker(
+        onCameraClick = imagePicker.launchCamera,
+        onGalleryClick = imagePicker.launchGallery,
+        onDismiss = { isShowPickerDialog = false }
+    )
+    uiState.isShowLoading.LoadingDialog()
+    messageDialog?.getMessage()?.ShowMessageDialog(
+        rightButtonMessage = if (messageDialog?.type == ASK_SAVE) R.string.cancel else R.string.confirm,
+        onRightButtonClick = {
+            if (messageDialog?.type == SAVE_SUCCESS) onBackIconClick.invoke()
+        },
+        leftButtonMessage = if (messageDialog?.type == ASK_SAVE) R.string.confirm else null,
+        onLeftButtonClick = if (messageDialog?.type == ASK_SAVE) {
+            {
+                scope.launch {
+                    val file = context.uriToFile(diaryImage.toUri())
+                    viewModel.uploadImageToBuket(fileUrl = file)
+                }
+            }
+        } else null
+    )
 }
 
 @Preview
@@ -95,19 +130,14 @@ fun EditorScreenRoute(
 fun EditorScreen(
     modifier: Modifier = Modifier,
     writeDate: Long = System.currentTimeMillis(),
-    diaryImage: String? = null,
+    diaryImage: Uri? = null,
+    onShowImagePicker: () -> Unit = {},
     onSaveDairy: () -> Unit = {},
     onBackIconClick: () -> Unit = {},
     onChangeCalendar: () -> Unit = {},
-    onChangeDiaryText: (String) -> Unit = {}
+    onChangeDiaryText: (String) -> Unit = {},
+    onChangeHashTag: (List<String>) -> Unit = {}
 ) {
-
-    var imageUrl by remember { mutableStateOf(diaryImage?.toUri()) }
-    var isShowPickerDialog by remember { mutableStateOf(false) }
-    val imagePicker = rememberImagePicker { uri ->
-        uri?.let { imageUrl = it }
-    }
-
 
     val contentsTextState = rememberTextFieldState("")
 
@@ -142,25 +172,20 @@ fun EditorScreen(
         )   // 날짜 View
         Spacer(Modifier.height(20.dp))
         CardPreviewItem(
-            imageUrl = imageUrl,
-            diaryText = contentsTextState.text.toString(),
+            imageUrl = diaryImage,
+            diaryContents = contentsTextState.text.toString(),
             diaryTag = hashTagList,
-            onChangeImage = { isShowPickerDialog = true }
+            onChangeImage = onShowImagePicker
         )   // 일기 미리보기
         Spacer(Modifier.height(10.dp))
         EditorItem(
             modifier = Modifier,
             textFieldState = contentsTextState,
+            hashList = hashTagList,
             onChangeDiaryText = onChangeDiaryText,
-            hashList = hashTagList
+            onChangeTagItem = onChangeHashTag,
         )   // 일기 작성
         Spacer(Modifier.height(20.dp))
     }
-
-    isShowPickerDialog.ShowImagePicker(
-        onCameraClick = imagePicker.launchCamera,
-        onGalleryClick = imagePicker.launchGallery,
-        onDismiss = { isShowPickerDialog = false }
-    )
 
 }

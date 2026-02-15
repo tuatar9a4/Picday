@@ -27,17 +27,6 @@ class OracleRepository @Inject constructor(
     ) = callbackFlow {
         trySend(StartUpload)
         runCatching {
-//            val requestBody = MultipartBody.Part.createFormData(
-//                "image",
-//                file.name,
-//                StreamRequestBody(
-//                    file = file,
-//                    contentType = "image/jpeg",
-//                ) {
-//                    trySend(Uploading(it))
-//                }
-//            )
-
             val requestBody = StreamRequestBody(
                 file = file,
                 contentType = "image/jpeg",
@@ -51,12 +40,11 @@ class OracleRepository @Inject constructor(
                 file = requestBody
             )
         }.onSuccess {
-            trySend(SuccessUpload)
+            trySend(SuccessUpload(file.name))
         }.onFailure { e ->
             e.printStackTrace()
-            trySend(FailUpload)
+            trySend(FailUpload(e.localizedMessage ?: "Fail"))
         }
-
         close()
     }.flowOn(Dispatchers.IO).distinctUntilChanged()
 
