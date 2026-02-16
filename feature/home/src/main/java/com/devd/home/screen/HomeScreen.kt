@@ -26,6 +26,7 @@ import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.core.net.toUri
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.devd.commonsystem.R
@@ -34,6 +35,7 @@ import com.devd.commonsystem.theme.PrimaryColor
 import com.devd.commonsystem.theme.WhiteColor
 import com.devd.commonsystem.ui.Toolbar
 import com.devd.commonsystem.ui.calendar.CustomDatePickerDialog
+import com.devd.commonsystem.ui.cropImageDialog.ShowCropDialog
 import com.devd.commonsystem.ui.dialog.ShowImagePicker
 import com.devd.commonsystem.ui.dialog.ShowMessageDialog
 import com.devd.commonsystem.ui.loading.LoadingDialog
@@ -46,6 +48,7 @@ import com.devd.permission.Consts
 import com.devd.permission.IPermissionHandler
 import com.devd.permission.rememberPermissionHandler
 import kotlinx.coroutines.launch
+import java.io.File
 
 
 @Composable
@@ -63,14 +66,17 @@ fun HomeScreenRoute(
 
     val imagePicker = rememberImagePicker { uri ->
         uri?.let {
-            val selectIndex = diaryState.centerItemIndex() ?: -1
-            val selectDiary = uiState.diaryList.getOrNull(selectIndex)
-            onEditorMove.invoke(
-                it.toString(),
-                uiState.bookInfo?.bookId ?: 0,
-                selectDiary?.diaryId?.takeIf { id -> id != -1L }
-            )
+            viewModel.changeCropImageDialog(it)
         }
+    }
+
+    fun moveToEditor(cropFile: File) {
+        val selectIndex = diaryState.centerItemIndex() ?: -1
+        val selectDiary = uiState.diaryList.getOrNull(selectIndex)
+        onEditorMove.invoke(
+            cropFile.toUri().toString(),
+            uiState.bookInfo?.bookId ?: 0,
+            selectDiary?.diaryId?.takeIf { id -> id != -1L })
     }
 
     LaunchedEffect(Unit) {
@@ -91,15 +97,19 @@ fun HomeScreenRoute(
                     viewModel.showImagePickerDialog()
                 }
             }
-        }
-    )
-    uiState.getDialogMessage()?.ShowMessageDialog(onRightButtonClick = viewModel::dismissMessageDialog)
+        })
+    uiState.getDialogMessage()
+        ?.ShowMessageDialog(onRightButtonClick = viewModel::dismissMessageDialog)
     uiState.isShowImagePicker.ShowImagePicker(
         onCameraClick = imagePicker.launchCamera,
         onGalleryClick = imagePicker.launchGallery,
         onDismiss = viewModel::dismissImagePickerDialog
     )
     uiState.isLoading.LoadingDialog()
+    uiState.uriForCrop?.ShowCropDialog { saveFile ->
+        viewModel.changeCropImageDialog(null)
+        saveFile?.let { moveToEditor(saveFile) }
+    }
     if (uiState.isShowCalendar) {
         CustomDatePickerDialog(
             title = "검색할 날짜를 선택해주세요",
@@ -139,8 +149,7 @@ fun HomeScreen(
                 rightButtonClick = {})
             Spacer(Modifier.height(20.dp))
             BookCardScreen(
-                modifier = Modifier
-                    .align(Alignment.CenterHorizontally),
+                modifier = Modifier.align(Alignment.CenterHorizontally),
                 diaryTitle = uiState.bookInfo?.title ?: "",
                 diaryDescription = uiState.bookInfo?.description ?: "",
                 diaryMonthPercent = uiState.bookInfo?.monthWritePercent ?: 0f,
@@ -151,8 +160,7 @@ fun HomeScreen(
                 searchDate = uiState.searchDate,
                 onClick = { time ->
                     onClickDate.invoke()
-                }
-            )   // 년도 선택 스크린
+                })   // 년도 선택 스크린
             Spacer(Modifier.height(15.dp))
             DiaryListScreen(
                 modifier = Modifier,
@@ -169,8 +177,7 @@ fun HomeScreen(
 
         ) {
             FloatingActionButton(
-                modifier = Modifier
-                    .size(42.dp),
+                modifier = Modifier.size(42.dp),
                 shape = CircleShape,
                 containerColor = AccentOpacity40Color,
                 elevation = FloatingActionButtonDefaults.elevation(defaultElevation = 0.dp),
@@ -184,8 +191,7 @@ fun HomeScreen(
             }   // 일기장 작성 이동 버튼
             Spacer(Modifier.width(20.dp))
             FloatingActionButton(
-                modifier = Modifier
-                    .size(42.dp),
+                modifier = Modifier.size(42.dp),
                 shape = CircleShape,
                 containerColor = AccentOpacity40Color,
                 elevation = FloatingActionButtonDefaults.elevation(defaultElevation = 0.dp),

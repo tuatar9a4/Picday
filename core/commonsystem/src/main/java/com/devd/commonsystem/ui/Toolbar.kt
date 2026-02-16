@@ -13,22 +13,28 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.devd.commonsystem.R
+import com.devd.commonsystem.theme.BlackColor
 import com.devd.commonsystem.theme.OneDayTypography
 import com.devd.commonsystem.theme.TextDefaultColor
+import com.devd.commonsystem.theme.WhiteColor
 
 @Composable
 fun Toolbar(
     modifier: Modifier = Modifier,
     title: String,
+    useWhitIcon: Boolean = false,
     @DrawableRes leftButtonIcon: Int = R.drawable.icon_back_arrow,
     leftButtonClick: (() -> Unit)? = null,
     @DrawableRes rightButtonIcon: Int = R.drawable.icon_hamburger,
     rightButtonClick: (() -> Unit)? = null,
 ) {
+
+    val colorFilter = ColorFilter.tint(color = if (useWhitIcon) WhiteColor else BlackColor)
     Row(
         modifier = modifier.then(
             Modifier
@@ -45,13 +51,14 @@ fun Toolbar(
                     .size(32.dp)
                     .padding(4.dp),
                 painter = painterResource(leftButtonIcon),
+                colorFilter = colorFilter,
                 contentDescription = "Back"
             )
         } ?: Spacer(Modifier.size(32.dp))
         Text(
             text = title,
             style = OneDayTypography.titleMedium.copy(
-                color = TextDefaultColor
+                color = if (useWhitIcon) WhiteColor else TextDefaultColor
             )
         )
         rightButtonClick?.let {
@@ -61,6 +68,7 @@ fun Toolbar(
                     .size(32.dp)
                     .padding(4.dp),
                 painter = painterResource(rightButtonIcon),
+                colorFilter = colorFilter,
                 contentDescription = "Back"
             )
         } ?: Spacer(Modifier.size(32.dp))

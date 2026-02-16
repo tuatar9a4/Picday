@@ -164,6 +164,7 @@ fun EditorScreen(
             title = stringResource(R.string.editor_page_title),
             leftButtonIcon = R.drawable.icon_back_arrow,
             leftButtonClick = onBackIconClick,
+            rightButtonIcon = R.drawable.icon_pencil,
             rightButtonClick = onSaveDairy
         )
         Spacer(Modifier.height(15.dp))

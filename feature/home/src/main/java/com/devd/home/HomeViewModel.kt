@@ -1,5 +1,6 @@
 package com.devd.home
 
+import android.net.Uri
 import androidx.annotation.StringRes
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.res.stringResource
@@ -27,11 +28,12 @@ data class HomeUiState(
     var isLoading: Boolean = false,
     var isShowCalendar: Boolean = false,
     var isShowImagePicker: Boolean = false,
+    var uriForCrop: Uri? = null,
     var bookInfo: DiaryBookInfo? = null,
     var diaryList: List<DiaryInfo> = emptyList(),
     var searchDate: ZonedDateTime = Instant.now().atZone(ZoneId.systemDefault()),
     @param:StringRes var dialogMessage: Int? = null
-){
+) {
     @Composable
     fun getDialogMessage() = dialogMessage?.let { stringResource(it) }
 }
@@ -108,6 +110,10 @@ class HomeViewModel @Inject constructor(
 
     fun dismissImagePickerDialog() {
         _homeUiState.update { it.copy(isShowImagePicker = false) }
+    }
+
+    fun changeCropImageDialog(uri: Uri?) {
+        _homeUiState.update { it.copy(uriForCrop = uri) }
     }
 
     fun changeSearchMonth(changeTime: Long) {
