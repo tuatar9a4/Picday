@@ -2,7 +2,6 @@ package com.devd.editor.screen
 
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
-import android.net.Uri
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -24,36 +23,41 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import coil3.compose.AsyncImage
 import com.devd.commonsystem.R
 import com.devd.commonsystem.theme.BlackOpacity40Color
 import com.devd.commonsystem.theme.GreyColor
 import com.devd.commonsystem.theme.OneDayTypography
 import com.devd.commonsystem.theme.WhiteColor
 import com.devd.commonsystem.utils.noRippleClickable
+import com.devd.commonsystem.utils.rememberImageUrl
+import com.devd.editor.data.ImageType
+import com.devd.editor.data.Local
+import com.devd.editor.data.Remote
+import timber.log.Timber
 
 @Composable
 fun CardPreviewItem(
-    imageUrl: Uri? = null,
+    imageUrl: ImageType? = null,
     diaryContents: String = "",
     diaryTag: List<String> = listOf(),
     onChangeImage: () -> Unit = {},
 ) {
     val context = LocalContext.current
     val bitmap: Bitmap? = remember(imageUrl) {
-        imageUrl?.let {
+        (imageUrl as? Local)?.uri?.let {
             context.contentResolver.openInputStream(it)?.use { stream ->
                 BitmapFactory.decodeStream(stream)
             }
         }
     }
-
+    Timber.d("CheckRetmoe => ${imageUrl is Remote} => ${(imageUrl as? Remote)?.url?.rememberImageUrl()}")
     Box(
         modifier = Modifier
             .fillMaxWidth()
@@ -61,15 +65,15 @@ fun CardPreviewItem(
             .background(color = GreyColor, shape = RoundedCornerShape(10.dp))
             .aspectRatio(9 / 16f)
     ) {
-        bitmap?.let {
-            Image(
+        imageUrl?.let {
+            AsyncImage(
                 modifier = Modifier
                     .align(Alignment.Center)
                     .clip(RoundedCornerShape(10.dp))
                     .fillMaxSize()
                     .noRippleClickable(onClick = onChangeImage),
                 contentScale = ContentScale.Crop,
-                bitmap = it.asImageBitmap(),
+                model = if (imageUrl is Remote) imageUrl.url?.rememberImageUrl() else it,
                 contentDescription = null
             )
         } ?: run {

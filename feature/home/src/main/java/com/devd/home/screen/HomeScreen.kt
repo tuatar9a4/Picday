@@ -54,7 +54,7 @@ import java.io.File
 @Composable
 fun HomeScreenRoute(
     modifier: Modifier = Modifier,
-    onEditorMove: (imageUrl: String, bookId: Long, diaryId: Long?) -> Unit = { _, _, _ -> },
+    onEditorMove: (imageUrl: String?, bookId: Long, diaryId: Long?) -> Unit = { _, _, _ -> },
     viewModel: HomeViewModel = hiltViewModel()
 ) {
     val uiState by viewModel.homeUiState.collectAsStateWithLifecycle()
@@ -70,13 +70,21 @@ fun HomeScreenRoute(
         }
     }
 
-    fun moveToEditor(cropFile: File) {
-        val selectIndex = diaryState.centerItemIndex() ?: -1
-        val selectDiary = uiState.diaryList.getOrNull(selectIndex)
+    suspend fun checkPermission() {
+        val grant = permissionHandler.requestPermissionIfNeeded(Consts.CAMERA_PERMISSION)
+        if (grant.any { !it.value }) {
+            viewModel.showMessageDialog(R.string.need_camera_permission)
+        } else {
+            viewModel.showImagePickerDialog()
+        }
+    }
+
+    fun moveToEditor(cropFile: File?, diaryId: Long?) {
         onEditorMove.invoke(
-            cropFile.toUri().toString(),
+            cropFile?.toUri()?.toString(),
             uiState.bookInfo?.bookId ?: 0,
-            selectDiary?.diaryId?.takeIf { id -> id != -1L })
+            diaryId
+        )
     }
 
     LaunchedEffect(Unit) {
@@ -89,17 +97,19 @@ fun HomeScreenRoute(
         diaryState = diaryState,
         onClickDate = viewModel::showCalendarDialog,
         onEditorClick = {
-            scope.launch {
-                val grant = permissionHandler.requestPermissionIfNeeded(Consts.CAMERA_PERMISSION)
-                if (grant.any { !it.value }) {
-                    viewModel.showMessageDialog(R.string.need_camera_permission)
-                } else {
-                    viewModel.showImagePickerDialog()
-                }
+            val selectIndex = diaryState.centerItemIndex() ?: -1
+            val selectDiary =
+                uiState.diaryList.getOrNull(selectIndex)?.diaryId?.takeIf { id -> id != -1L }
+            selectDiary?.let {
+                moveToEditor(null, it)
+            } ?: run {
+                scope.launch { checkPermission() }
             }
         })
+
     uiState.getDialogMessage()
         ?.ShowMessageDialog(onRightButtonClick = viewModel::dismissMessageDialog)
+
     uiState.isShowImagePicker.ShowImagePicker(
         onCameraClick = imagePicker.launchCamera,
         onGalleryClick = imagePicker.launchGallery,
@@ -108,7 +118,7 @@ fun HomeScreenRoute(
     uiState.isLoading.LoadingDialog()
     uiState.uriForCrop?.ShowCropDialog { saveFile ->
         viewModel.changeCropImageDialog(null)
-        saveFile?.let { moveToEditor(saveFile) }
+        saveFile?.let { moveToEditor(saveFile, null) }
     }
     if (uiState.isShowCalendar) {
         CustomDatePickerDialog(
@@ -160,7 +170,8 @@ fun HomeScreen(
                 searchDate = uiState.searchDate,
                 onClick = { time ->
                     onClickDate.invoke()
-                })   // 년도 선택 스크린
+                }
+            )   // 년도 선택 스크린
             Spacer(Modifier.height(15.dp))
             DiaryListScreen(
                 modifier = Modifier,

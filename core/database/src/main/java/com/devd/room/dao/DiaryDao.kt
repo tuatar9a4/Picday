@@ -4,7 +4,6 @@ import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
-import androidx.room.Transaction
 import androidx.room.Update
 import com.devd.room.data.DiaryWithExtras
 import com.devd.room.entity.DiaryEntity
@@ -15,7 +14,7 @@ interface DiaryDao {
     /* Create */
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun insertDiary(diary: DiaryEntity) : Long
+    suspend fun insertDiary(diary: DiaryEntity): Long
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertDiaries(diaries: List<DiaryEntity>)
@@ -49,17 +48,18 @@ interface DiaryDao {
     ): List<DiaryEntity>
 
 
-    @Transaction
     @Query(
         """
         SELECT * FROM diary
-        WHERE diaryBookId = :diaryBookId AND isDeleted = 0
-        ORDER BY createdAt DESC
+        WHERE diaryBookId = :diaryBookId
+           AND localId = :diaryId
+           AND isDeleted = 0
     """
     )
     suspend fun getDiariesWithExtras(
-        diaryBookId: Long
-    ): List<DiaryWithExtras>
+        diaryBookId: Long,
+        diaryId: Long
+    ): DiaryWithExtras
 
     @Query(
         """
@@ -84,7 +84,8 @@ interface DiaryDao {
         SET isDeleted = 1,
             updatedAt = :deletedAt
         WHERE localId = :diaryId
-    """)
+    """
+    )
     suspend fun softDeleteDiary(
         diaryId: String,
         deletedAt: Long = System.currentTimeMillis()

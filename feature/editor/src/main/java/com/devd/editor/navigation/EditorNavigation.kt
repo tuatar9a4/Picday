@@ -11,7 +11,7 @@ import kotlinx.serialization.Serializable
 @Serializable
 data class EditorRoute(
     val currentTime: Long,
-    val imageUrl: String,
+    val imageUrl: String?,
     val bookId: Long,
     val diaryId: Long?
 )
@@ -19,14 +19,14 @@ data class EditorRoute(
 
 fun NavGraphBuilder.editorScreen(
     modifier: Modifier = Modifier,
-    backListner : ()->Unit
+    backListener : ()->Unit
 ) {
     composable<EditorRoute> { backstackEntry ->
         val route = backstackEntry.toRoute<EditorRoute>()
 
         EditorScreenRoute(
             modifier = modifier,
-            onBackIconClick = backListner,
+            onBackIconClick = backListener,
             currentTime = route.currentTime,
             diaryImage = route.imageUrl,
             bookId = route.bookId,

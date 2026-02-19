@@ -5,6 +5,7 @@ import com.devd.commonsystem.utils.getCurrentMonthRangeMillis
 import com.devd.data.utils.CallResult
 import com.devd.data.utils.SafeNetCall
 import com.devd.model.local.CreateDiaryRequest
+import com.devd.model.local.UpdateDiaryRequest
 import com.devd.room.dao.DiaryBookDao
 import com.devd.room.dao.DiaryDao
 import com.devd.room.dao.DiaryImageDao
@@ -84,11 +85,12 @@ class DiaryBookRepository @Inject constructor(
 
     /* Diary */
 
-    suspend fun fetchDairiesByDiaryBook(diaryBookId: Long) = safeApiCall(Dispatchers.IO) {
-        diaryDao.getDiariesWithExtras(diaryBookId).map { it.transToModel() }
-    }.run {
-        return@run if (this is CallResult.Success) this.res else emptyList()
-    }
+    suspend fun fetchDairiesByDiaryBook(diaryBookId: Long, diaryId: Long) =
+        safeApiCall(Dispatchers.IO) {
+            diaryDao.getDiariesWithExtras(diaryBookId, diaryId).transToModel()
+        }.run {
+            return@run if (this is CallResult.Success) this.res else null
+        }
 
     suspend fun fetchMonthDairiesByDiaryBook(
         diaryBookId: Long,
@@ -133,6 +135,45 @@ class DiaryBookRepository @Inject constructor(
             diaryTagDao.insertCross(
                 DiaryTagCrossEntity(
                     diaryId = diaryId,
+                    tagId = tagId
+                )
+            )
+        }
+    }
+
+    @Transaction
+    suspend fun updateDiaryWithExtras(
+        diaryInfo: UpdateDiaryRequest
+    ){
+        val diaryExtras = diaryDao.getDiaryById(diaryId = diaryInfo.diaryId)!!
+        val diary = diaryExtras.diary
+        diary.content = diaryInfo.content
+        diary.updatedAt = System.currentTimeMillis()
+        diaryDao.updateDiary(diary)
+
+        val imageRequest = diaryInfo.imageUrls.mapIndexed { index, string ->
+            DiaryImageEntity(
+                diaryId = diary.localId,
+                uri = string,
+                order = index
+            )
+        }
+
+        val firstImage =  diaryImageDao.getImagesByDiary(diary.localId).firstOrNull()
+
+        if(imageRequest.firstOrNull()?.uri != firstImage?.uri){
+            diaryImageDao.deleteImagesByDiary(diary.localId)
+            diaryImageDao.insertImages(imageRequest)
+        }
+
+        diaryTagDao.deleteByDiary(diary.localId)
+        diaryInfo.tags.forEach { tagName ->
+            val tagId = tagDao.getTagByName(tagName)?.id
+                ?: tagDao.insertTag(TagEntity(name = tagName))
+
+            diaryTagDao.insertCross(
+                DiaryTagCrossEntity(
+                    diaryId = diary.localId,
                     tagId = tagId
                 )
             )

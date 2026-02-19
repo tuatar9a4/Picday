@@ -1,6 +1,5 @@
 package com.devd.editor.screen
 
-import android.net.Uri
 import androidx.compose.foundation.gestures.scrollBy
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -11,6 +10,7 @@ import androidx.compose.foundation.layout.ime
 import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.input.rememberTextFieldState
+import androidx.compose.foundation.text.input.setTextAndPlaceCursorAtEnd
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -19,7 +19,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -41,8 +40,10 @@ import com.devd.commonsystem.utils.rememberImagePicker
 import com.devd.commonsystem.utils.uriToFile
 import com.devd.editor.EditorViewModel
 import com.devd.editor.data.ASK_SAVE
+import com.devd.editor.data.DiaryInfoState
 import com.devd.editor.data.SAVE_SUCCESS
-import kotlinx.coroutines.launch
+import com.devd.editor.data.SAVE_UPDATE
+import timber.log.Timber
 
 @Composable
 fun rememberImeBottomSize(): Int {
@@ -55,17 +56,17 @@ fun EditorScreenRoute(
     modifier: Modifier = Modifier,
     viewModel: EditorViewModel = hiltViewModel(),
     currentTime: Long,
-    diaryImage: String,
+    diaryImage: String?,
     bookId: Long,
     diaryId: Long?,
     onBackIconClick: () -> Unit
 ) {
     val context = LocalContext.current
-    val scope = rememberCoroutineScope()
     LaunchedEffect(Unit) {
         viewModel.initSelectDate(currentTime)
-        viewModel.initDiaryInfo(bookId, diaryId, diaryImage.toUri())
+        viewModel.initDiaryInfo(bookId, diaryId, diaryImage)
     }
+
     /* UiState */
     val uiState by viewModel.editorUiState.collectAsStateWithLifecycle()
 
@@ -80,12 +81,15 @@ fun EditorScreenRoute(
 
     /* CalendarDialog */
     val customDatePickerDialogState by viewModel.customDatePickerDialogState.collectAsState()
-    val diaryInfoState by viewModel.diaryInfoState.collectAsState()
 
+    val diaryInfoState by viewModel.diaryInfoState.collectAsState()
+    LaunchedEffect(diaryInfoState) {
+        Timber.d("Check..diaryInfoState =>${diaryInfoState}")
+    }
     EditorScreen(
         modifier = modifier,
         writeDate = customDatePickerDialogState.selectedDate,
-        diaryImage = diaryInfoState.imageUrl,
+        diaryState = diaryInfoState,
         onShowImagePicker = { isShowPickerDialog = true },
         onChangeDiaryText = viewModel::setDiaryText,
         onChangeHashTag = viewModel::changeHashTag,
@@ -105,24 +109,26 @@ fun EditorScreenRoute(
     isShowPickerDialog.ShowImagePicker(
         onCameraClick = imagePicker.launchCamera,
         onGalleryClick = imagePicker.launchGallery,
-        onDismiss = { isShowPickerDialog = false }
-    )
+        onDismiss = { isShowPickerDialog = false })
     uiState.isShowLoading.LoadingDialog()
-    messageDialog?.getMessage()?.ShowMessageDialog(
-        rightButtonMessage = if (messageDialog?.type == ASK_SAVE) R.string.cancel else R.string.confirm,
-        onRightButtonClick = {
-            if (messageDialog?.type == SAVE_SUCCESS) onBackIconClick.invoke()
-        },
-        leftButtonMessage = if (messageDialog?.type == ASK_SAVE) R.string.confirm else null,
-        onLeftButtonClick = if (messageDialog?.type == ASK_SAVE) {
-            {
-                scope.launch {
-                    val file = context.uriToFile(diaryImage.toUri())
-                    viewModel.uploadImageToBuket(fileUrl = file)
+    messageDialog?.getMessage()
+        ?.ShowMessageDialog(
+            leftButtonMessage = if (messageDialog?.type == ASK_SAVE) R.string.cancel else null,
+            rightButtonMessage = R.string.confirm,
+            onRightButtonClick = {
+                when (messageDialog?.type) {
+                    SAVE_SUCCESS,SAVE_UPDATE -> {
+                        viewModel.dismissMessageDialog()
+                        onBackIconClick.invoke()
+                    }
+                    ASK_SAVE -> {
+                        val file = diaryImage?.let { context.uriToFile(diaryImage.toUri()) }
+                        viewModel.uploadImageToBuket(fileUrl = file)
+                    }
+                    else -> {}
                 }
             }
-        } else null
-    )
+        )
 }
 
 @Preview
@@ -130,20 +136,34 @@ fun EditorScreenRoute(
 fun EditorScreen(
     modifier: Modifier = Modifier,
     writeDate: Long = System.currentTimeMillis(),
-    diaryImage: Uri? = null,
+    diaryState: DiaryInfoState? = null,
     onShowImagePicker: () -> Unit = {},
     onSaveDairy: () -> Unit = {},
     onBackIconClick: () -> Unit = {},
     onChangeCalendar: () -> Unit = {},
     onChangeDiaryText: (String) -> Unit = {},
-    onChangeHashTag: (List<String>) -> Unit = {}
+    onChangeHashTag: (String?,String?) -> Unit = {_,_ -> }
 ) {
 
-    val contentsTextState = rememberTextFieldState("")
+    val contentsTextState = rememberTextFieldState(diaryState?.diaryContents?:"z")
 
     val hashTagList = remember { mutableStateListOf<String>() }
     val focusManger = LocalFocusManager.current
     val scrollState = rememberScrollState()
+
+    LaunchedEffect(diaryState?.diaryContents) {
+        diaryState?.diaryContents?:return@LaunchedEffect
+        if (contentsTextState.text.toString() != diaryState.diaryContents) {
+            contentsTextState.setTextAndPlaceCursorAtEnd(diaryState.diaryContents)
+        }
+    }
+
+    LaunchedEffect(diaryState?.diaryTag) {
+        if(diaryState?.diaryTag.isNullOrEmpty()) return@LaunchedEffect
+        if(hashTagList == diaryState.diaryTag) return@LaunchedEffect
+        hashTagList.clear()
+        hashTagList.addAll(diaryState.diaryTag)
+    }
 
     //Keyboard 노출에 따른 Bottom Size
     val imeBottom = rememberImeBottomSize()
@@ -173,16 +193,16 @@ fun EditorScreen(
         )   // 날짜 View
         Spacer(Modifier.height(20.dp))
         CardPreviewItem(
-            imageUrl = diaryImage,
+            imageUrl = diaryState?.imageUrl,
             diaryContents = contentsTextState.text.toString(),
-            diaryTag = hashTagList,
+            diaryTag = diaryState?.diaryTag?:emptyList(),
             onChangeImage = onShowImagePicker
         )   // 일기 미리보기
         Spacer(Modifier.height(10.dp))
         EditorItem(
             modifier = Modifier,
             textFieldState = contentsTextState,
-            hashList = hashTagList,
+            hashList = diaryState?.diaryTag?:emptyList(),
             onChangeDiaryText = onChangeDiaryText,
             onChangeTagItem = onChangeHashTag,
         )   // 일기 작성

@@ -23,7 +23,7 @@ interface DiaryImageDao {
         WHERE diaryId = :diaryId
         ORDER BY `order` ASC
     """)
-    suspend fun getImagesByDiary(diaryId: String): List<DiaryImageEntity>
+    suspend fun getImagesByDiary(diaryId: Long): List<DiaryImageEntity>
 
     /* Delete */
 

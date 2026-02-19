@@ -24,12 +24,12 @@ data class DiaryEntity(
 
     val remoteId: Long? = null,
 
-    val diaryBookId: Long,     // ⭐ 어느 일기장에 속하는지
+    var diaryBookId: Long,     // ⭐ 어느 일기장에 속하는지
 
-    val content: String,
+    var content: String,
 
     val createdAt: Long,
-    val updatedAt: Long,
+    var updatedAt: Long,
 
     val mood: Int? = null,
     val weather: Int? = null,

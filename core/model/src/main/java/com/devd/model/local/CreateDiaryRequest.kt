@@ -6,3 +6,10 @@ data class CreateDiaryRequest(
     val imageUrls: List<String>,
     val tags: List<String>
 )
+
+data class UpdateDiaryRequest(
+    val diaryId: Long,
+    val content: String,
+    val imageUrls: List<String>,
+    val tags: List<String>
+)

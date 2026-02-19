@@ -39,7 +39,7 @@ fun MyNavHost(
 
         editorScreen(
             modifier = modifier,
-            backListner = {navController.popBackStack()}
+            backListener = {navController.popBackStack()}
         )
     }
 

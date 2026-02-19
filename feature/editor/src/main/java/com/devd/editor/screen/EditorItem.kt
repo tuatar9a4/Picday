@@ -22,8 +22,6 @@ import androidx.compose.foundation.text.input.rememberTextFieldState
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.mutableStateListOf
-import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.FirstBaseline
 import androidx.compose.ui.platform.LocalDensity
@@ -39,15 +37,14 @@ fun EditorItem(
     modifier: Modifier = Modifier,
     textFieldState: TextFieldState,
     onChangeDiaryText: (String) -> Unit = {},
-    onChangeTagItem: (List<String>) -> Unit = {},
-    hashList: SnapshotStateList<String> = mutableStateListOf()
+    onChangeTagItem: (String?,String?) -> Unit = {_,_ ->},
+    hashList: List<String> = emptyList()
 ) {
     val hashTextField = rememberTextFieldState()
 
     fun addHashTag(hashTag: String) {
-        hashList.add(hashTag)
         hashTextField.clearText()
-        onChangeTagItem.invoke(hashList)
+        onChangeTagItem.invoke(hashTag, null)
     }
 
     Column(

@@ -70,5 +70,5 @@ fun EditorDateItem(
 @Preview
 @Composable
 fun EditorDateSreenPreview() {
-    EditorScreen { }
+    EditorScreen {_,_ -> }
 }
