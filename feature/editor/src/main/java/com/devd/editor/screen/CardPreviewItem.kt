@@ -73,7 +73,7 @@ fun CardPreviewItem(
                     .fillMaxSize()
                     .noRippleClickable(onClick = onChangeImage),
                 contentScale = ContentScale.Crop,
-                model = if (imageUrl is Remote) imageUrl.url?.rememberImageUrl() else it,
+                model = if (imageUrl is Remote) imageUrl.url?.rememberImageUrl() else bitmap,
                 contentDescription = null
             )
         } ?: run {
