@@ -64,7 +64,7 @@ fun Context.createCameraUri(): Uri {
 @Composable
 fun String.rememberImageUrl(): String {
     val ociKey = stringResource(R.string.ociBuketKey)
-    return remember {
+    return remember(this) {
         "https://cnud835pjoeg.objectstorage.ap-seoul-1.oci.customer-oci.com/p/$ociKey/n/cnud835pjoeg/b/devd_storage/o/diary/$this"
     }
 }

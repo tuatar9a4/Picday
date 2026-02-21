@@ -114,15 +114,6 @@ fun DiaryCardScreen(
             modifier = Modifier
                 .fillMaxSize()
         ) {
-            Text(
-                modifier = Modifier
-                    .align(Alignment.TopStart)
-                    .padding(10.dp),
-                text = diaryDate,
-                style = OneDayTypography.titleMedium.copy(
-                    color = BlackColor
-                )
-            )
             prefixImageUrl?.let {
                 AsyncImage(
                     modifier = Modifier
@@ -132,6 +123,15 @@ fun DiaryCardScreen(
                     contentDescription = null
                 )
             }
+            Text(
+                modifier = Modifier
+                    .align(Alignment.TopStart)
+                    .padding(10.dp),
+                text = diaryDate,
+                style = OneDayTypography.titleMedium.copy(
+                    color = BlackColor
+                )
+            )
             Column(
                 modifier = Modifier
                     .align(Alignment.BottomCenter)
