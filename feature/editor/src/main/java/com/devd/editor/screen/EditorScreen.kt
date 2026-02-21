@@ -117,6 +117,7 @@ fun EditorScreenRoute(
     messageDialog?.getMessage()
         ?.ShowMessageDialog(
             leftButtonMessage = if (messageDialog?.type == ASK_SAVE) R.string.cancel else null,
+            onLeftButtonClick = { viewModel.dismissMessageDialog() },
             rightButtonMessage = R.string.confirm,
             onRightButtonClick = {
                 when (messageDialog?.type) {
