@@ -62,9 +62,7 @@ class EditorViewModel @Inject constructor(
     private val _diaryInfoState = MutableStateFlow(DiaryInfoState(-1))
     val diaryInfoState: StateFlow<DiaryInfoState> get() = _diaryInfoState.asStateFlow()
 
-    val dsd = MutableStateFlow("")
     fun initSelectDate(initDate: Long) {
-        dsd.update { "123" }
         _customDatePickerDialogState.update {
             it.copy(
                 selectedDate = initDate,

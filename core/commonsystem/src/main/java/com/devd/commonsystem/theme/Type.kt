@@ -5,6 +5,7 @@ import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.sp
 import com.devd.commonsystem.R
@@ -46,6 +47,13 @@ val OneDayTypography = Typography(
         fontWeight = FontWeight(400),
         fontSize = 11.sp,
     ),
+)
+
+val textHashTagStyle = TextStyle(
+    fontFamily = FontFamily(Font(R.font.suit_semi_bold)),
+    fontWeight = FontWeight(600),
+    fontStyle = FontStyle.Italic,
+    fontSize = 11.sp,
 )
 
 val LocalCustomTypography = staticCompositionLocalOf {

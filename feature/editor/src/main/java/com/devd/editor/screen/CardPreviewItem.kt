@@ -35,6 +35,7 @@ import com.devd.commonsystem.theme.BlackOpacity40Color
 import com.devd.commonsystem.theme.GreyColor
 import com.devd.commonsystem.theme.OneDayTypography
 import com.devd.commonsystem.theme.WhiteColor
+import com.devd.commonsystem.theme.textHashTagStyle
 import com.devd.commonsystem.utils.noRippleClickable
 import com.devd.commonsystem.utils.rememberImageUrl
 import com.devd.editor.data.ImageType
@@ -116,9 +117,9 @@ fun CardPreviewItem(
             ) {
                 items(diaryTag) {
                     Text(
-                        text = "#$it",
-                        style = OneDayTypography.labelLarge.copy(
-                            color = WhiteColor
+                        text = "# $it",
+                        style = textHashTagStyle.copy(
+                            color = WhiteColor,
                         ),
                     )
                 }

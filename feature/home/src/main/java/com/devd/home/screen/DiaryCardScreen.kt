@@ -42,6 +42,7 @@ import com.devd.commonsystem.theme.BlackColor
 import com.devd.commonsystem.theme.BlackOpacity40Color
 import com.devd.commonsystem.theme.OneDayTypography
 import com.devd.commonsystem.theme.WhiteColor
+import com.devd.commonsystem.theme.textHashTagStyle
 import com.devd.commonsystem.utils.noRippleClickable
 import com.devd.commonsystem.utils.rememberImageUrl
 import com.devd.model.local.DiaryInfo
@@ -168,8 +169,8 @@ fun DiaryCardScreen(
                 ) {
                     diaryTag.forEach {
                         Text(
-                            text = "#$it",
-                            style = OneDayTypography.labelLarge.copy(
+                            text = "# $it",
+                            style = textHashTagStyle.copy(
                                 color = WhiteColor
                             )
                         )
