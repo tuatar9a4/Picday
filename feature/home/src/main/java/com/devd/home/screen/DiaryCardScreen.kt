@@ -105,7 +105,6 @@ fun DiaryCardScreen(
         modifier = modifier.then(
             Modifier
                 .width(260.dp)
-                .background(color = WhiteColor)
                 .aspectRatio(ratio = 9 / 16f)
         ),
         shape = RoundedCornerShape(20.dp),

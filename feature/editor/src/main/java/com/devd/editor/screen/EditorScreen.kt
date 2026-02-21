@@ -33,6 +33,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.devd.commonsystem.R
 import com.devd.commonsystem.ui.Toolbar
 import com.devd.commonsystem.ui.calendar.CustomDatePickerDialog
+import com.devd.commonsystem.ui.cropImageDialog.ShowCropDialog
 import com.devd.commonsystem.ui.dialog.ShowImagePicker
 import com.devd.commonsystem.ui.dialog.ShowMessageDialog
 import com.devd.commonsystem.ui.loading.LoadingDialog
@@ -41,9 +42,9 @@ import com.devd.commonsystem.utils.uriToFile
 import com.devd.editor.EditorViewModel
 import com.devd.editor.data.ASK_SAVE
 import com.devd.editor.data.DiaryInfoState
+import com.devd.editor.data.Local
 import com.devd.editor.data.SAVE_SUCCESS
 import com.devd.editor.data.SAVE_UPDATE
-import timber.log.Timber
 
 @Composable
 fun rememberImeBottomSize(): Int {
@@ -76,16 +77,13 @@ fun EditorScreenRoute(
     /* ImagePicker */
     var isShowPickerDialog by remember { mutableStateOf(false) }
     val imagePicker = rememberImagePicker { uri ->
-        uri?.let { viewModel.updateImageUrl(it) }
+        viewModel.changeCropImageDialog(uri)
     }
 
     /* CalendarDialog */
     val customDatePickerDialogState by viewModel.customDatePickerDialogState.collectAsState()
 
     val diaryInfoState by viewModel.diaryInfoState.collectAsState()
-    LaunchedEffect(diaryInfoState) {
-        Timber.d("Check..diaryInfoState =>${diaryInfoState}")
-    }
     EditorScreen(
         modifier = modifier,
         writeDate = customDatePickerDialogState.selectedDate,
@@ -109,26 +107,34 @@ fun EditorScreenRoute(
     isShowPickerDialog.ShowImagePicker(
         onCameraClick = imagePicker.launchCamera,
         onGalleryClick = imagePicker.launchGallery,
-        onDismiss = { isShowPickerDialog = false })
-    uiState.isShowLoading.LoadingDialog()
+        onDismiss = { isShowPickerDialog = false }
+    )   // ImagePicker
+    uiState.isShowLoading.LoadingDialog()   // LoadingDialog TODO : MoveMainActivity로 옮기기
+    uiState.imageUrlForCrop?.ShowCropDialog { cropFile ->
+        viewModel.changeCropImageDialog(null)
+        cropFile?.let { viewModel.updateImageUrl(it.toUri()) }
+    }   // CropDialog
     messageDialog?.getMessage()
         ?.ShowMessageDialog(
             leftButtonMessage = if (messageDialog?.type == ASK_SAVE) R.string.cancel else null,
             rightButtonMessage = R.string.confirm,
             onRightButtonClick = {
                 when (messageDialog?.type) {
-                    SAVE_SUCCESS,SAVE_UPDATE -> {
+                    SAVE_SUCCESS, SAVE_UPDATE -> {
                         viewModel.dismissMessageDialog()
                         onBackIconClick.invoke()
                     }
+
                     ASK_SAVE -> {
-                        val file = diaryImage?.let { context.uriToFile(diaryImage.toUri()) }
+                        val file =
+                            (diaryInfoState.imageUrl as? Local)?.uri?.let { context.uriToFile(it) }
                         viewModel.uploadImageToBuket(fileUrl = file)
                     }
+
                     else -> {}
                 }
             }
-        )
+        )   // MessageDialog
 }
 
 @Preview
@@ -142,25 +148,25 @@ fun EditorScreen(
     onBackIconClick: () -> Unit = {},
     onChangeCalendar: () -> Unit = {},
     onChangeDiaryText: (String) -> Unit = {},
-    onChangeHashTag: (String?,String?) -> Unit = {_,_ -> }
+    onChangeHashTag: (String?, String?) -> Unit = { _, _ -> }
 ) {
 
-    val contentsTextState = rememberTextFieldState(diaryState?.diaryContents?:"z")
+    val contentsTextState = rememberTextFieldState(diaryState?.diaryContents ?: "z")
 
     val hashTagList = remember { mutableStateListOf<String>() }
     val focusManger = LocalFocusManager.current
     val scrollState = rememberScrollState()
 
     LaunchedEffect(diaryState?.diaryContents) {
-        diaryState?.diaryContents?:return@LaunchedEffect
+        diaryState?.diaryContents ?: return@LaunchedEffect
         if (contentsTextState.text.toString() != diaryState.diaryContents) {
             contentsTextState.setTextAndPlaceCursorAtEnd(diaryState.diaryContents)
         }
     }
 
     LaunchedEffect(diaryState?.diaryTag) {
-        if(diaryState?.diaryTag.isNullOrEmpty()) return@LaunchedEffect
-        if(hashTagList == diaryState.diaryTag) return@LaunchedEffect
+        if (diaryState?.diaryTag.isNullOrEmpty()) return@LaunchedEffect
+        if (hashTagList == diaryState.diaryTag) return@LaunchedEffect
         hashTagList.clear()
         hashTagList.addAll(diaryState.diaryTag)
     }
@@ -195,14 +201,14 @@ fun EditorScreen(
         CardPreviewItem(
             imageUrl = diaryState?.imageUrl,
             diaryContents = contentsTextState.text.toString(),
-            diaryTag = diaryState?.diaryTag?:emptyList(),
+            diaryTag = diaryState?.diaryTag ?: emptyList(),
             onChangeImage = onShowImagePicker
         )   // 일기 미리보기
         Spacer(Modifier.height(10.dp))
         EditorItem(
             modifier = Modifier,
             textFieldState = contentsTextState,
-            hashList = diaryState?.diaryTag?:emptyList(),
+            hashList = diaryState?.diaryTag ?: emptyList(),
             onChangeDiaryText = onChangeDiaryText,
             onChangeTagItem = onChangeHashTag,
         )   // 일기 작성

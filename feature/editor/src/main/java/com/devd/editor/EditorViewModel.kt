@@ -40,6 +40,7 @@ import javax.inject.Inject
 
 data class EditorUiState(
     var isShowLoading: Boolean = false,
+    var imageUrlForCrop : Uri? = null
 )
 
 @HiltViewModel
@@ -88,7 +89,6 @@ class EditorViewModel @Inject constructor(
                             messageId = R.string.fail_fetch_diary_book
                         )
                     )
-                Timber.d("....?? ${diary}")
                 _diaryInfoState.update { diaryInfo ->
                     diaryInfo.copy(
                         bookId = bookId,
@@ -111,6 +111,10 @@ class EditorViewModel @Inject constructor(
 
     fun updateImageUrl(uri: Uri) {
         _diaryInfoState.update { it.copy(imageUrl = Local(uri)) }
+    }
+
+    fun changeCropImageDialog(uri :Uri?){
+        _editorUiState.update { it.copy(imageUrlForCrop = uri) }
     }
 
     fun setDiaryText(text: String) {
