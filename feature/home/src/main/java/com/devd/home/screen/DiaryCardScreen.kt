@@ -21,6 +21,7 @@ import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Card
 import androidx.compose.material3.Text
@@ -126,10 +127,12 @@ fun DiaryCardScreen(
             Text(
                 modifier = Modifier
                     .align(Alignment.TopStart)
-                    .padding(10.dp),
+                    .padding(10.dp)
+                    .background(color = BlackOpacity40Color, shape = CircleShape)
+                    .padding(vertical = 5.dp, horizontal = 15.dp),
                 text = diaryDate,
                 style = OneDayTypography.titleMedium.copy(
-                    color = BlackColor
+                    color = WhiteColor
                 )
             )
             Column(

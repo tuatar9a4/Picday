@@ -68,6 +68,14 @@ fun EditorScreenRoute(
         viewModel.initDiaryInfo(bookId, diaryId, diaryImage)
     }
 
+    /* Resolvation Move Back */
+    LaunchedEffect(viewModel.shouldBackPage) {
+        if (viewModel.shouldBackPage) {
+            onBackIconClick.invoke()
+            viewModel.shouldBackPage = false
+        }
+    }
+
     /* UiState */
     val uiState by viewModel.editorUiState.collectAsStateWithLifecycle()
 
@@ -123,7 +131,7 @@ fun EditorScreenRoute(
                 when (messageDialog?.type) {
                     SAVE_SUCCESS, SAVE_UPDATE -> {
                         viewModel.dismissMessageDialog()
-                        onBackIconClick.invoke()
+                        viewModel.shouldBackPage = true
                     }
 
                     ASK_SAVE -> {

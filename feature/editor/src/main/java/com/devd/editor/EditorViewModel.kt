@@ -1,6 +1,9 @@
 package com.devd.editor
 
 import android.net.Uri
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import androidx.core.net.toUri
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -61,6 +64,9 @@ class EditorViewModel @Inject constructor(
 
     private val _diaryInfoState = MutableStateFlow(DiaryInfoState(-1))
     val diaryInfoState: StateFlow<DiaryInfoState> get() = _diaryInfoState.asStateFlow()
+
+    var shouldBackPage by mutableStateOf(false)
+
 
     fun initSelectDate(initDate: Long) {
         _customDatePickerDialogState.update {
