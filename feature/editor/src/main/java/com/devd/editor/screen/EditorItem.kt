@@ -130,10 +130,8 @@ fun EditorItem(
                     lineLimits = TextFieldLineLimits.MultiLine(1, 1),
                     inputTransformation = {
                         if (length > 8) revertAllChanges()
-                        if (asCharSequence().toString()
-                                .contains(" ") && asCharSequence().isNotBlank()
-                        ) {
-                            addHashTag(hashTextField.text.toString())
+                        if (asCharSequence().toString().contains(" ")) {
+                            if (asCharSequence().isNotBlank()) addHashTag(hashTextField.text.toString())
                             delete(0, length)
                         }
                     },
@@ -142,8 +140,8 @@ fun EditorItem(
                     ),
                     onKeyboardAction = {
                         if (hashTextField.text.isEmpty()) return@TextField
-                        hashTextField.clearText()
                         addHashTag(hashTextField.text.toString())
+                        hashTextField.clearText()
                     },
                     shape = RoundedCornerShape(5.dp),
                     textStyle = OneDayTypography.labelLarge.copy(
