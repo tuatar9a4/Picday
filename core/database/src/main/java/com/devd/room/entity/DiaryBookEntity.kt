@@ -4,6 +4,7 @@ import androidx.room.Entity
 import androidx.room.Index
 import androidx.room.PrimaryKey
 import com.devd.model.local.DiaryBookInfo
+import com.devd.model.local.DiaryPhaseType
 
 @Entity(
     tableName = "diary_book",
@@ -17,7 +18,9 @@ data class DiaryBookEntity(
     val remoteID: Long? = null,
 
     val userLocalUUId: String? = null,
+
     val title: String,        // 맛집 일기장, 여행 일기장 등
+    val bookPhaseType: Int = 0,
     val description: String?,
 
     val isMajor: Boolean = false,
@@ -25,11 +28,12 @@ data class DiaryBookEntity(
     val createdAt: Long,
     val updatedAt: Long?,
 
-    val isDeleted : Boolean = false
+    val isDeleted: Boolean = false
 ) {
     fun transToModel() = DiaryBookInfo(
         bookId = localId,
         title = title,
-        description = description
+        description = description,
+        bookPhaseType = DiaryPhaseType.entries[bookPhaseType]
     )
 }

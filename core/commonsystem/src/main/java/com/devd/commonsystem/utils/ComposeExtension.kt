@@ -1,7 +1,9 @@
 package com.devd.commonsystem.utils
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.net.Uri
+import androidx.annotation.FloatRange
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.runtime.Composable
@@ -11,11 +13,14 @@ import androidx.compose.ui.composed
 import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.Dp
 import androidx.core.content.FileProvider
 import com.devd.commonsystem.R
+import com.devd.model.local.DiaryPhaseType
 import java.io.File
 
 
@@ -30,6 +35,7 @@ fun Modifier.noRippleClickable(onClick: () -> Unit): Modifier = composed {
 }
 
 
+@SuppressLint("UnnecessaryComposedModifier")
 fun Modifier.bottomBorder(strokeWidth: Dp, color: Color) = composed(
     factory = {
         val density = LocalDensity.current
@@ -66,5 +72,17 @@ fun String.rememberImageUrl(): String {
     val ociKey = stringResource(R.string.ociBuketKey)
     return remember(this) {
         "https://cnud835pjoeg.objectstorage.ap-seoul-1.oci.customer-oci.com/p/$ociKey/n/cnud835pjoeg/b/devd_storage/o/diary/$this"
+    }
+}
+
+@Composable
+fun DiaryPhaseType.diaryPhaseIcon(
+    @FloatRange(0.0, 1.0) percent: Float
+): Painter {
+    return when (this) {
+        DiaryPhaseType.MOON -> {
+            val index = ((this.ids.size - 1) * percent).toInt()
+            painterResource(this.ids[index])
+        }
     }
 }

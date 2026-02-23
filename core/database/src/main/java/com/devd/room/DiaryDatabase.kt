@@ -39,7 +39,7 @@ abstract class DiaryDatabase : RoomDatabase() {
                 DiaryDatabase::class.java,
                 "local_diary_db"
             ).setQueryCallback(
-                { sqlQuery, bindArgs -> Timber.tag("SQL LOG").d("$sqlQuery   $bindArgs") },
+                { sqlQuery, bindArgs -> Timber.tag("SQL_LOG").d("$sqlQuery   $bindArgs") },
                 Executors.newSingleThreadExecutor()
             ).addMigrations()
                 .build()

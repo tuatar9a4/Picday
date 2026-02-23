@@ -18,23 +18,24 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.StrokeCap
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.devd.commonsystem.R
 import com.devd.commonsystem.theme.BlackColor
 import com.devd.commonsystem.theme.GreyColor
 import com.devd.commonsystem.theme.OneDayOneShotTheme
 import com.devd.commonsystem.theme.OneDayTypography
 import com.devd.commonsystem.theme.SecondaryColor
 import com.devd.commonsystem.theme.WhiteColor
+import com.devd.commonsystem.utils.diaryPhaseIcon
+import com.devd.model.local.DiaryPhaseType
 
 @Composable
 fun BookCardScreen(
     modifier: Modifier = Modifier,
     diaryTitle: String = "",
+    phaseType: DiaryPhaseType,
     diaryDescription: String = "",
     diaryMonthPercent: Float = 0f
 ) {
@@ -64,13 +65,13 @@ fun BookCardScreen(
                         modifier = Modifier
                             .size(50.dp)
                             .background(color = WhiteColor, shape = RoundedCornerShape(5.dp)),
-                        painter = painterResource(R.drawable.icon_diary_book),
+                        painter = phaseType.diaryPhaseIcon(diaryMonthPercent),
                         contentDescription = null
                     )
                     Spacer(Modifier.width(15.dp))
                     Column() {
                         Text(
-                            modifier = Modifier.padding(end =  30.dp),
+                            modifier = Modifier.padding(end = 30.dp),
                             text = diaryTitle.ifEmpty { "---" },
                             maxLines = 1,
                             overflow = TextOverflow.Ellipsis,
@@ -112,11 +113,12 @@ fun BookCardScreen(
 
 @Preview
 @Composable
-fun BookCardScreenPreview(){
-    OneDayOneShotTheme{
+fun BookCardScreenPreview() {
+    OneDayOneShotTheme {
         BookCardScreen(
             diaryTitle = "다이어리 타이틀",
             diaryDescription = "다이어리 설명",
+            phaseType = DiaryPhaseType.MOON,
             diaryMonthPercent = 0.2f
         )
     }

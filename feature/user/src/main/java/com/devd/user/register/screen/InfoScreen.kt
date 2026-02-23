@@ -30,8 +30,8 @@ import com.devd.commonsystem.utils.checkValidateRex
 fun InfoScreen(
     modifier: Modifier = Modifier,
     nickName: MutableState<String> = mutableStateOf(""),
-    diaryName: MutableState<String> = mutableStateOf(""),
-    onDone: () -> Unit = {}
+//    diaryName: MutableState<String> = mutableStateOf(""),
+//    onDone: () -> Unit = {}
 ) {
 
     val diaryNameFocus = remember { FocusRequester() }
@@ -68,24 +68,24 @@ fun InfoScreen(
             }
 
         )
-        Spacer(Modifier.height(15.dp))
-        Text(
-            modifier = Modifier.padding(horizontal = 20.dp),
-            text = stringResource(R.string.diary_book_make_message),
-            style = OneDayTypography.titleMedium.copy(
-                color = TextDefaultColor
-            )
-        )
-        Spacer(Modifier.height(10.dp))
-        SingleLineTextField(
-            modifier = Modifier.fillMaxWidth(),
-            editText = diaryName,
-            onTextChange = { text ->
-                diaryName.value = text
-            },
-            imeAction = ImeAction.Done,
-            onDone = onDone
-        )
+//        Spacer(Modifier.height(15.dp))
+//        Text(
+//            modifier = Modifier.padding(horizontal = 20.dp),
+//            text = stringResource(R.string.diary_book_make_message),
+//            style = OneDayTypography.titleMedium.copy(
+//                color = TextDefaultColor
+//            )
+//        )
+//        Spacer(Modifier.height(10.dp))
+//        SingleLineTextField(
+//            modifier = Modifier.fillMaxWidth(),
+//            editText = diaryName,
+//            onTextChange = { text ->
+//                diaryName.value = text
+//            },
+//            imeAction = ImeAction.Done,
+//            onDone = onDone
+//        )
     }
 
 }

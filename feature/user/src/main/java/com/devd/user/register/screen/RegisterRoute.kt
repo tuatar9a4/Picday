@@ -84,8 +84,8 @@ fun RegisterRoute(
             RegisterStep.Step3 -> InfoScreen(
                 modifier = Modifier.weight(1f),
                 nickName = viewmodel.nickname,
-                diaryName = viewmodel.diaryName,
-                onDone = changeStep
+//                diaryName = viewmodel.diaryName,
+//                onDone = changeStep
             )
         }
         TextButton(
@@ -116,5 +116,12 @@ fun PasswordPreview() {
     PasswordScreen(
         passwordText = mutableStateOf(""),
         onSnackBarMessage = {}
+    )
+}
+@Preview
+@Composable
+fun InfoPreview() {
+    InfoScreen (
+
     )
 }

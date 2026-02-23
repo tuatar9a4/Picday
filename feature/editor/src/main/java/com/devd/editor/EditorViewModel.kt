@@ -43,7 +43,7 @@ import javax.inject.Inject
 
 data class EditorUiState(
     var isShowLoading: Boolean = false,
-    var imageUrlForCrop : Uri? = null
+    var imageUrlForCrop: Uri? = null
 )
 
 @HiltViewModel
@@ -117,7 +117,7 @@ class EditorViewModel @Inject constructor(
         _diaryInfoState.update { it.copy(imageUrl = Local(uri)) }
     }
 
-    fun changeCropImageDialog(uri :Uri?){
+    fun changeCropImageDialog(uri: Uri?) {
         _editorUiState.update { it.copy(imageUrlForCrop = uri) }
     }
 

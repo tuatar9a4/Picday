@@ -131,7 +131,7 @@ fun DiaryCardScreen(
                     .background(color = BlackOpacity40Color, shape = CircleShape)
                     .padding(vertical = 5.dp, horizontal = 15.dp),
                 text = diaryDate,
-                style = OneDayTypography.titleMedium.copy(
+                style = OneDayTypography.bodyLarge.copy(
                     color = WhiteColor
                 )
             )

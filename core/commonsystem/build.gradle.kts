@@ -16,6 +16,7 @@ dependencies {
     implementation(libs.androidx.appcompat)
     implementation(libs.material)
 
+    implementation(projects.core.model)
     //NOTE : CommonSystem 의 경우 UI를 추가하는 경우도 있으니 Compose 추가
 //    implementation(platform(libs.androidx.compose.bom))
 //    implementation(libs.androidx.compose.ui)
@@ -30,4 +31,7 @@ dependencies {
 //    androidTestImplementation(libs.androidx.compose.ui.test.junit4)
 //    debugImplementation(libs.androidx.compose.ui.tooling)
 //    debugImplementation(libs.androidx.compose.ui.test.manifest)
+
+    implementation(libs.coil.image.compose)
+    implementation(libs.coil.http.compose)
 }
