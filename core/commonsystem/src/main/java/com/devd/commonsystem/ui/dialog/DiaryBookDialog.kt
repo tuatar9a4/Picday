@@ -44,8 +44,8 @@ import com.devd.commonsystem.theme.AccentColor
 import com.devd.commonsystem.theme.BlackColor
 import com.devd.commonsystem.theme.BlackOpacity40Color
 import com.devd.commonsystem.theme.GreyColor
+import com.devd.commonsystem.theme.GreyOpacity40Color
 import com.devd.commonsystem.theme.OneDayTypography
-import com.devd.commonsystem.theme.SecondaryColor
 import com.devd.commonsystem.theme.TextDefaultColor
 import com.devd.commonsystem.theme.WhiteColor
 import com.devd.commonsystem.ui.TextButton
@@ -59,6 +59,7 @@ import com.devd.permission.Consts
 import com.devd.permission.IPermissionHandler
 import com.devd.permission.rememberPermissionHandler
 import kotlinx.coroutines.launch
+import timber.log.Timber
 import java.time.Instant
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
@@ -93,7 +94,7 @@ fun DiaryBookDialog(
     dialogType: DiaryBookDialogType,
     bookInfo: DiaryBookInfo,
     onDismissRequest: () -> Unit,
-    onSaveClick: (imageUrl: Uri?, title: String, description: String, monthType: DiaryPhaseType) -> Unit
+    onSaveClick: ((imageUrl: Uri?, title: String, description: String, monthType: DiaryPhaseType) -> Unit)? = null
 ) {
     val titleTextFieldState = rememberTextFieldState(bookInfo.title)
     val descriptionTextFieldState = rememberTextFieldState(bookInfo.description ?: "")
@@ -128,7 +129,7 @@ fun DiaryBookDialog(
                 .fillMaxWidth()
                 .padding(15.dp),
             colors = CardDefaults.cardColors().copy(
-                containerColor = SecondaryColor
+                containerColor = WhiteColor
             )
         ) {
             Column(
@@ -137,11 +138,14 @@ fun DiaryBookDialog(
                 Row(
                     verticalAlignment = Alignment.CenterVertically
                 ) {
+                    Timber.d("Check? => ${imageUrl}")
                     ((imageUrl as? Uri) ?: (imageUrl as? String)?.rememberImageUrl())?.let {
-                        println("CheckUri ??=> $it")
                         AsyncImage(
                             modifier = Modifier
-                                .clickable(onClick = { scope.launch { checkPermission() } })
+                                .clickable(onClick = {
+                                    if (dialogType == DiaryBookDialogType.VIEW) return@clickable
+                                    scope.launch { checkPermission() }
+                                })
                                 .clip(RoundedCornerShape(5.dp))
                                 .size(56.dp),
                             model = it,
@@ -151,7 +155,10 @@ fun DiaryBookDialog(
                     } ?: run {
                         Image(
                             modifier = Modifier
-                                .clickable(onClick = { scope.launch { checkPermission() } })
+                                .clickable(onClick = {
+                                    if (dialogType == DiaryBookDialogType.VIEW) return@clickable
+                                    scope.launch { checkPermission() }
+                                })
                                 .border(1.dp, BlackColor, RoundedCornerShape(5.dp))
                                 .size(56.dp)
                                 .padding(10.dp),
@@ -163,7 +170,10 @@ fun DiaryBookDialog(
                     BasicTextField(
                         modifier = Modifier
                             .weight(1f)
-                            .bottomBorder(1.dp, BlackOpacity40Color),
+                            .then(
+                                if (dialogType == DiaryBookDialogType.VIEW) Modifier
+                                else Modifier.bottomBorder(1.dp, BlackOpacity40Color)
+                            ),
                         state = titleTextFieldState,
                         textStyle = OneDayTypography.titleMedium.copy(
                             color = TextDefaultColor
@@ -179,7 +189,7 @@ fun DiaryBookDialog(
                     modifier = Modifier
                         .fillMaxWidth()
                         .height(70.dp)
-                        .background(color = WhiteColor, shape = RoundedCornerShape(5.dp))
+                        .background(color = GreyOpacity40Color, shape = RoundedCornerShape(5.dp))
                         .padding(5.dp),
                     state = descriptionTextFieldState,
                     readOnly = dialogType == DiaryBookDialogType.VIEW,
@@ -204,7 +214,10 @@ fun DiaryBookDialog(
                         Spacer(Modifier.height(5.dp))
                         Image(
                             modifier = Modifier
-                                .clickable(onClick = { showMonthTypeSelectSheet = true })
+                                .clickable(onClick = {
+                                    if (dialogType == DiaryBookDialogType.VIEW) return@clickable
+                                    showMonthTypeSelectSheet = true
+                                })
                                 .size(48.dp)
                                 .border(2.dp, GreyColor, RoundedCornerShape(10.dp))
                                 .padding(4.dp),
@@ -228,12 +241,12 @@ fun DiaryBookDialog(
                         modifier = Modifier.weight(1f),
                         text = stringResource(if (dialogType == DiaryBookDialogType.EDIT) R.string.save else R.string.confirm),
                         onClick = {
-                            onSaveClick(
+                            onSaveClick?.invoke(
                                 (imageUrl as? Uri),
                                 titleTextFieldState.text.toString(),
                                 descriptionTextFieldState.text.toString(),
                                 monthTypeState
-                            )
+                            ) ?: onDismissRequest()
                         }
                     )
 

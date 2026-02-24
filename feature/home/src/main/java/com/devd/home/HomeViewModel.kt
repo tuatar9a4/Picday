@@ -28,6 +28,7 @@ data class HomeUiState(
     var isLoading: Boolean = false,
     var isShowCalendar: Boolean = false,
     var isShowImagePicker: Boolean = false,
+    val isShowBookDialog: Boolean = false,
     var uriForCrop: Uri? = null,
     var bookInfo: DiaryBookInfo? = null,
     var diaryList: List<DiaryInfo> = emptyList(),
@@ -110,6 +111,15 @@ class HomeViewModel @Inject constructor(
 
     fun dismissImagePickerDialog() {
         _homeUiState.update { it.copy(isShowImagePicker = false) }
+    }
+
+    fun showBookDialog() {
+        _homeUiState.update { it.copy(isShowBookDialog = (it.bookInfo != null)) }
+    }
+
+    fun dismissBookDialog() {
+        _homeUiState.update { it.copy(isShowBookDialog = false) }
+
     }
 
     fun changeCropImageDialog(uri: Uri?) {

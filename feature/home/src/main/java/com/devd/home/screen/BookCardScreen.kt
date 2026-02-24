@@ -2,6 +2,7 @@ package com.devd.home.screen
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -29,21 +30,22 @@ import com.devd.commonsystem.theme.OneDayTypography
 import com.devd.commonsystem.theme.SecondaryColor
 import com.devd.commonsystem.theme.WhiteColor
 import com.devd.commonsystem.utils.diaryPhaseIcon
+import com.devd.model.local.DiaryBookInfo
 import com.devd.model.local.DiaryPhaseType
 
 @Composable
 fun BookCardScreen(
     modifier: Modifier = Modifier,
-    diaryTitle: String = "",
-    phaseType: DiaryPhaseType,
-    diaryDescription: String = "",
-    diaryMonthPercent: Float = 0f
+    bookInfo: DiaryBookInfo?,
+    onBookClick: () -> Unit = {}
 ) {
+    bookInfo ?: return
     Card(
         modifier = modifier.then(
             Modifier
                 .fillMaxWidth()
                 .padding(horizontal = 40.dp)
+                .clickable(onClick = onBookClick)
         ),
         shape = RoundedCornerShape(10.dp)
     ) {
@@ -65,14 +67,14 @@ fun BookCardScreen(
                         modifier = Modifier
                             .size(50.dp)
                             .background(color = WhiteColor, shape = RoundedCornerShape(5.dp)),
-                        painter = phaseType.diaryPhaseIcon(diaryMonthPercent),
+                        painter = bookInfo.bookPhaseType.diaryPhaseIcon(bookInfo.monthWritePercent),
                         contentDescription = null
                     )
                     Spacer(Modifier.width(15.dp))
                     Column() {
                         Text(
                             modifier = Modifier.padding(end = 30.dp),
-                            text = diaryTitle.ifEmpty { "---" },
+                            text = bookInfo.title.ifEmpty { "---" },
                             maxLines = 1,
                             overflow = TextOverflow.Ellipsis,
                             style = OneDayTypography.bodyLarge.copy(
@@ -82,7 +84,7 @@ fun BookCardScreen(
                         Spacer(Modifier.height(10.dp))
                         Text(
                             modifier = Modifier.padding(end = 30.dp),
-                            text = diaryDescription,
+                            text = bookInfo.description ?: "",
                             maxLines = 2,
                             overflow = TextOverflow.Ellipsis,
                             style = OneDayTypography.bodySmall.copy(
@@ -103,7 +105,7 @@ fun BookCardScreen(
                 strokeCap = StrokeCap.Round,
                 drawStopIndicator = {},
                 progress = {
-                    diaryMonthPercent
+                    bookInfo.monthWritePercent
                 }
             )
             Spacer(Modifier.height(5.dp))
@@ -116,10 +118,16 @@ fun BookCardScreen(
 fun BookCardScreenPreview() {
     OneDayOneShotTheme {
         BookCardScreen(
-            diaryTitle = "다이어리 타이틀",
-            diaryDescription = "다이어리 설명",
-            phaseType = DiaryPhaseType.MOON,
-            diaryMonthPercent = 0.2f
+            bookInfo = DiaryBookInfo(
+                bookId = 3826,
+                bookImage = null,
+                title = "다이어리 타이틀",
+                description = "다이어리 설명",
+                bookPhaseType = DiaryPhaseType.MOON,
+                createDate = 6782,
+                monthWritePercent = 0.2f
+
+            )
         )
     }
 }

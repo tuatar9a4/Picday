@@ -36,6 +36,8 @@ import com.devd.commonsystem.theme.WhiteColor
 import com.devd.commonsystem.ui.Toolbar
 import com.devd.commonsystem.ui.calendar.CustomDatePickerDialog
 import com.devd.commonsystem.ui.cropImageDialog.ShowCropDialog
+import com.devd.commonsystem.ui.dialog.DiaryBookDialog
+import com.devd.commonsystem.ui.dialog.DiaryBookDialogType
 import com.devd.commonsystem.ui.dialog.ShowImagePicker
 import com.devd.commonsystem.ui.dialog.ShowMessageDialog
 import com.devd.commonsystem.ui.loading.LoadingDialog
@@ -44,7 +46,6 @@ import com.devd.commonsystem.utils.isCurrentMonth
 import com.devd.commonsystem.utils.rememberImagePicker
 import com.devd.home.HomeUiState
 import com.devd.home.HomeViewModel
-import com.devd.model.local.DiaryPhaseType
 import com.devd.permission.Consts
 import com.devd.permission.IPermissionHandler
 import com.devd.permission.rememberPermissionHandler
@@ -106,7 +107,9 @@ fun HomeScreenRoute(
             } ?: run {
                 scope.launch { checkPermission() }
             }
-        })
+        },
+        onBookClick = viewModel::showBookDialog
+    )
 
     uiState.getDialogMessage()
         ?.ShowMessageDialog(onRightButtonClick = viewModel::dismissMessageDialog)
@@ -129,6 +132,13 @@ fun HomeScreenRoute(
             onClickCancel = viewModel::dismissCalendar
         )
     }
+    if (uiState.isShowBookDialog) {
+        DiaryBookDialog(
+            dialogType = DiaryBookDialogType.VIEW,
+            bookInfo = uiState.bookInfo!!,
+            onDismissRequest = viewModel::dismissBookDialog
+        )
+    }
 }
 
 
@@ -140,6 +150,7 @@ fun HomeScreen(
     diaryState: LazyListState = rememberLazyListState(),
     onClickDate: () -> Unit = {},
     onEditorClick: () -> Unit = {},
+    onBookClick: () -> Unit = {}
 ) {
     Box(
         modifier = modifier.then(
@@ -161,10 +172,8 @@ fun HomeScreen(
             Spacer(Modifier.height(20.dp))
             BookCardScreen(
                 modifier = Modifier.align(Alignment.CenterHorizontally),
-                diaryTitle = uiState.bookInfo?.title ?: "",
-                phaseType = uiState.bookInfo?.bookPhaseType ?: DiaryPhaseType.MOON,
-                diaryDescription = uiState.bookInfo?.description ?: "",
-                diaryMonthPercent = uiState.bookInfo?.monthWritePercent ?: 0f,
+                bookInfo = uiState.bookInfo,
+                onBookClick = onBookClick
             )   // 일기장 카드
             Spacer(Modifier.height(20.dp))
             YearCategory(
