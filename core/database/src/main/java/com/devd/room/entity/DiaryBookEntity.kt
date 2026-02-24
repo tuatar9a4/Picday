@@ -19,9 +19,10 @@ data class DiaryBookEntity(
 
     val userLocalUUId: String? = null,
 
+    val bookImage: String,
     val title: String,        // 맛집 일기장, 여행 일기장 등
-    val bookPhaseType: Int = 0,
     val description: String?,
+    val bookPhaseType: Int = 0,
 
     val isMajor: Boolean = false,
 
@@ -32,8 +33,10 @@ data class DiaryBookEntity(
 ) {
     fun transToModel() = DiaryBookInfo(
         bookId = localId,
+        bookImage = bookImage,
         title = title,
         description = description,
+        createDate = createdAt,
         bookPhaseType = DiaryPhaseType.entries[bookPhaseType]
     )
 }

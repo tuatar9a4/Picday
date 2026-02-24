@@ -33,6 +33,7 @@ class DiaryBookRepository @Inject constructor(
     /* Diary Book */
 
     suspend fun insertNewDiaryBook(
+        bookImage: String,
         bookTitle: String,
         uuid: String,
         bookDescription: String
@@ -42,11 +43,12 @@ class DiaryBookRepository @Inject constructor(
         diaryBookDao.insertDiaryBook(
             DiaryBookEntity(
                 title = bookTitle,
+                bookImage = bookImage,
                 userLocalUUId = uuid,
                 description = bookDescription,
                 isMajor = isFirstBook,
                 createdAt = currentMillis,
-                updatedAt = currentMillis
+                updatedAt = currentMillis,
             )
         )
     }
@@ -144,7 +146,7 @@ class DiaryBookRepository @Inject constructor(
     @Transaction
     suspend fun updateDiaryWithExtras(
         diaryInfo: UpdateDiaryRequest
-    ){
+    ) {
         val diaryExtras = diaryDao.getDiaryById(diaryId = diaryInfo.diaryId)!!
         val diary = diaryExtras.diary
         diary.content = diaryInfo.content
@@ -159,9 +161,9 @@ class DiaryBookRepository @Inject constructor(
             )
         }
 
-        val firstImage =  diaryImageDao.getImagesByDiary(diary.localId).firstOrNull()
+        val firstImage = diaryImageDao.getImagesByDiary(diary.localId).firstOrNull()
 
-        if(imageRequest.firstOrNull()?.uri != firstImage?.uri){
+        if (imageRequest.firstOrNull()?.uri != firstImage?.uri) {
             diaryImageDao.deleteImagesByDiary(diary.localId)
             diaryImageDao.insertImages(imageRequest)
         }

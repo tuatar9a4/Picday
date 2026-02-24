@@ -17,6 +17,7 @@ dependencies {
     implementation(libs.material)
 
     implementation(projects.core.model)
+    implementation(projects.core.permission)
     //NOTE : CommonSystem 의 경우 UI를 추가하는 경우도 있으니 Compose 추가
 //    implementation(platform(libs.androidx.compose.bom))
 //    implementation(libs.androidx.compose.ui)

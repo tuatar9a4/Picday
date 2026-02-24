@@ -10,15 +10,21 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.devd.commonsystem.theme.PrimaryColor
 import com.devd.commonsystem.ui.TextButton
 import com.devd.commonsystem.ui.Toolbar
+import com.devd.commonsystem.ui.dialog.DiaryBookDialog
+import com.devd.commonsystem.ui.dialog.DiaryBookDialogType
+import com.devd.commonsystem.utils.uriToFile
 import com.devd.user.register.RegisterViewModel
 import com.devd.user.register.data.RegisterStep
 
@@ -30,18 +36,32 @@ fun RegisterRoute(
     onSnackBar: (String) -> Unit = {},
     backClick: () -> Unit = {}
 ) {
+    val context = LocalContext.current
+
     val currentStep = remember { mutableStateOf(RegisterStep.Step3) }
+    val bookDialogInfo = viewmodel.diaryBookDialog.collectAsState()
+
+    val messageDialog = viewmodel.simpleMessage.collectAsState(null)
+
+    LaunchedEffect(messageDialog.value) {
+        messageDialog.value?.let { state ->
+            onSnackBar(state.message)
+            viewmodel.clearMessage()
+        }
+    }
+
     val changeStep = {
         when (currentStep.value) {
             RegisterStep.Step1 -> {
-                if(!viewmodel.isCheckDuplicate.value){
+                if (!viewmodel.isCheckDuplicate.value) {
                     onSnackBar.invoke("중복 확인을 해주세요")
-                }else{
+                } else {
                     currentStep.value = RegisterStep.Step2
                 }
             }
+
             RegisterStep.Step2 -> currentStep.value = RegisterStep.Step3
-            RegisterStep.Step3 -> viewmodel.requestMakeId()
+            RegisterStep.Step3 -> viewmodel.showDiaryBookDialog()
         }
     }
     Column(
@@ -84,8 +104,6 @@ fun RegisterRoute(
             RegisterStep.Step3 -> InfoScreen(
                 modifier = Modifier.weight(1f),
                 nickName = viewmodel.nickname,
-//                diaryName = viewmodel.diaryName,
-//                onDone = changeStep
             )
         }
         TextButton(
@@ -99,14 +117,27 @@ fun RegisterRoute(
         )
         Spacer(Modifier.height(20.dp))
     }
+
+    if (bookDialogInfo.value.isShow) {
+        DiaryBookDialog(
+            dialogType = DiaryBookDialogType.EDIT,
+            bookInfo = bookDialogInfo.value.bookInfo,
+            onDismissRequest = viewmodel::dismissBookDialog,
+            onSaveClick = { imageUrl, title, description, monthType ->
+                val uploadFile = imageUrl?.let { context.uriToFile(it) }
+                viewmodel.saveAndMakeBookInfo(uploadFile, title, description, monthType)
+            }
+        )
+    }
+
 }
 
 @Preview
 @Composable
 fun NickNamePreview() {
     NickNameScreen(
-        editText = mutableStateOf(""),
-        isCheckDuplicate = mutableStateOf(false),
+        editText = remember { mutableStateOf("") },
+        isCheckDuplicate = remember { mutableStateOf(false) },
     )
 }
 
@@ -114,14 +145,15 @@ fun NickNamePreview() {
 @Composable
 fun PasswordPreview() {
     PasswordScreen(
-        passwordText = mutableStateOf(""),
+        passwordText = remember { mutableStateOf("") },
         onSnackBarMessage = {}
     )
 }
+
 @Preview
 @Composable
 fun InfoPreview() {
-    InfoScreen (
+    InfoScreen(
 
     )
 }

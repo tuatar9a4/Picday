@@ -44,6 +44,7 @@ import com.devd.commonsystem.utils.isCurrentMonth
 import com.devd.commonsystem.utils.rememberImagePicker
 import com.devd.home.HomeUiState
 import com.devd.home.HomeViewModel
+import com.devd.model.local.DiaryPhaseType
 import com.devd.permission.Consts
 import com.devd.permission.IPermissionHandler
 import com.devd.permission.rememberPermissionHandler
@@ -161,6 +162,7 @@ fun HomeScreen(
             BookCardScreen(
                 modifier = Modifier.align(Alignment.CenterHorizontally),
                 diaryTitle = uiState.bookInfo?.title ?: "",
+                phaseType = uiState.bookInfo?.bookPhaseType ?: DiaryPhaseType.MOON,
                 diaryDescription = uiState.bookInfo?.description ?: "",
                 diaryMonthPercent = uiState.bookInfo?.monthWritePercent ?: 0f,
             )   // 일기장 카드

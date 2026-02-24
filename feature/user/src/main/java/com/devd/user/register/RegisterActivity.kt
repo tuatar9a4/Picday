@@ -66,10 +66,6 @@ class RegisterActivity : ComponentActivity() {
                         startActivity(intent)
                         finish()
                     }
-
-                    is RegisterUIState.FailMakeDiary -> {
-
-                    }
                 }
             }
         }
