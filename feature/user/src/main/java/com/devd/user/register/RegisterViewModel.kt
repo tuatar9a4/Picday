@@ -77,19 +77,16 @@ class RegisterViewModel @Inject constructor(
         imageFile: File?, title: String, description: String, monthType: DiaryPhaseType
     ) {
         viewModelScope.launch {
-            if (!validateDiaryInfo(imageFile,title)) return@launch
+            if (!validateDiaryInfo(imageFile, title)) return@launch
             val newUserId = requestMakeId()
             var uploadImagePath: String? = null
-            Timber.d("CheckImageFil => ${imageFile}")
             if (imageFile != null) {
-                val result = oracleRepository.uploadImageFile(newUserId, imageFile).last()
-
-                Timber.d("CheckImageFil result => ${result}")
-                when (result) {
-                    is SuccessUpload -> uploadImagePath = result.uploadFileName
+                when (val result = oracleRepository.uploadImageFile(newUserId, imageFile).last()) {
+                    is SuccessUpload -> uploadImagePath = "$newUserId/${result.uploadFileName}"
                     is FailUpload -> return@launch _simpleMessage.emit(
                         SimpleMessageState(result.errorMessage)
                     )
+
                     is Uploading, StartUpload -> Unit
                 }
             }
@@ -129,7 +126,7 @@ class RegisterViewModel @Inject constructor(
         }
     }
 
-    private suspend fun validateDiaryInfo(bookImage:File?, title: String): Boolean {
+    private suspend fun validateDiaryInfo(bookImage: File?, title: String): Boolean {
         if (nickname.value.length < 2 || nickname.value.isBlank()) {
             _simpleMessage.emit(SimpleMessageState("Nickname 은 글자 2자 이상!"))
             return false
@@ -146,7 +143,7 @@ class RegisterViewModel @Inject constructor(
         return true
     }
 
-    fun clearMessage(){
+    fun clearMessage() {
         viewModelScope.launch { _simpleMessage.emit(null) }
     }
 
@@ -156,7 +153,7 @@ sealed interface RegisterUIState {
     data object SuccessMakeId : RegisterUIState
 }
 
-data class SimpleMessageState(val message :String)
+data class SimpleMessageState(val message: String)
 
 data class DiaryBookDialog(
     val isShow: Boolean = false, val bookInfo: DiaryBookInfo = DiaryBookInfo(
