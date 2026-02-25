@@ -89,6 +89,21 @@ fun HomeScreenRoute(
         )
     }
 
+    fun checkDiaryInfoBeforeMove() {
+        scope.launch {
+            if (!uiState.searchDate.isCurrentMonth()) {
+                viewModel.fetchTodayDiary()?.diaryId
+            } else {
+                val selectIndex = diaryState.centerItemIndex() ?: -1
+                uiState.diaryList.getOrNull(selectIndex)?.diaryId?.takeIf { id -> id != -1L }
+            }?.let {
+                moveToEditor(null, it)
+            } ?: run {
+                checkPermission()
+            }
+        }
+    }
+
     LaunchedEffect(Unit) {
         viewModel.fetchMainDiaryBook()
     }
@@ -97,17 +112,8 @@ fun HomeScreenRoute(
         modifier = modifier,
         uiState = uiState,
         diaryState = diaryState,
-        onClickDate = viewModel::showCalendarDialog,
-        onEditorClick = {
-            val selectIndex = diaryState.centerItemIndex() ?: -1
-            val selectDiary =
-                uiState.diaryList.getOrNull(selectIndex)?.diaryId?.takeIf { id -> id != -1L }
-            selectDiary?.let {
-                moveToEditor(null, it)
-            } ?: run {
-                scope.launch { checkPermission() }
-            }
-        },
+        onShowCalendar = viewModel::showCalendarDialog,
+        onEditorClick = { checkDiaryInfoBeforeMove() },
         onBookClick = viewModel::showBookDialog
     )
 
@@ -148,7 +154,7 @@ fun HomeScreen(
     modifier: Modifier = Modifier,
     uiState: HomeUiState = HomeUiState(),
     diaryState: LazyListState = rememberLazyListState(),
-    onClickDate: () -> Unit = {},
+    onShowCalendar: () -> Unit = {},
     onEditorClick: () -> Unit = {},
     onBookClick: () -> Unit = {}
 ) {
@@ -179,9 +185,7 @@ fun HomeScreen(
             YearCategory(
                 modifier = Modifier.align(Alignment.CenterHorizontally),
                 searchDate = uiState.searchDate,
-                onClick = { time ->
-                    onClickDate.invoke()
-                }
+                onClick = onShowCalendar
             )   // 년도 선택 스크린
             Spacer(Modifier.height(15.dp))
             DiaryListScreen(

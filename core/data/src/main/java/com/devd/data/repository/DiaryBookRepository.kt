@@ -2,6 +2,7 @@ package com.devd.data.repository
 
 import androidx.room.Transaction
 import com.devd.commonsystem.utils.getCurrentMonthRangeMillis
+import com.devd.commonsystem.utils.getStartEndRangeMillis
 import com.devd.data.utils.CallResult
 import com.devd.data.utils.SafeNetCall
 import com.devd.model.local.CreateDiaryRequest
@@ -104,16 +105,25 @@ class DiaryBookRepository @Inject constructor(
         return@run if (this is CallResult.Success) this.res else emptyList()
     }
 
+    suspend fun fetchOneDiaryForDate(
+        diaryBookId: Long,
+        date: Long
+    ) = safeApiCall(Dispatchers.IO) {
+        val (start, end) = LocalDate.ofEpochDay(date).getStartEndRangeMillis()
+        diaryDao.getDiariesByDateRange(diaryBookId, start, end).firstOrNull()?.transToModel()
+    }.run {
+        return@run if (this is CallResult.Success) this.res else null
+    }
+
     @Transaction
-    suspend fun saveDairyWithExtras(
+    suspend fun insertNewDairyWithExtras(
         diaryInfo: CreateDiaryRequest,
     ) {
-        val createTime = System.currentTimeMillis()
         val diary = DiaryEntity(
             diaryBookId = diaryInfo.bookId,
             content = diaryInfo.content,
-            createdAt = createTime,
-            updatedAt = createTime,
+            createdAt = diaryInfo.createDate,
+            updatedAt = diaryInfo.updateDate,
         )
         val diaryId = diaryDao.insertDiary(diary)
 

@@ -140,7 +140,7 @@ fun EditorScreenRoute(
                         viewModel.uploadImageToBuket(fileUrl = file)
                     }
 
-                    else -> {}
+                    else -> { viewModel.dismissMessageDialog() }
                 }
             }
         )   // MessageDialog

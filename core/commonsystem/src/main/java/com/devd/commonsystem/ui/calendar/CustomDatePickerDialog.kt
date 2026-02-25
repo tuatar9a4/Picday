@@ -29,6 +29,8 @@ import com.devd.commonsystem.theme.GreyColor
 import com.devd.commonsystem.theme.GreyOpacity40Color
 import com.devd.commonsystem.theme.OneDayTypography
 import com.devd.commonsystem.ui.TextButton
+import com.devd.commonsystem.utils.getCurrentMonthRangeMillis
+import java.time.LocalDate
 import java.util.Calendar
 
 @Preview
@@ -51,7 +53,8 @@ fun CustomDatePickerDialog(
             initialSelectedDateMillis = initDateMillis,
             selectableDates = object : SelectableDates {
                 override fun isSelectableDate(utcTimeMillis: Long): Boolean {
-                    return utcTimeMillis < System.currentTimeMillis()
+                    val monthStartMillis = LocalDate.now().getCurrentMonthRangeMillis().first
+                    return utcTimeMillis > monthStartMillis && utcTimeMillis < System.currentTimeMillis()
 
                 }
             }

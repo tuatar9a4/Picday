@@ -23,6 +23,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
@@ -32,9 +33,10 @@ import androidx.compose.ui.unit.dp
 import coil3.compose.AsyncImage
 import com.devd.commonsystem.R
 import com.devd.commonsystem.theme.BlackOpacity40Color
-import com.devd.commonsystem.theme.GreyColor
 import com.devd.commonsystem.theme.OneDayTypography
+import com.devd.commonsystem.theme.SecondaryColor
 import com.devd.commonsystem.theme.WhiteColor
+import com.devd.commonsystem.theme.WhiteOpacity40Color
 import com.devd.commonsystem.theme.textHashTagStyle
 import com.devd.commonsystem.utils.noRippleClickable
 import com.devd.commonsystem.utils.rememberImageUrl
@@ -63,7 +65,7 @@ fun CardPreviewItem(
         modifier = Modifier
             .fillMaxWidth()
             .padding(horizontal = 80.dp)
-            .background(color = GreyColor, shape = RoundedCornerShape(10.dp))
+            .background(color = SecondaryColor, shape = RoundedCornerShape(10.dp))
             .aspectRatio(9 / 16f)
     ) {
         imageUrl?.let {
@@ -81,8 +83,11 @@ fun CardPreviewItem(
             Image(
                 modifier = Modifier
                     .align(Alignment.Center)
+                    .padding(horizontal = 60.dp)
+                    .fillMaxSize()
                     .noRippleClickable(onClick = onChangeImage),
                 painter = painterResource(R.drawable.icon_photo),
+                colorFilter = ColorFilter.tint(WhiteOpacity40Color),
                 contentDescription = null
             )
         }

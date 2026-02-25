@@ -22,12 +22,12 @@ import java.time.ZonedDateTime
 fun YearCategory(
     modifier: Modifier = Modifier,
     searchDate: ZonedDateTime = ZonedDateTime.now(),
-    onClick: (Long) -> Unit
+    onClick: () -> Unit
 ) {
     Row(
         modifier = modifier.then(
             Modifier
-                .clickable(onClick = { onClick.invoke(searchDate.toInstant().toEpochMilli()) })
+                .clickable(onClick = onClick)
         ),
         verticalAlignment = Alignment.CenterVertically,
     ) {

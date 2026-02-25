@@ -24,6 +24,7 @@ import com.devd.editor.data.SAVE_FAIL
 import com.devd.editor.data.SAVE_SUCCESS
 import com.devd.editor.data.SAVE_UPDATE
 import com.devd.model.local.CreateDiaryRequest
+import com.devd.model.local.DiaryInfo
 import com.devd.model.local.FailUpload
 import com.devd.model.local.SuccessUpload
 import com.devd.model.local.UpdateDiaryRequest
@@ -135,8 +136,26 @@ class EditorViewModel @Inject constructor(
     }
 
     fun changeSelectData(dateMillis: Long) {
-        _customDatePickerDialogState.update {
-            it.copy(isShowDialog = false, selectedDate = dateMillis)
+        viewModelScope.launch {
+            val findItem = diaryBookRepository.fetchOneDiaryForDate(
+                diaryBookId = diaryInfoState.value.bookId,
+                date = dateMillis
+            )
+            updateDiaryInfo(findItem)
+            _customDatePickerDialogState.update {
+                it.copy(isShowDialog = false, selectedDate = dateMillis)
+            }
+        }
+    }
+
+    private fun updateDiaryInfo(diaryInfo: DiaryInfo? = null) {
+        _diaryInfoState.update {
+            it.copy(
+                diaryId = diaryInfo?.diaryId,
+                imageUrl = (diaryInfo?.let { Remote(diaryInfo.imageUrlList.first()) }),
+                diaryContents = diaryInfo?.content ?: "",
+                diaryTag = diaryInfo?.tagList ?: emptyList(),
+            )
         }
     }
 
@@ -153,42 +172,62 @@ class EditorViewModel @Inject constructor(
             val userUUID = dataStoreRepository.getPreferData(DataStoreKey.UserUID) ?: return@launch
             _editorUiState.update { it.copy(isShowLoading = true) }
             _messageDialog.emit(MessageInfo(type = NONE))
-            fileUrl?.let {
+            fileUrl?.let {  // fileUrl 이 있을 경우 서버에 업로드 필요!
                 oracleRepository.uploadImageFile(
                     header = userUUID,
                     file = fileUrl
                 ).collect { result ->
-                    if (result is SuccessUpload) {
-                        if (_diaryInfoState.value.diaryId != null) updateDiaryData("$userUUID/${result.uploadFileName}")
-                        else saveDiaryData("$userUUID/${result.uploadFileName}")
-                    } else if (result is FailUpload) {
+                    if (result is SuccessUpload) { // 이미지 업로드 성공
+                        if (diaryInfoState.value.diaryId != null) modifyDiaryDataInDB("$userUUID/${result.uploadFileName}")
+                        else saveNewDiaryData("$userUUID/${result.uploadFileName}")
+                    } else if (result is FailUpload) {  // 이미지 업로드 실패[일기 저장실패]
                         _messageDialog.emit(
                             MessageInfo(type = SAVE_FAIL, messageStr = result.errorMessage)
                         )
                         _editorUiState.update { it.copy(isShowLoading = false) }
                     }
                 }
-            } ?: updateDiaryData()
+            } ?: modifyDiaryDataInDB()
         }
     }
 
     fun showAskSavePopup() {
         viewModelScope.launch {
+            if (!checkValidateDiaryInfo()) return@launch
             _messageDialog.emit(
                 MessageInfo(type = ASK_SAVE, messageId = R.string.ask_save_diary_message)
             )
         }
     }
 
-    fun saveDiaryData(imageName: String) {
+    private suspend fun checkValidateDiaryInfo(): Boolean {
+        val diaryInfo = diaryInfoState.value
+        if (diaryInfo.imageUrl == null) { // 이미지 있어야지
+            _messageDialog.emit(
+                MessageInfo(type = SAVE_FAIL, messageId = R.string.request_diary_image_message)
+            )
+            return false
+        }
+        if (diaryInfo.diaryContents.isBlank() || diaryInfo.diaryContents.length < 2) { //내용이 있어야지 2자 이상
+            _messageDialog.emit(
+                MessageInfo(type = SAVE_FAIL, messageId = R.string.request_diary_contents_message)
+            )
+            return false
+        }
+        return true
+    }
+
+    fun saveNewDiaryData(imageName: String) {
         viewModelScope.launch(Dispatchers.IO) {
             val diaryInfo = diaryInfoState.value
-            diaryBookRepository.saveDairyWithExtras(
+            diaryBookRepository.insertNewDairyWithExtras(
                 CreateDiaryRequest(
                     bookId = diaryInfo.bookId,
                     content = diaryInfo.diaryContents,
                     imageUrls = listOf(imageName),
-                    tags = diaryInfo.diaryTag
+                    tags = diaryInfo.diaryTag,
+                    createDate = customDatePickerDialogState.value.selectedDate,
+                    updateDate = System.currentTimeMillis()
                 )
             )
             _messageDialog.emit(
@@ -198,7 +237,7 @@ class EditorViewModel @Inject constructor(
         }
     }
 
-    fun updateDiaryData(updateImage: String? = null) {
+    fun modifyDiaryDataInDB(updateImage: String? = null) {
         viewModelScope.launch {
             val diaryInfo = diaryInfoState.value
             val imageUrl = updateImage ?: (diaryInfo.imageUrl as Remote).url!!

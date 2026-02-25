@@ -89,6 +89,13 @@ class HomeViewModel @Inject constructor(
         }
     }
 
+    suspend fun fetchTodayDiary() =
+        diaryBookRepository.fetchOneDiaryForDate(
+            homeUiState.value.bookInfo?.bookId!!,
+            System.currentTimeMillis()
+        )
+
+
     fun showCalendarDialog() {
         _homeUiState.update { it.copy(isShowCalendar = true) }
     }

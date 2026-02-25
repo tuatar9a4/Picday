@@ -9,7 +9,6 @@ import com.devd.editor.navigation.EditorRoute
 import com.devd.editor.navigation.editorScreen
 import com.devd.home.navigation.HomeRoute
 import com.devd.home.navigation.homeScreen
-import timber.log.Timber
 
 
 @Composable
@@ -25,7 +24,6 @@ fun MyNavHost(
         homeScreen(
             modifier = modifier,
             onNavigateToEditor = { uri, bookId, diaryId ->
-                Timber.d("???Move...???? uri :$uri")
                 navController.navigate(
                     EditorRoute(
                         currentTime = System.currentTimeMillis(),

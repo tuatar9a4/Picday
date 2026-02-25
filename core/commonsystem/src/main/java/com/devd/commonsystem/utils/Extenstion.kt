@@ -61,6 +61,14 @@ fun LocalDate.getCurrentMonthRangeMillis(): Pair<Long, Long> {
     return start.toEpochMilli() to end.toEpochMilli()
 }
 
+fun LocalDate.getStartEndRangeMillis(): Pair<Long, Long> {
+    val zoneId = ZoneId.systemDefault()
+    val start = this.atStartOfDay(zoneId).toInstant()
+    val end = this.atTime(LocalTime.MAX).atZone(zoneId).toInstant()
+
+    return start.toEpochMilli() to end.toEpochMilli()
+}
+
 fun ZonedDateTime.isCurrentMonth(): Boolean {
     val targetMonth = YearMonth.from(this)
     val currentMonth = YearMonth.now(ZoneId.systemDefault())
