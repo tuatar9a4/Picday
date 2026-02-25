@@ -94,6 +94,7 @@ class EditorViewModel @Inject constructor(
                             messageId = R.string.fail_fetch_diary_book
                         )
                     )
+                _customDatePickerDialogState.update { calendar -> calendar.copy(selectedDate = diary.createdAt) }
                 _diaryInfoState.update { diaryInfo ->
                     diaryInfo.copy(
                         bookId = bookId,

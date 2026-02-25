@@ -18,8 +18,10 @@ import com.devd.room.entity.DiaryImageEntity
 import com.devd.room.entity.DiaryTagCrossEntity
 import com.devd.room.entity.TagEntity
 import kotlinx.coroutines.Dispatchers
+import java.time.Instant
 import java.time.LocalDate
 import java.time.YearMonth
+import java.time.ZoneId
 import java.util.Date
 import javax.inject.Inject
 
@@ -109,7 +111,10 @@ class DiaryBookRepository @Inject constructor(
         diaryBookId: Long,
         date: Long
     ) = safeApiCall(Dispatchers.IO) {
-        val (start, end) = LocalDate.ofEpochDay(date).getStartEndRangeMillis()
+        val (start, end) = Instant.ofEpochMilli(date)
+            .atZone(ZoneId.systemDefault())
+            .toLocalDate().getStartEndRangeMillis()
+
         diaryDao.getDiariesByDateRange(diaryBookId, start, end).firstOrNull()?.transToModel()
     }.run {
         return@run if (this is CallResult.Success) this.res else null
