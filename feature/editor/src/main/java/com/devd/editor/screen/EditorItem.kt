@@ -89,8 +89,16 @@ fun EditorItem(
                 .heightIn(min = with(LocalDensity.current) { (30.sp * 2).toDp() }),
             state = textFieldState,
             lineLimits = TextFieldLineLimits.MultiLine(1, 2),
+            placeholder = {
+                Text(
+                    text = "일기의 내용은 되도록 짧게해주세요\n너무 길면 안 보일 수 있습니다.(최대 100자)",
+                    style = OneDayTypography.labelMedium.copy(
+                        color = GreyOpacity40Color
+                    )
+                )
+            },
             inputTransformation = {
-                if (asCharSequence().lines().size > 2) revertAllChanges()
+                if (length > 100) revertAllChanges()
                 onChangeDiaryText.invoke(asCharSequence().toString())
             },
             shape = RoundedCornerShape(0.dp),
