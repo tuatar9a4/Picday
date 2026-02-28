@@ -1,9 +1,12 @@
 package com.devd.home.navigation
 
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.Modifier
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
+import com.devd.commonsystem.utils.LocalAnimatedVisibilityScope
 import com.devd.home.screen.HomeScreenRoute
+import com.devd.model.local.DiaryInfo
 import kotlinx.serialization.Serializable
 
 
@@ -11,13 +14,19 @@ import kotlinx.serialization.Serializable
 data object HomeRoute
 
 fun NavGraphBuilder.homeScreen(
-    modifier : Modifier = Modifier,
-    onNavigateToEditor: (String?,Long,Long?) -> Unit
+    modifier: Modifier = Modifier,
+    onNavigateToEditor: (String?, Long, Long?) -> Unit,
+    onNavigateToList: (list: List<DiaryInfo>, pos: Int) -> Unit,
 ) {
     composable<HomeRoute> {
-        HomeScreenRoute(
-            modifier = modifier,
-            onEditorMove = onNavigateToEditor
-        )
+        CompositionLocalProvider(
+            LocalAnimatedVisibilityScope provides this
+        ) {
+            HomeScreenRoute(
+                modifier = modifier,
+                onEditorMove = onNavigateToEditor,
+                onMoveDiaryList = onNavigateToList
+            )
+        }
     }
 }

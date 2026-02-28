@@ -4,10 +4,13 @@ import android.annotation.SuppressLint
 import android.content.Context
 import android.net.Uri
 import androidx.annotation.FloatRange
+import androidx.compose.animation.AnimatedVisibilityScope
+import androidx.compose.animation.SharedTransitionScope
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.composed
 import androidx.compose.ui.draw.drawBehind
@@ -19,10 +22,13 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.Dp
 import androidx.core.content.FileProvider
+import coil3.compose.AsyncImage
 import com.devd.commonsystem.R
 import com.devd.model.local.DiaryPhaseType
 import java.io.File
 
+val LocalSharedTransitionScope = staticCompositionLocalOf<SharedTransitionScope?> { null }
+val LocalAnimatedVisibilityScope = staticCompositionLocalOf<AnimatedVisibilityScope?> { null }
 
 fun Modifier.noRippleClickable(onClick: () -> Unit): Modifier = composed {
     clickable(
@@ -85,4 +91,29 @@ fun DiaryPhaseType.diaryPhaseIcon(
             painterResource(this.ids[index])
         }
     }
+}
+
+@Composable
+fun SharedTransitionScope?.AnimateAsyncImage(
+    modifier: Modifier,
+    model: Any?,
+    key: String,
+    animatedVisibilityScope: AnimatedVisibilityScope?
+) {
+    AsyncImage(
+        modifier = modifier.then(
+            if (this == null || animatedVisibilityScope == null) {
+                Modifier
+            } else {
+                with(this) {
+                    Modifier.sharedElement(
+                        rememberSharedContentState(key = key),
+                        animatedVisibilityScope = animatedVisibilityScope
+                    )
+                }
+            }
+        ),
+        model = model,
+        contentDescription = null
+    )
 }

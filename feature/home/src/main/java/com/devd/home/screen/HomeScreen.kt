@@ -46,6 +46,7 @@ import com.devd.commonsystem.utils.isCurrentMonth
 import com.devd.commonsystem.utils.rememberImagePicker
 import com.devd.home.HomeUiState
 import com.devd.home.HomeViewModel
+import com.devd.model.local.DiaryInfo
 import com.devd.permission.Consts
 import com.devd.permission.IPermissionHandler
 import com.devd.permission.rememberPermissionHandler
@@ -57,6 +58,7 @@ import java.io.File
 fun HomeScreenRoute(
     modifier: Modifier = Modifier,
     onEditorMove: (imageUrl: String?, bookId: Long, diaryId: Long?) -> Unit = { _, _, _ -> },
+    onMoveDiaryList: (List<DiaryInfo>, Int) -> Unit = { _, _ -> },
     viewModel: HomeViewModel = hiltViewModel()
 ) {
     val uiState by viewModel.homeUiState.collectAsStateWithLifecycle()
@@ -89,6 +91,16 @@ fun HomeScreenRoute(
         )
     }
 
+    fun moveToDiaryList(list: List<DiaryInfo>, originalIndex: Int) {
+        var selectPos = originalIndex
+        val filteredList = list.filter {
+            val isAddItem = it.diaryId == -1L
+            if (isAddItem) selectPos--
+            !isAddItem
+        }
+        onMoveDiaryList.invoke(filteredList, selectPos)
+    }
+
     fun checkDiaryInfoBeforeMove() {
         scope.launch {
             if (!uiState.searchDate.isCurrentMonth()) {
@@ -114,6 +126,7 @@ fun HomeScreenRoute(
         diaryState = diaryState,
         onShowCalendar = viewModel::showCalendarDialog,
         onEditorClick = { checkDiaryInfoBeforeMove() },
+        onDiaryCardClick = { moveToDiaryList(uiState.diaryList, it) },
         onBookClick = viewModel::showBookDialog
     )
 
@@ -156,6 +169,7 @@ fun HomeScreen(
     diaryState: LazyListState = rememberLazyListState(),
     onShowCalendar: () -> Unit = {},
     onEditorClick: () -> Unit = {},
+    onDiaryCardClick: (Int) -> Unit = {},
     onBookClick: () -> Unit = {}
 ) {
     Box(
@@ -193,6 +207,7 @@ fun HomeScreen(
                 diaryState = diaryState,
                 diaryList = uiState.diaryList,
                 isCurrentMonth = uiState.searchDate.isCurrentMonth(),
+                onDiaryCardClick = onDiaryCardClick,
                 onAddCardClick = onEditorClick
             )   // DiaryList 스크린
         }

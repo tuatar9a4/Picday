@@ -1,15 +1,14 @@
 plugins {
-    id("devd.android.library")
-    id("devd.android.room")
-    id("kotlin-parcelize")
+    id("devd.android.feature")
 }
 
 android {
-    namespace = "com.devd.model"
+    namespace = "com.devd.diary"
 }
 
 dependencies {
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)
     implementation(libs.material)
+
 }

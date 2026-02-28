@@ -3,6 +3,7 @@ package com.devd.home.screen
 import android.annotation.SuppressLint
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.snapping.rememberSnapFlingBehavior
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -37,13 +38,15 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import coil3.compose.AsyncImage
 import com.devd.commonsystem.R
 import com.devd.commonsystem.theme.BlackColor
 import com.devd.commonsystem.theme.BlackOpacity40Color
 import com.devd.commonsystem.theme.OneDayTypography
 import com.devd.commonsystem.theme.WhiteColor
 import com.devd.commonsystem.theme.textHashTagStyle
+import com.devd.commonsystem.utils.AnimateAsyncImage
+import com.devd.commonsystem.utils.LocalAnimatedVisibilityScope
+import com.devd.commonsystem.utils.LocalSharedTransitionScope
 import com.devd.commonsystem.utils.noRippleClickable
 import com.devd.commonsystem.utils.rememberImageUrl
 import com.devd.model.local.DiaryInfo
@@ -57,6 +60,7 @@ fun DiaryListScreen(
     isCurrentMonth: Boolean = true,
     diaryState: LazyListState = rememberLazyListState(),
     diaryList: List<DiaryInfo> = emptyList(),
+    onDiaryCardClick: (pos: Int) -> Unit = {},
     onAddCardClick: () -> Unit = {}
 ) {
 
@@ -79,10 +83,13 @@ fun DiaryListScreen(
                 else EmptyDiaryCardScreen()
             } else {
                 DiaryCardScreen(
-                    modifier = Modifier.graphicsLayer {
-                        scaleX = scale
-                        scaleY = scale
-                    },
+                    modifier = Modifier
+                        .graphicsLayer {
+                            scaleX = scale
+                            scaleY = scale
+                        }
+                        .clickable(onClick = { onDiaryCardClick(index) }),
+                    index = index,
                     diaryDate = item.createDay.toString(),
                     diaryTitle = item.content,
                     diaryTag = item.tagList,
@@ -96,6 +103,7 @@ fun DiaryListScreen(
 @Composable
 fun DiaryCardScreen(
     modifier: Modifier = Modifier,
+    index: Int = 0,
     diaryDate: String,
     diaryTitle: String,
     diaryImage: String? = null,
@@ -103,6 +111,8 @@ fun DiaryCardScreen(
     diarySticker: String? = null
 ) {
     val prefixImageUrl = diaryImage?.rememberImageUrl()
+    val sharedScope = LocalSharedTransitionScope.current
+    val animatedScope = LocalAnimatedVisibilityScope.current
     Card(
         modifier = modifier.then(
             Modifier
@@ -116,12 +126,13 @@ fun DiaryCardScreen(
                 .fillMaxSize()
         ) {
             prefixImageUrl?.let {
-                AsyncImage(
+                sharedScope.AnimateAsyncImage(
                     modifier = Modifier
                         .fillMaxSize()
                         .background(color = BlackColor, shape = RoundedCornerShape(20.dp)),
                     model = it,
-                    contentDescription = null
+                    key =  "image-$index",
+                    animatedVisibilityScope = animatedScope
                 )
             }
             Text(

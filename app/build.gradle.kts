@@ -43,9 +43,11 @@ dependencies {
 
 
     implementation(projects.core.commonsystem)
+    implementation(projects.core.model)
     implementation(projects.feature.intro)
     implementation(projects.feature.user)
     implementation(projects.feature.home)
     implementation(projects.feature.editor)
+    implementation(projects.feature.diary)
 
 }
