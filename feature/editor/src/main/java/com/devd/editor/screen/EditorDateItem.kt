@@ -28,6 +28,7 @@ import java.time.ZoneId
 @Composable
 fun EditorDateItem(
     writeDate: Long = System.currentTimeMillis(),
+    isCanChangeDate: Boolean = true,
     onShowCalendar: () -> Unit = {},
 ) {
     val dairyDate =
@@ -39,7 +40,7 @@ fun EditorDateItem(
     Row(
         modifier = Modifier
             .padding(start = 20.dp)
-            .noRippleClickable(onClick = onShowCalendar),
+            .noRippleClickable(onClick = { if (isCanChangeDate) onShowCalendar() }),
         verticalAlignment = Alignment.CenterVertically
     ) {
         Text(
@@ -59,16 +60,18 @@ fun EditorDateItem(
             )
         }
         Spacer(Modifier.width(8.dp))
-        Image(
-            modifier = Modifier.size(15.dp),
-            painter = painterResource(R.drawable.icon_drop_down),
-            contentDescription = null
-        )
+        if (isCanChangeDate) {
+            Image(
+                modifier = Modifier.size(15.dp),
+                painter = painterResource(R.drawable.icon_drop_down),
+                contentDescription = null
+            )
+        }
     }
 }
 
 @Preview
 @Composable
-fun EditorDateSreenPreview() {
-    EditorScreen {_,_ -> }
+fun EditorDateScreenPreview() {
+    EditorDateItem { }
 }

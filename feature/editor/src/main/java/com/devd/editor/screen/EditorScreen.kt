@@ -46,6 +46,7 @@ import com.devd.editor.data.DiaryInfoState
 import com.devd.editor.data.Local
 import com.devd.editor.data.SAVE_SUCCESS
 import com.devd.editor.data.SAVE_UPDATE
+import com.devd.model.local.EditMode
 
 @Composable
 fun rememberImeBottomSize(): Int {
@@ -57,6 +58,7 @@ fun rememberImeBottomSize(): Int {
 fun EditorScreenRoute(
     modifier: Modifier = Modifier,
     viewModel: EditorViewModel = hiltViewModel(),
+    editMode: EditMode,
     currentTime: Long,
     diaryImage: String?,
     bookId: Long,
@@ -65,7 +67,7 @@ fun EditorScreenRoute(
 ) {
     val context = LocalContext.current
     LaunchedEffect(Unit) {
-        viewModel.initSelectDate(currentTime)
+        viewModel.initSelectDate(currentTime, editMode)
         viewModel.initDiaryInfo(bookId, diaryId, diaryImage)
     }
 
@@ -96,6 +98,7 @@ fun EditorScreenRoute(
     EditorScreen(
         modifier = modifier,
         writeDate = customDatePickerDialogState.selectedDate,
+        isCanChangeDate = customDatePickerDialogState.isCanChangeDate,
         diaryState = diaryInfoState,
         onShowImagePicker = { isShowPickerDialog = true },
         onChangeDiaryText = viewModel::setDiaryText,
@@ -155,6 +158,7 @@ fun EditorScreenRoute(
 fun EditorScreen(
     modifier: Modifier = Modifier,
     writeDate: Long = System.currentTimeMillis(),
+    isCanChangeDate: Boolean = true,
     diaryState: DiaryInfoState? = null,
     onShowImagePicker: () -> Unit = {},
     onSaveDairy: () -> Unit = {},
@@ -209,6 +213,7 @@ fun EditorScreen(
         Spacer(Modifier.height(15.dp))
         EditorDateItem(
             writeDate = writeDate,
+            isCanChangeDate = isCanChangeDate,
             onShowCalendar = {
                 onChangeCalendar()
             }

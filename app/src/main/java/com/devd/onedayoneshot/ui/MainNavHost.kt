@@ -14,6 +14,7 @@ import com.devd.editor.navigation.EditorRoute
 import com.devd.editor.navigation.editorScreen
 import com.devd.home.navigation.HomeRoute
 import com.devd.home.navigation.homeScreen
+import com.devd.model.local.EditMode
 
 @Composable
 fun MyNavHost(
@@ -36,6 +37,7 @@ fun MyNavHost(
                         navController.navigate(
                             EditorRoute(
                                 currentTime = System.currentTimeMillis(),
+                                editMode = EditMode.Edit,
                                 imageUrl = uri,
                                 bookId = bookId,
                                 diaryId = diaryId
@@ -59,6 +61,17 @@ fun MyNavHost(
 
                 diaryListScreen(
                     modifier = modifier,
+                    onNavigateToEditor = { uri, bookId, diaryId ->
+                        navController.navigate(
+                            EditorRoute(
+                                currentTime = System.currentTimeMillis(),
+                                editMode = EditMode.EditOnlyThis,
+                                imageUrl = uri,
+                                bookId = bookId,
+                                diaryId = diaryId
+                            )
+                        )
+                    },
                     backListener = { navController.popBackStack() }
                 )
             }

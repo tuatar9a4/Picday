@@ -25,6 +25,7 @@ import com.devd.editor.data.SAVE_SUCCESS
 import com.devd.editor.data.SAVE_UPDATE
 import com.devd.model.local.CreateDiaryRequest
 import com.devd.model.local.DiaryInfo
+import com.devd.model.local.EditMode
 import com.devd.model.local.FailUpload
 import com.devd.model.local.SuccessUpload
 import com.devd.model.local.UpdateDiaryRequest
@@ -44,6 +45,7 @@ import javax.inject.Inject
 
 data class EditorUiState(
     var isShowLoading: Boolean = false,
+    var editMode: EditMode = EditMode.Edit,
     var imageUrlForCrop: Uri? = null
 )
 
@@ -69,10 +71,11 @@ class EditorViewModel @Inject constructor(
     var shouldBackPage by mutableStateOf(false)
 
 
-    fun initSelectDate(initDate: Long) {
+    fun initSelectDate(initDate: Long, editMode: EditMode) {
         _customDatePickerDialogState.update {
             it.copy(
                 selectedDate = initDate,
+                isCanChangeDate = editMode != EditMode.EditOnlyThis,
                 onClickConfirm = ::changeSelectData,
                 onClickCancel = ::dismissDatePickerDialog
             )

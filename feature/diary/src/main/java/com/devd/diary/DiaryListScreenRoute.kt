@@ -46,7 +46,7 @@ fun DiaryListScreenRoute(
     viewModel: DiaryListViewModel = hiltViewModel(),
     initList: List<DiaryInfo>,
     startPos: Int = 0,
-    navigateEditPage: () -> Unit,
+    navigateEditPage: (String?, Long, Long?) -> Unit,
     onBackClick: () -> Unit
 ) {
     LaunchedEffect(Unit) { viewModel.setInitDiaryList(initList) }
@@ -96,7 +96,7 @@ fun DiaryListScreen(
     diaryList: List<DiaryInfo>,
     startPos: Int = 0,
     onDeleteClick: (id: Int) -> Unit,
-    onEditClick: () -> Unit,
+    onEditClick: (String?, Long, Long?) -> Unit,
     onBackClick: () -> Unit,
 ) {
 
@@ -169,7 +169,14 @@ fun DiaryListScreen(
                 Image(
                     modifier = Modifier
                         .size(32.dp)
-                        .clickable(onClick = onEditClick)
+                        .clickable(onClick = {
+                            val diaryInfo = diaryList[pagerState.currentPage]
+                            onEditClick(
+                                diaryInfo.imageUrlList.firstOrNull(),
+                                diaryInfo.diaryBookId,
+                                diaryInfo.diaryId
+                            )
+                        })
                         .padding(4.dp),
                     painter = painterResource(R.drawable.icon_pencil),
                     contentDescription = null,
@@ -206,7 +213,7 @@ fun DiaryListScreenPreview() {
 
             ),
         ),
-        onEditClick = {},
+        onEditClick = { _, _, _ -> },
         onDeleteClick = {},
         onBackClick = {}
     )

@@ -48,6 +48,7 @@ val DiaryInfoListType = object : NavType<List<DiaryInfo>>(isNullableAllowed = fa
 
 fun NavGraphBuilder.diaryListScreen(
     modifier: Modifier = Modifier,
+    onNavigateToEditor :(String?, Long, Long?) -> Unit,
     backListener: () -> Unit
 ) {
     composable<DiaryListRoute>(
@@ -62,7 +63,7 @@ fun NavGraphBuilder.diaryListScreen(
                 modifier = modifier,
                 initList = route.initList,
                 startPos = route.startPos,
-                navigateEditPage = {},
+                navigateEditPage = onNavigateToEditor,
                 onBackClick = backListener
             )
         }
