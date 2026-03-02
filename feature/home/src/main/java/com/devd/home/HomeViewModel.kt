@@ -8,6 +8,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.devd.commonsystem.R
 import com.devd.commonsystem.utils.getCurrentMonthRangeMillis
+import com.devd.commonsystem.utils.isCurrentMonth
 import com.devd.data.repository.DiaryBookRepository
 import com.devd.datastore.DataStoreKey
 import com.devd.datastore.DataStoreRepository
@@ -67,7 +68,8 @@ class HomeViewModel @Inject constructor(
             val monthDiaries =
                 diaryBookRepository.fetchMonthDairiesByDiaryBook(diaryBook.bookId, start, end)
                     .toMutableList()
-            if (monthDiaries.isEmpty() || !monthDiaries.first().isTodayItem) {
+            val isCurrentMonth = homeUiState.value.searchDate.isCurrentMonth()
+            if (monthDiaries.isEmpty() || (!monthDiaries.first().isTodayItem && isCurrentMonth)) {
                 monthDiaries.add(
                     0,
                     DiaryInfo(
