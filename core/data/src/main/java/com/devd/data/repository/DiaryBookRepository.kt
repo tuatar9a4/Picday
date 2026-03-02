@@ -6,6 +6,7 @@ import com.devd.commonsystem.utils.getStartEndRangeMillis
 import com.devd.data.utils.CallResult
 import com.devd.data.utils.SafeNetCall
 import com.devd.model.local.CreateDiaryRequest
+import com.devd.model.local.DiaryInfo
 import com.devd.model.local.UpdateDiaryRequest
 import com.devd.room.dao.DiaryBookDao
 import com.devd.room.dao.DiaryDao
@@ -197,5 +198,12 @@ class DiaryBookRepository @Inject constructor(
         }
     }
 
+    suspend fun deleteDiaryWithExtras(
+        id: Long,
+    ): DiaryInfo? {
+        val targetDiary = diaryDao.getDiaryById(diaryId = id) ?: return null
+        diaryDao.softDeleteDiary(id)
+        return targetDiary.transToModel()
+    }
 
 }

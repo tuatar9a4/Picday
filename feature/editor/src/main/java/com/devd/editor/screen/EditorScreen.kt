@@ -208,7 +208,10 @@ fun EditorScreen(
         )
         Spacer(Modifier.height(15.dp))
         EditorDateItem(
-            writeDate = writeDate, onShowCalendar = onChangeCalendar
+            writeDate = writeDate,
+            onShowCalendar = {
+                onChangeCalendar()
+            }
         )   // 날짜 View
         Spacer(Modifier.height(20.dp))
         CardPreviewItem(

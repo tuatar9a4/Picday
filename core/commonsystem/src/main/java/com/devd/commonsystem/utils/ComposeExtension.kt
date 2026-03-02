@@ -108,7 +108,8 @@ fun SharedTransitionScope?.AnimateAsyncImage(
                 with(this) {
                     Modifier.sharedElement(
                         rememberSharedContentState(key = key),
-                        animatedVisibilityScope = animatedVisibilityScope
+                        animatedVisibilityScope = animatedVisibilityScope,
+                        renderInOverlayDuringTransition = false
                     )
                 }
             }

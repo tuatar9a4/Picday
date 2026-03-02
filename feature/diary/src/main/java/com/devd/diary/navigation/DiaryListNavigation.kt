@@ -20,7 +20,7 @@ import kotlin.reflect.typeOf
 @Serializable
 data class DiaryListRoute(
     val initList: List<DiaryInfo>,
-    val startPos : Int,
+    val startPos: Int,
 )
 
 val DiaryInfoListType = object : NavType<List<DiaryInfo>>(isNullableAllowed = false) {
@@ -48,7 +48,7 @@ val DiaryInfoListType = object : NavType<List<DiaryInfo>>(isNullableAllowed = fa
 
 fun NavGraphBuilder.diaryListScreen(
     modifier: Modifier = Modifier,
-    backListener : () -> Unit
+    backListener: () -> Unit
 ) {
     composable<DiaryListRoute>(
         typeMap = mapOf(typeOf<List<DiaryInfo>>() to DiaryInfoListType)
@@ -62,6 +62,7 @@ fun NavGraphBuilder.diaryListScreen(
                 modifier = modifier,
                 initList = route.initList,
                 startPos = route.startPos,
+                navigateEditPage = {},
                 onBackClick = backListener
             )
         }

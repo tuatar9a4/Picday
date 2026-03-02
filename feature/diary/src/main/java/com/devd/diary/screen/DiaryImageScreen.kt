@@ -9,7 +9,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.pager.HorizontalPager
-import androidx.compose.foundation.pager.rememberPagerState
+import androidx.compose.foundation.pager.PagerState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -38,15 +38,14 @@ import kotlin.math.min
 
 @Composable
 fun DiaryImageScreen(
+    pagerState : PagerState,
     imageList: List<String?>,
-    startPos: Int,
     onChangePage: (Int) -> Unit
 ) {
     val scope = rememberCoroutineScope()
     val sharedScope = LocalSharedTransitionScope.current
     val animatedScope = LocalAnimatedVisibilityScope.current
 
-    val pagerState = rememberPagerState(pageCount = { imageList.size }, initialPage = startPos)
     val isCanScroll = remember { mutableStateOf(CanScrollDirection.CAN_SCROLL_ANYWHERE) }
 
     LaunchedEffect(pagerState.currentPage) {

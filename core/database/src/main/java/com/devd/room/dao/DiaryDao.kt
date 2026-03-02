@@ -87,7 +87,7 @@ interface DiaryDao {
     """
     )
     suspend fun softDeleteDiary(
-        diaryId: String,
+        diaryId: Long,
         deletedAt: Long = System.currentTimeMillis()
     )
 }
