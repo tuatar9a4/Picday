@@ -33,6 +33,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.devd.commonsystem.R
 import com.devd.commonsystem.ui.Toolbar
 import com.devd.commonsystem.ui.calendar.CustomDatePickerDialog
+import com.devd.commonsystem.ui.calendar.RangeType
 import com.devd.commonsystem.ui.cropImageDialog.ShowCropDialog
 import com.devd.commonsystem.ui.dialog.ShowImagePicker
 import com.devd.commonsystem.ui.dialog.ShowMessageDialog
@@ -106,6 +107,7 @@ fun EditorScreenRoute(
     if (customDatePickerDialogState.isShowDialog) {
         CustomDatePickerDialog(
             title = "일기 작성 날짜를 선택하세요",
+            selectRange = RangeType.CURRENT_MONTH,
             initDateMillis = customDatePickerDialogState.selectedDate,
             onSelectDate = customDatePickerDialogState.onClickConfirm,
             onClickCancel = customDatePickerDialogState.onClickCancel
@@ -140,7 +142,9 @@ fun EditorScreenRoute(
                         viewModel.uploadImageToBuket(fileUrl = file)
                     }
 
-                    else -> { viewModel.dismissMessageDialog() }
+                    else -> {
+                        viewModel.dismissMessageDialog()
+                    }
                 }
             }
         )   // MessageDialog

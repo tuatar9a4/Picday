@@ -29,14 +29,21 @@ import com.devd.commonsystem.theme.GreyColor
 import com.devd.commonsystem.theme.GreyOpacity40Color
 import com.devd.commonsystem.theme.OneDayTypography
 import com.devd.commonsystem.ui.TextButton
+import com.devd.commonsystem.ui.calendar.RangeType.ALL
+import com.devd.commonsystem.ui.calendar.RangeType.CURRENT_MONTH
 import com.devd.commonsystem.utils.getCurrentMonthRangeMillis
 import java.time.LocalDate
 import java.util.Calendar
+
+enum class RangeType {
+    ALL, CURRENT_MONTH
+}
 
 @Preview
 @Composable
 fun CustomDatePickerDialog(
     title: String = "",
+    selectRange: RangeType = ALL,
     initDateMillis: Long = Calendar.getInstance().timeInMillis,
     onSelectDate: (dateMillis: Long) -> Unit = {},
     onClickCancel: () -> Unit = {}
@@ -54,8 +61,10 @@ fun CustomDatePickerDialog(
             selectableDates = object : SelectableDates {
                 override fun isSelectableDate(utcTimeMillis: Long): Boolean {
                     val monthStartMillis = LocalDate.now().getCurrentMonthRangeMillis().first
-                    return utcTimeMillis > monthStartMillis && utcTimeMillis < System.currentTimeMillis()
-
+                    return when (selectRange) {
+                        ALL -> utcTimeMillis < System.currentTimeMillis()
+                        CURRENT_MONTH -> utcTimeMillis > monthStartMillis && utcTimeMillis < System.currentTimeMillis()
+                    }
                 }
             }
         )
