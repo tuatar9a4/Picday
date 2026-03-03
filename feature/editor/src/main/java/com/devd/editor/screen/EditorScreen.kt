@@ -63,7 +63,7 @@ fun EditorScreenRoute(
     diaryImage: String?,
     bookId: Long,
     diaryId: Long?,
-    onBackIconClick: () -> Unit
+    onBackIconClick: (id: Long?) -> Unit
 ) {
     val context = LocalContext.current
     LaunchedEffect(Unit) {
@@ -74,7 +74,7 @@ fun EditorScreenRoute(
     /* Resolvation Move Back */
     LaunchedEffect(viewModel.shouldBackPage) {
         if (viewModel.shouldBackPage) {
-            onBackIconClick.invoke()
+            onBackIconClick.invoke(viewModel.diaryInfoState.value.diaryId)
             viewModel.shouldBackPage = false
         }
     }
@@ -104,7 +104,7 @@ fun EditorScreenRoute(
         onChangeDiaryText = viewModel::setDiaryText,
         onChangeHashTag = viewModel::changeHashTag,
         onSaveDairy = viewModel::showAskSavePopup,
-        onBackIconClick = onBackIconClick,
+        onBackIconClick = { onBackIconClick(null) },
         onChangeCalendar = viewModel::showDatePickerDialog,
     )
     if (customDatePickerDialogState.isShowDialog) {

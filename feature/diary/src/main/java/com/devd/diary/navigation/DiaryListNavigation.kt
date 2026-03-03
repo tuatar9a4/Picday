@@ -8,13 +8,13 @@ import androidx.compose.ui.Modifier
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavType
 import androidx.navigation.compose.composable
-import androidx.navigation.toRoute
 import com.devd.commonsystem.utils.LocalAnimatedVisibilityScope
 import com.devd.diary.DiaryListScreenRoute
 import com.devd.model.local.DiaryInfo
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
+import timber.log.Timber
 import kotlin.reflect.typeOf
 
 @Serializable
@@ -48,21 +48,25 @@ val DiaryInfoListType = object : NavType<List<DiaryInfo>>(isNullableAllowed = fa
 
 fun NavGraphBuilder.diaryListScreen(
     modifier: Modifier = Modifier,
-    onNavigateToEditor :(String?, Long, Long?) -> Unit,
+    onNavigateToEditor: (String?, Long, Long?) -> Unit,
     backListener: () -> Unit
 ) {
     composable<DiaryListRoute>(
         typeMap = mapOf(typeOf<List<DiaryInfo>>() to DiaryInfoListType)
     ) { backstackEntry ->
+        Timber.d("backstackEntry => ${backstackEntry.savedStateHandle.get<Long>("ChangeID")}")
+        var changId: Long? = null
+        backstackEntry.savedStateHandle.get<Long>("ChangeID")?.let { id ->
+            changId = id
+            backstackEntry.savedStateHandle.remove<Long>("ChangeID")
+        }
         CompositionLocalProvider(
             LocalAnimatedVisibilityScope provides this
         ) {
-            val route = backstackEntry.toRoute<DiaryListRoute>()
 
             DiaryListScreenRoute(
                 modifier = modifier,
-                initList = route.initList,
-                startPos = route.startPos,
+                changId = changId,
                 navigateEditPage = onNavigateToEditor,
                 onBackClick = backListener
             )

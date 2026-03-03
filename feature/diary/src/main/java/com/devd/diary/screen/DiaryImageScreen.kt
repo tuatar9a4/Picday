@@ -39,8 +39,7 @@ import kotlin.math.min
 @Composable
 fun DiaryImageScreen(
     pagerState : PagerState,
-    imageList: List<String?>,
-    onChangePage: (Int) -> Unit
+    imageList: List<String?>
 ) {
     val scope = rememberCoroutineScope()
     val sharedScope = LocalSharedTransitionScope.current
@@ -61,7 +60,6 @@ fun DiaryImageScreen(
 
             else -> isCanScroll.value = CanScrollDirection.CAN_SCROLL_ANYWHERE
         }
-        onChangePage(pagerState.currentPage)
     }
 
     fun moveToPage(tagetPage: Int) {

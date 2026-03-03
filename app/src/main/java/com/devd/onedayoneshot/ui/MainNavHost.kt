@@ -56,7 +56,14 @@ fun MyNavHost(
 
                 editorScreen(
                     modifier = modifier,
-                    backListener = { navController.popBackStack() }
+                    backListener = { changeId ->
+                        changeId?.let {
+                            navController.previousBackStackEntry
+                                ?.savedStateHandle
+                                ?.set("ChangeID", changeId)
+                        }
+                        navController.popBackStack()
+                    }
                 )
 
                 diaryListScreen(

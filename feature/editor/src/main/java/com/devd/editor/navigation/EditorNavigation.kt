@@ -21,7 +21,7 @@ data class EditorRoute(
 
 fun NavGraphBuilder.editorScreen(
     modifier: Modifier = Modifier,
-    backListener: () -> Unit
+    backListener: (Long?) -> Unit
 ) {
     composable<EditorRoute> { backstackEntry ->
         val route = backstackEntry.toRoute<EditorRoute>()

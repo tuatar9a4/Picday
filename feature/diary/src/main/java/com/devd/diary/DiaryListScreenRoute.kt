@@ -18,8 +18,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.ColorFilter
@@ -38,28 +36,29 @@ import com.devd.commonsystem.ui.loading.LoadingDialog
 import com.devd.diary.screen.DiaryContentsScreen
 import com.devd.diary.screen.DiaryImageScreen
 import com.devd.model.local.DiaryInfo
-import timber.log.Timber
 
 @Composable
 fun DiaryListScreenRoute(
     modifier: Modifier = Modifier,
+    changId: Long? = null,
     viewModel: DiaryListViewModel = hiltViewModel(),
-    initList: List<DiaryInfo>,
-    startPos: Int = 0,
     navigateEditPage: (String?, Long, Long?) -> Unit,
     onBackClick: () -> Unit
 ) {
-    LaunchedEffect(Unit) { viewModel.setInitDiaryList(initList) }
-
     val uiState by viewModel.diaryListUiState.collectAsState()
-    LaunchedEffect(uiState.isDiaryList) {
-        Timber.d("CheckDiaryList => ${uiState.isDiaryList}")
-        if (uiState.isDiaryList.isEmpty()) onBackClick()
+
+    LaunchedEffect(uiState.diaryList) {
+        if (uiState.diaryList.isEmpty()) onBackClick()
     }
+
+    LaunchedEffect(changId) {
+        changId?.let { viewModel.updateDiaryItem(changId) }
+    }
+
     DiaryListScreen(
         modifier = modifier,
-        diaryList = uiState.isDiaryList,
-        startPos = startPos,
+        diaryList = uiState.diaryList,
+        startPos = uiState.startPos,
         onDeleteClick = viewModel::showAskDeleteDiary,
         onEditClick = navigateEditPage,
         onBackClick = onBackClick
@@ -104,17 +103,11 @@ fun DiaryListScreen(
     val pagerState = rememberPagerState(pageCount = { diaryList.size }, initialPage = startPos)
 
     /* ContentsInfo */
-    val dateStr = remember { mutableStateOf("") }
-    val contentsStr = remember { mutableStateOf("") }
-    val hashTag = remember { mutableStateOf(emptyList<String>()) }
+    val currentDiary = diaryList.getOrNull(pagerState.currentPage)
 
-    fun changeDiaryContents(pos: Int) {
-        if (diaryList.isEmpty()) return
-        val selectPageInfo = diaryList[pos]
-        dateStr.value = selectPageInfo.cratedDateStr("yyyy.MM.dd HH:mm")
-        contentsStr.value = selectPageInfo.content
-        hashTag.value = selectPageInfo.tagList
-    }
+    val dateStr = currentDiary?.cratedDateStr("yyyy.MM.dd HH:mm") ?: ""
+    val contentsStr = currentDiary?.content ?: ""
+    val hashTag = currentDiary?.tagList ?: emptyList()
 
     Box(
         modifier = modifier.then(
@@ -126,9 +119,7 @@ fun DiaryListScreen(
         DiaryImageScreen(
             pagerState = pagerState,
             imageList = diaryList.map { it.imageUrlList.firstOrNull() },
-        ) { changedPos ->
-            changeDiaryContents(changedPos)
-        }   //이미지 Screen
+        )
         Row(
             modifier = Modifier
                 .fillMaxWidth()
@@ -186,9 +177,9 @@ fun DiaryListScreen(
         }
         DiaryContentsScreen(
             modifier = Modifier.align(Alignment.BottomCenter),
-            diaryDate = dateStr.value,
-            diaryContents = contentsStr.value,
-            diaryTagList = hashTag.value
+            diaryDate = dateStr,
+            diaryContents = contentsStr,
+            diaryTagList = hashTag
         )   // 하단 컨텐츠
     }
 
