@@ -7,7 +7,6 @@ import java.text.SimpleDateFormat
 import java.time.Instant
 import java.time.LocalDate
 import java.time.ZoneId
-import java.util.Calendar
 import java.util.Date
 import java.util.Locale
 
@@ -26,10 +25,12 @@ data class DiaryInfo(
 ) : Parcelable {
     val createDay: Int
         get() {
-            val date = Calendar.getInstance().clone() as Calendar
-            date.timeInMillis = createdAt
-            return date.get(Calendar.DAY_OF_MONTH)
+            return Instant.ofEpochMilli(createdAt)
+                .atZone(ZoneId.systemDefault())
+                .toLocalDate().dayOfMonth
         }
+    val localDataWithCreate: LocalDate
+        get() = Instant.ofEpochMilli(createdAt).atZone(ZoneId.systemDefault()).toLocalDate()
 
     val isTodayItem: Boolean
         get() {
@@ -42,7 +43,7 @@ data class DiaryInfo(
             return targetDate == today
         }
 
-    fun cratedDateStr(format: String): String {
+    fun getDateStr(format: String): String {
         val dateFormat = SimpleDateFormat(format, Locale.getDefault())
         val date = Date(createdAt)
         return dateFormat.format(date)

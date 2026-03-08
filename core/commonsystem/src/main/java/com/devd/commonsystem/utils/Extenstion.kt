@@ -9,12 +9,13 @@ import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.ui.platform.LocalDensity
 import com.devd.commonsystem.R
 import java.time.DayOfWeek
+import java.time.Instant
 import java.time.LocalDate
 import java.time.LocalTime
 import java.time.YearMonth
 import java.time.ZoneId
 import java.time.ZonedDateTime
-import java.time.temporal.TemporalAdjusters
+import kotlin.math.ceil
 
 object StringRexFormat {
     const val ID_REGEX = "^[a-zA-Z0-9]{2,10}$"
@@ -47,20 +48,7 @@ fun keyboardAsState(): State<Boolean> {
     return rememberUpdatedState(isImeVisible)
 }
 
-fun LocalDate.getCurrentMonthRangeMillis(): Pair<Long, Long> {
-    val zoneId = ZoneId.systemDefault()
-    val start = this.withDayOfMonth(1)
-        .atStartOfDay(zoneId)
-        .toInstant()
-
-    val end = this.with(TemporalAdjusters.lastDayOfMonth())
-        .atTime(LocalTime.MAX)
-        .atZone(zoneId)
-        .toInstant()
-
-    return start.toEpochMilli() to end.toEpochMilli()
-}
-
+/* 특정 날의 첫번째와 마지막 시간 */
 fun LocalDate.getStartEndRangeMillis(): Pair<Long, Long> {
     val zoneId = ZoneId.systemDefault()
     val start = this.atStartOfDay(zoneId).toInstant()
@@ -69,10 +57,37 @@ fun LocalDate.getStartEndRangeMillis(): Pair<Long, Long> {
     return start.toEpochMilli() to end.toEpochMilli()
 }
 
+/* 해당 달의 첫번째날과 마지막날의 Millis */
+fun Long.getCurrentMonthRangeMillis(includePreMonth: Boolean = false): Pair<Long, Long> {
+    val zoneId = ZoneId.systemDefault()
+    val dateTime = Instant.ofEpochMilli(this).atZone(zoneId)
+    val currentMonth = YearMonth.from(dateTime)
+
+    // 1. 달력 시작일 (첫 번째 칸)
+    val firstDayOfMonth = currentMonth.atDay(1)
+    val firstDayOfWeekValue = if (includePreMonth) firstDayOfMonth.dayOfWeek.value % 7 else 0
+    val calendarStartDay = firstDayOfMonth.minusDays(firstDayOfWeekValue.toLong())
+
+    // 2. 주 수 및 전체 칸 수 계산
+    val weekCount = ceil((firstDayOfWeekValue + currentMonth.lengthOfMonth()) / 7f).toInt()
+    val totalCells = weekCount * 7
+
+    // 3. 달력 종료일 (마지막 칸)
+    val calendarEndDay = calendarStartDay.plusDays((totalCells - 1).toLong())
+
+    // 4. Millis 변환
+    val startMillis = calendarStartDay.atStartOfDay(zoneId).toInstant().toEpochMilli()
+
+    // 마지막 날의 23:59:59.999
+    val endMillis = calendarEndDay.atTime(LocalTime.MAX).atZone(zoneId).toInstant().toEpochMilli()
+
+    return Pair(startMillis, endMillis)
+}
+
+
 fun ZonedDateTime.isCurrentMonth(): Boolean {
     val targetMonth = YearMonth.from(this)
     val currentMonth = YearMonth.now(ZoneId.systemDefault())
-
     return targetMonth == currentMonth
 }
 

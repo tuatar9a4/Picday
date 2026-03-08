@@ -58,6 +58,7 @@ import java.io.File
 fun HomeScreenRoute(
     modifier: Modifier = Modifier,
     onEditorMove: (imageUrl: String?, bookId: Long, diaryId: Long?) -> Unit = { _, _, _ -> },
+    onCalendarMove: (bookId: Long, selectMillis: Long) -> Unit = { _, _ -> },
     onMoveDiaryList: (List<DiaryInfo>, Int) -> Unit = { _, _ -> },
     viewModel: HomeViewModel = hiltViewModel()
 ) {
@@ -126,6 +127,13 @@ fun HomeScreenRoute(
         diaryState = diaryState,
         onShowCalendar = viewModel::showCalendarDialog,
         onEditorClick = { checkDiaryInfoBeforeMove() },
+        onCalendarClick = {
+            uiState.bookInfo?.bookId ?: return@HomeScreen
+            onCalendarMove(
+                uiState.bookInfo?.bookId!!,
+                uiState.searchDate.toInstant().toEpochMilli()
+            )
+        },
         onDiaryCardClick = { moveToDiaryList(uiState.diaryList, it) },
         onBookClick = viewModel::showBookDialog
     )
@@ -169,6 +177,7 @@ fun HomeScreen(
     diaryState: LazyListState = rememberLazyListState(),
     onShowCalendar: () -> Unit = {},
     onEditorClick: () -> Unit = {},
+    onCalendarClick: () -> Unit = {},
     onDiaryCardClick: (Int) -> Unit = {},
     onBookClick: () -> Unit = {}
 ) {
@@ -236,7 +245,7 @@ fun HomeScreen(
                 shape = CircleShape,
                 containerColor = AccentOpacity40Color,
                 elevation = FloatingActionButtonDefaults.elevation(defaultElevation = 0.dp),
-                onClick = { },
+                onClick = onCalendarClick,
             ) {
                 Image(
                     painter = painterResource(R.drawable.icon_calendar),

@@ -32,8 +32,8 @@ import com.devd.commonsystem.ui.TextButton
 import com.devd.commonsystem.ui.calendar.RangeType.ALL
 import com.devd.commonsystem.ui.calendar.RangeType.CURRENT_MONTH
 import com.devd.commonsystem.utils.getCurrentMonthRangeMillis
-import java.time.LocalDate
 import java.util.Calendar
+import java.util.Date
 
 enum class RangeType {
     ALL, CURRENT_MONTH
@@ -60,7 +60,7 @@ fun CustomDatePickerDialog(
             initialSelectedDateMillis = initDateMillis,
             selectableDates = object : SelectableDates {
                 override fun isSelectableDate(utcTimeMillis: Long): Boolean {
-                    val monthStartMillis = LocalDate.now().getCurrentMonthRangeMillis().first
+                    val monthStartMillis = Date().time.getCurrentMonthRangeMillis().first
                     return when (selectRange) {
                         ALL -> utcTimeMillis < System.currentTimeMillis()
                         CURRENT_MONTH -> utcTimeMillis > monthStartMillis && utcTimeMillis < System.currentTimeMillis()

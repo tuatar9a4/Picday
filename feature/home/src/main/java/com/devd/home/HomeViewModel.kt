@@ -63,7 +63,7 @@ class HomeViewModel @Inject constructor(
 
     private fun fetchDairiesByDiaryBook(diaryBook: DiaryBookInfo) {
         viewModelScope.launch {
-            val (start, end) = homeUiState.value.searchDate.toLocalDate()
+            val (start, end) = homeUiState.value.searchDate.toInstant().toEpochMilli()
                 .getCurrentMonthRangeMillis()
             val monthDiaries =
                 diaryBookRepository.fetchMonthDairiesByDiaryBook(diaryBook.bookId, start, end)

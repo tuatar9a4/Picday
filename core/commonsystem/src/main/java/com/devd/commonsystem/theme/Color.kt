@@ -14,6 +14,8 @@ val PurpleGrey40 = Color(0xFF625b71)
 val Pink40 = Color(0xFF7D5260)
 
 
+val TransParents = Color(0x00000000)
+
 //https://kwongdevelop.tistory.com/5
 val PrimaryColor = Color(0xFFF5F1EB)
 val SecondaryColor = Color(0xFFC8B6A6)

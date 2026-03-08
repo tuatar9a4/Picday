@@ -20,7 +20,6 @@ import com.devd.room.entity.DiaryTagCrossEntity
 import com.devd.room.entity.TagEntity
 import kotlinx.coroutines.Dispatchers
 import java.time.Instant
-import java.time.LocalDate
 import java.time.YearMonth
 import java.time.ZoneId
 import java.util.Date
@@ -69,7 +68,7 @@ class DiaryBookRepository @Inject constructor(
     suspend fun fetchMajorDiaryBook(uuid: String) =
         safeApiCall(Dispatchers.IO) {
             val diaryBook = diaryBookDao.selectMainDiaryBook(uuid).transToModel()
-            val (start, end) = LocalDate.now().getCurrentMonthRangeMillis()
+            val (start, end) = Date().time.getCurrentMonthRangeMillis()
             val monthDatCount = YearMonth.now().lengthOfMonth()
             val curMonthDiaryCount =
                 diaryDao.getDiariesByDateRange(diaryBook.bookId, start, end).size

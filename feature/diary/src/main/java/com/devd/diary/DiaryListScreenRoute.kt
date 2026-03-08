@@ -105,7 +105,7 @@ fun DiaryListScreen(
     /* ContentsInfo */
     val currentDiary = diaryList.getOrNull(pagerState.currentPage)
 
-    val dateStr = currentDiary?.cratedDateStr("yyyy.MM.dd HH:mm") ?: ""
+    val dateStr = currentDiary?.getDateStr("yyyy.MM.dd HH:mm") ?: ""
     val contentsStr = currentDiary?.content ?: ""
     val hashTag = currentDiary?.tagList ?: emptyList()
 

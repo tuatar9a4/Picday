@@ -7,6 +7,8 @@ import androidx.compose.ui.Modifier
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.rememberNavController
+import com.devd.calendar.navigation.CustomCalendarRoute
+import com.devd.calendar.navigation.customCalendarScreen
 import com.devd.commonsystem.utils.LocalSharedTransitionScope
 import com.devd.diary.navigation.DiaryListRoute
 import com.devd.diary.navigation.diaryListScreen
@@ -22,7 +24,7 @@ fun MyNavHost(
     navController: NavHostController = rememberNavController()
 ) {
 
-    //HomeRoute, EditorRoute, DiaryListRoute
+    //HomeRoute, EditorRoute, DiaryListRoute, CustomCalendarRoute
     SharedTransitionLayout {
         CompositionLocalProvider(
             LocalSharedTransitionScope provides this,
@@ -49,6 +51,14 @@ fun MyNavHost(
                             DiaryListRoute(
                                 initList = list,
                                 startPos = pos
+                            )
+                        )
+                    },
+                    onNavigateToCalendar = { bookId, selectMillis ->
+                        navController.navigate(
+                            CustomCalendarRoute(
+                                selectBookID = bookId,
+                                selectMillis = selectMillis
                             )
                         )
                     }
@@ -80,6 +90,11 @@ fun MyNavHost(
                         )
                     },
                     backListener = { navController.popBackStack() }
+                )
+
+                customCalendarScreen(
+                    modifier = modifier,
+                    onBackClick = { navController.popBackStack() }
                 )
             }
         }
