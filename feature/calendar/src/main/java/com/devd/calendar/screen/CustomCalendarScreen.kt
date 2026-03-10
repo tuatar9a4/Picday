@@ -30,6 +30,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalWindowInfo
 import androidx.compose.ui.res.painterResource
@@ -38,6 +39,8 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import coil3.compose.AsyncImage
+import coil3.request.ImageRequest
+import coil3.size.Size
 import com.devd.calendar.data.CalendarImageInfo
 import com.devd.commonsystem.R
 import com.devd.commonsystem.theme.AccentColor
@@ -45,19 +48,24 @@ import com.devd.commonsystem.theme.BlackOpacity40Color
 import com.devd.commonsystem.theme.OneDayTypography
 import com.devd.commonsystem.theme.RedColor
 import com.devd.commonsystem.theme.WhiteColor
+import com.devd.commonsystem.utils.getFirstDayMillis
 import kotlinx.coroutines.launch
+import java.time.DayOfWeek
 import java.time.Instant
 import java.time.LocalDate
 import java.time.YearMonth
 import java.time.ZoneId
 import java.time.temporal.ChronoUnit
+import kotlin.math.ceil
 
 @SuppressLint("ConfigurationScreenWidthHeight")
 @Preview
 @Composable
 fun CustomCalendarScreen(
     selectDate: Long = System.currentTimeMillis(),
-    infoList: List<CalendarImageInfo> = emptyList()
+    infoList: Map<YearMonth, List<CalendarImageInfo>> = emptyMap(),
+    onDateSelector: (CalendarImageInfo) -> Unit = {},
+    onChangeDate: (selectMillis: Long, isPre: Boolean, isNext: Boolean) -> Unit = { _, _, _ -> }
 ) {
 
     val configuration = LocalConfiguration.current
@@ -78,9 +86,13 @@ fun CustomCalendarScreen(
     val pagerState = rememberPagerState(initialPage = initialPage) { Int.MAX_VALUE }
     val scope = rememberCoroutineScope()
 
-    val currentMonth = remember(pagerState.currentPage) {
-//        YearMonth.from(LocalDate.ofEpochDay(selectDate))
-        anchorMonth.plusMonths((pagerState.currentPage - (Int.MAX_VALUE / 2)).toLong())
+    val currentMonth = remember(pagerState.targetPage) {
+        val isPreMove = pagerState.targetPage < pagerState.settledPage
+        val isNextMove = pagerState.targetPage < pagerState.settledPage
+        val newMonth =
+            anchorMonth.plusMonths((pagerState.targetPage - (Int.MAX_VALUE / 2)).toLong())
+        onChangeDate(newMonth.getFirstDayMillis(), isPreMove, isNextMove)
+        newMonth
     }
 
     Column(
@@ -120,11 +132,10 @@ fun CustomCalendarScreen(
         ) { page ->
             // 각 페이지(화면)에 해당하는 월을 계산해서 달력 그리드를 그립니다.
             val pageMonth = YearMonth.now().plusMonths((page - initialPage).toLong())
-
             CalendarGrid(
                 currentMonth = pageMonth,
-                imageList = infoList,
-                onDateSelected = { },
+                imageList = infoList[pageMonth],
+                onDateSelector = onDateSelector
             )
         }
     }
@@ -179,36 +190,37 @@ fun DaysOfWeekHeader() {
 @Composable
 fun CalendarGrid(
     currentMonth: YearMonth,
-    imageList: List<CalendarImageInfo>,
-    onDateSelected: (LocalDate) -> Unit
+    imageList: List<CalendarImageInfo>?,
+    onDateSelector: (info: CalendarImageInfo) -> Unit
 ) {
-//    // 이달 초로 이동
-//    val firstDayOfMonth = currentMonth.atDay(1)
-//    // 시작 주
-//    val firstDayOfWeekValue = firstDayOfMonth.dayOfWeek.value % 7
-//    // 몇 주 인지
-//    val weekCount = ceil((firstDayOfWeekValue + currentMonth.lengthOfMonth()) / 7f).toInt()
-//
-//    val calendarStartDay = firstDayOfMonth.minusDays(firstDayOfWeekValue.toLong())
+    // 이달 초로 이동
+    val firstDayOfMonth = currentMonth.atDay(1)
+    // 시작 주
+    val firstDayOfWeekValue = firstDayOfMonth.dayOfWeek.value % 7
+    // 몇 주 인지
+    val weekCount = ceil((firstDayOfWeekValue + currentMonth.lengthOfMonth()) / 7f).toInt()
+
+    val calendarStartDay = firstDayOfMonth.minusDays(firstDayOfWeekValue.toLong())
+
+    val calendarItemCount = imageList?.size ?: (7 * weekCount)
 
     val deviceWidthPx = LocalWindowInfo.current.containerDpSize.width - 32.dp
     val density = LocalDensity.current
     val boxWidth = with(density) { (deviceWidthPx / 7) }
+    val imagePixel = with(density) { boxWidth.toPx().toInt() }
 
-//    val days = (0..<(7 * weekCount)).toList()
     Column(
         modifier = Modifier.fillMaxWidth()
     ) {
-        imageList.chunked(7).forEach { week ->
+        (0..<calendarItemCount).toList().chunked(7).forEach { week ->
             Row() {
-                week.forEach { dayInfo ->
-                    val isToday = dayInfo.isToday
-                    val isCurrentMonth = dayInfo.isCurrentMonth
-                    val isSunDay = dayInfo.isSunDay
-//                    val date = calendarStartDay.plusDays((day).toLong())
-//                    val isToday = date == LocalDate.now()
-//                    val isCurrentMonth = YearMonth.from(date) == currentMonth
-//                    val isSunDay = date.dayOfWeek == DayOfWeek.SUNDAY
+                week.forEach { day ->
+                    val dayInfo = imageList?.getOrNull(day)
+                    val date = calendarStartDay.plusDays((day).toLong())
+                    val isToday = dayInfo?.isToday ?: (date == LocalDate.now())
+                    val isCurrentMonth =
+                        dayInfo?.isCurrentMonth ?: (YearMonth.from(date) == currentMonth)
+                    val isSunDay = dayInfo?.isSunDay ?: (date.dayOfWeek == DayOfWeek.SUNDAY)
                     Box(
                         modifier = Modifier
                             .width(boxWidth)
@@ -218,16 +230,21 @@ fun CalendarGrid(
                                 color = BlackOpacity40Color,
                                 shape = RoundedCornerShape(5.dp)
                             )
-                            .clickable { },
+                            .clickable {
+                                imageList?.getOrNull(day)?.diaryId?.let { onDateSelector(imageList[day]) }
+                            },
                         contentAlignment = Alignment.Center
                     ) {
-                        dayInfo.imageUrl()?.let {
+                        dayInfo?.imageUrl()?.let {
                             AsyncImage(
                                 modifier = Modifier
                                     .fillMaxSize()
                                     .clip(RoundedCornerShape(5.dp)),
                                 contentScale = ContentScale.Crop,
-                                model = it,
+                                model = ImageRequest.Builder(LocalContext.current)
+                                    .data(it)
+                                    .size(Size(imagePixel, imagePixel))
+                                    .build(),
                                 contentDescription = null
                             )
                         }
@@ -237,7 +254,7 @@ fun CalendarGrid(
                                 .align(Alignment.TopStart)
                                 .alpha(if (isToday || isCurrentMonth) 1f else 0.4f)
                                 .padding(vertical = 3.dp, horizontal = 5.dp),
-                            text = dayInfo?.day?.toString() ?: "-",
+                            text = dayInfo?.day?.toString() ?: "${date.dayOfMonth}",
                             style = OneDayTypography.labelLarge.copy(
                                 color = if (isToday) AccentColor else if (isSunDay) RedColor else WhiteColor
                             )

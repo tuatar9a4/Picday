@@ -81,6 +81,15 @@ class DiaryBookRepository @Inject constructor(
             }
         }
 
+    suspend fun fetchBookInfo(bookId: Long) =
+        safeApiCall(Dispatchers.IO) { diaryBookDao.selectDiaryBook(bookId).transToModel() }
+            .run {
+                return@run when (this) {
+                    is CallResult.Success -> this.res
+                    is CallResult.NetworkError -> null
+                }
+            }
+
 
     suspend fun hasDiaryBook(uuid: String) = safeApiCall(Dispatchers.IO) {
         diaryBookDao.selectAllDiaryBook(uuid).isNotEmpty()

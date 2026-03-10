@@ -91,6 +91,9 @@ fun ZonedDateTime.isCurrentMonth(): Boolean {
     return targetMonth == currentMonth
 }
 
+fun YearMonth.getFirstDayMillis() =
+    this.atDay(1).atStartOfDay(ZoneId.systemDefault()).toInstant().toEpochMilli()
+
 
 fun LazyListState.centerItemIndex(): Int? {
     val layoutInfo = layoutInfo

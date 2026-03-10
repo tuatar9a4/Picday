@@ -27,6 +27,9 @@ interface DiaryBookDao {
     @Query("SELECT * FROM diary_book WHERE userLocalUUId = :uuid AND isMajor = 1")
     suspend fun selectMainDiaryBook(uuid: String): DiaryBookEntity
 
+    @Query("SELECT * FROM diary_book WHERE localId = :bookId")
+    suspend fun selectDiaryBook(bookId: Long): DiaryBookEntity
+
 
     /* =====================
      * Delete (Soft Delete)

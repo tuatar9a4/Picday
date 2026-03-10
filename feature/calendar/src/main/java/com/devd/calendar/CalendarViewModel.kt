@@ -1,5 +1,6 @@
 package com.devd.calendar
 
+import androidx.annotation.FloatRange
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -7,13 +8,16 @@ import androidx.navigation.toRoute
 import com.devd.calendar.data.CalendarImageInfo
 import com.devd.calendar.navigation.CustomCalendarRoute
 import com.devd.commonsystem.utils.getCurrentMonthRangeMillis
+import com.devd.commonsystem.utils.getFirstDayMillis
 import com.devd.data.repository.DiaryBookRepository
+import com.devd.model.local.DiaryInfo
+import com.devd.model.local.DiaryPhaseType
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import timber.log.Timber
 import java.time.DayOfWeek
 import java.time.Instant
 import java.time.LocalDate
@@ -25,7 +29,9 @@ import kotlin.math.ceil
 data class CalendarUiState(
     val isLoading: Boolean = false,
     val selectDate: Long = System.currentTimeMillis(),
-    val imageList: List<CalendarImageInfo> = emptyList()
+    val writeDisplayType: DiaryPhaseType = DiaryPhaseType.MOON,
+    @param:FloatRange(from = 0.0, to = 1.0) val writePercent: Float = 0f,
+    val monthToList: Map<YearMonth, List<CalendarImageInfo>> = hashMapOf(),
 )
 
 @HiltViewModel
@@ -40,54 +46,99 @@ class CalendarViewModel @Inject constructor(
         MutableStateFlow(CalendarUiState(selectDate = route.selectMillis))
     val calendarUiState = _calendarUiState.asStateFlow()
 
+
     init {
-        _calendarUiState.update { it.copy(isLoading = true) }
-        fetchDiaryImageWithMonth(bookId, route.selectMillis)
+        viewModelScope.launch {
+            val bookInfo = diaryRepository.fetchBookInfo(bookId)
+            bookInfo?.let { bookInfo ->
+                _calendarUiState.update { it.copy(writeDisplayType = bookInfo.bookPhaseType) }
+            }
+        }
     }
 
-    fun fetchDiaryImageWithMonth(bookId: Long, millis: Long) {
+    fun fetchDiaryImageWithMonth(millis: Long, isPreMove: Boolean, isNextMove: Boolean) {
         viewModelScope.launch {
-            val (start, end) = millis.getCurrentMonthRangeMillis(true)
+            if (!isPreMove && !isNextMove && calendarUiState.value.monthToList.isNotEmpty()) return@launch
+            _calendarUiState.update { it.copy(isLoading = true) }
 
-            val diaryList =
-                diaryRepository.fetchMonthDairiesByDiaryBook(bookId, start, end)
+            val newList = calendarUiState.value.monthToList.toMutableMap()
 
-            val selectMonth = Instant.ofEpochMilli(millis)
-                .atZone(ZoneId.systemDefault())
-                .withDayOfMonth(1)
-                .toLocalDate()
-
-            val firstDayOfWeekValue = selectMonth.dayOfWeek.value % 7
-            val calendarStartDay = selectMonth.minusDays(firstDayOfWeekValue.toLong())
-
-            val weekCount = ceil((firstDayOfWeekValue + selectMonth.lengthOfMonth()) / 7f).toInt()
-            val calendarImageInfos = mutableListOf<CalendarImageInfo>()
-            (0..<weekCount * 7).forEach {
-                val selectDay = calendarStartDay.plusDays(it.toLong())
-                val diaryWithDay =
-                    diaryList.find { diary -> diary.localDataWithCreate == selectDay }
-                val isToday = selectDay == LocalDate.now()
-                val isCurrentMonth = YearMonth.from(selectDay) == YearMonth.now()
-                val isSunDay = selectDay.dayOfWeek == DayOfWeek.SUNDAY
-
-                val imageInfo = CalendarImageInfo(
-                    day = selectDay.dayOfMonth,
-                    isToday = isToday,
-                    isCurrentMonth = isCurrentMonth,
-                    isSunDay = isSunDay,
-                    diaryId = diaryWithDay?.diaryId,
-                    imageStr = diaryWithDay?.imageUrlList?.firstOrNull(),
-                    contents = diaryWithDay?.content,
-                    tagList = diaryWithDay?.tagList
-                )
-
-                calendarImageInfos.add(imageInfo)
+            //이번달 데이터 확인 후 삽입
+            val currentYM = Instant.ofEpochMilli(millis).atZone(ZoneId.systemDefault())
+                .toLocalDate().let { YearMonth.from(it) }
+            if (!calendarUiState.value.monthToList.contains(currentYM)) {
+                val currentDeferred = async { fetchMonthData(millis) }
+                val diaryList = currentDeferred.await()
+                val writeCount = diaryList.filter { it.isCurrentMonth && it.diaryId != null }.size
+                val dayCount = currentYM.lengthOfMonth().toFloat()
+                val currentMonthDayCount = writeCount / dayCount
+                _calendarUiState.update { it.copy(writePercent = currentMonthDayCount) }
+                newList[currentYM] = currentDeferred.await()
+            }else{
+                val writeCount =  newList[currentYM]!!.filter { it.isCurrentMonth && it.diaryId != null }.size
+                val dayCount = currentYM.lengthOfMonth().toFloat()
+                val currentMonthDayCount = writeCount / dayCount
+                _calendarUiState.update { it.copy(writePercent = currentMonthDayCount) }
             }
-            Timber.d("Check=> ${calendarImageInfos}")
-            _calendarUiState.update { it.copy(isLoading = false, imageList = calendarImageInfos) }
 
+            //이전달 데이터 확인 후 삽입
+            val prevYM = currentYM.minusMonths(1)
+            val prevMillis = prevYM.getFirstDayMillis()
+            if (!calendarUiState.value.monthToList.contains(prevYM)) {
+                val prevDeferred = async { fetchMonthData(prevMillis) }
+                newList[prevYM] = prevDeferred.await()
+            }
+
+            //다음달 데이터 확인 후 삽입
+            val nextYM = currentYM.plusMonths(1)
+            val nextMillis = nextYM.getFirstDayMillis()
+            if (!calendarUiState.value.monthToList.contains(nextYM)) {
+                val nextDeferred = async { fetchMonthData(nextMillis) }
+                newList[nextYM] = nextDeferred.await()
+            }
+
+            _calendarUiState.update { state ->
+                state.copy(isLoading = false, monthToList = newList)
+            }
         }
+    }
 
+    private suspend fun fetchMonthData(millis: Long): List<CalendarImageInfo> {
+        val (start, end) = millis.getCurrentMonthRangeMillis(true)
+        val diaryList = diaryRepository.fetchMonthDairiesByDiaryBook(bookId, start, end)
+        return createCalendarImageInfos(millis, diaryList)
+    }
+
+    private fun createCalendarImageInfos(
+        millis: Long,
+        diaryList: List<DiaryInfo>
+    ): List<CalendarImageInfo> {
+        val selectMonth = Instant.ofEpochMilli(millis)
+            .atZone(ZoneId.systemDefault())
+            .toLocalDate().withDayOfMonth(1)
+
+        val firstDayOfWeekValue = selectMonth.dayOfWeek.value % 7
+        val calendarStartDay = selectMonth.minusDays(firstDayOfWeekValue.toLong())
+        val weekCount = ceil((firstDayOfWeekValue + selectMonth.lengthOfMonth()) / 7f).toInt()
+
+        val today = LocalDate.now()
+        val currentYearMonth = YearMonth.from(selectMonth)
+
+        return (0..<weekCount * 7).map {
+            val selectDay = calendarStartDay.plusDays(it.toLong())
+            val diaryWithDay = diaryList.find { diary -> diary.localDataWithCreate == selectDay }
+
+            CalendarImageInfo(
+                day = selectDay.dayOfMonth,
+                isToday = selectDay == today,
+                isCurrentMonth = YearMonth.from(selectDay) == currentYearMonth,
+                isSunDay = selectDay.dayOfWeek == DayOfWeek.SUNDAY,
+                diaryId = diaryWithDay?.diaryId,
+                imageStr = diaryWithDay?.imageUrlList?.firstOrNull(),
+                contents = diaryWithDay?.content,
+                tagList = diaryWithDay?.tagList
+            )
+        }
     }
 
 }
