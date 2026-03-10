@@ -2,7 +2,6 @@ package com.devd.commonsystem.ui.dialog
 
 import android.net.Uri
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -44,7 +43,6 @@ import com.devd.commonsystem.theme.AccentColor
 import com.devd.commonsystem.theme.BlackColor
 import com.devd.commonsystem.theme.BlackOpacity40Color
 import com.devd.commonsystem.theme.GreyColor
-import com.devd.commonsystem.theme.GreyOpacity40Color
 import com.devd.commonsystem.theme.OneDayTypography
 import com.devd.commonsystem.theme.TextDefaultColor
 import com.devd.commonsystem.theme.WhiteColor
@@ -59,7 +57,6 @@ import com.devd.permission.Consts
 import com.devd.permission.IPermissionHandler
 import com.devd.permission.rememberPermissionHandler
 import kotlinx.coroutines.launch
-import timber.log.Timber
 import java.time.Instant
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
@@ -96,22 +93,32 @@ fun DiaryBookDialog(
     onDismissRequest: () -> Unit,
     onSaveClick: ((imageUrl: Uri?, title: String, description: String, monthType: DiaryPhaseType) -> Unit)? = null
 ) {
+
+    val scope = rememberCoroutineScope()
+    val permissionHandler: IPermissionHandler = rememberPermissionHandler()
+
     val titleTextFieldState = rememberTextFieldState(bookInfo.title)
     val descriptionTextFieldState = rememberTextFieldState(bookInfo.description ?: "")
     var monthTypeState by remember { mutableStateOf(bookInfo.bookPhaseType) }
     var showMonthTypeSelectSheet by remember { mutableStateOf(false) }
+
     val createDate = remember {
         Instant.ofEpochMilli(bookInfo.createDate)
             .atZone(ZoneId.systemDefault())
             .format(DateTimeFormatter.ofPattern("yyyy.MM.dd"))
     }
 
-    val scope = rememberCoroutineScope()
-    val permissionHandler: IPermissionHandler = rememberPermissionHandler()
     var isShowImagePicker by remember { mutableStateOf(false) }
     var imageUrl: Any? by remember { mutableStateOf(bookInfo.bookImage) }
     val imagePicker = rememberImagePicker { uri ->
         imageUrl = uri
+    }
+
+    var isShowCoverImage by remember { mutableStateOf(false) }
+    val contentsEditorBg = if (dialogType == DiaryBookDialogType.VIEW) {
+        Modifier
+    } else {
+        Modifier.border(1.dp, BlackOpacity40Color, RoundedCornerShape(5.dp))
     }
 
     suspend fun checkPermission() {
@@ -138,13 +145,15 @@ fun DiaryBookDialog(
                 Row(
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    Timber.d("Check? => ${imageUrl}")
                     ((imageUrl as? Uri) ?: (imageUrl as? String)?.rememberImageUrl())?.let {
                         AsyncImage(
                             modifier = Modifier
                                 .clickable(onClick = {
-                                    if (dialogType == DiaryBookDialogType.VIEW) return@clickable
-                                    scope.launch { checkPermission() }
+                                    if (dialogType == DiaryBookDialogType.VIEW) {
+                                        isShowCoverImage = true
+                                    } else {
+                                        scope.launch { checkPermission() }
+                                    }
                                 })
                                 .clip(RoundedCornerShape(5.dp))
                                 .size(56.dp),
@@ -186,11 +195,12 @@ fun DiaryBookDialog(
                 }
                 Spacer(Modifier.height(15.dp))
                 BasicTextField(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(70.dp)
-                        .background(color = GreyOpacity40Color, shape = RoundedCornerShape(5.dp))
-                        .padding(5.dp),
+                    modifier = contentsEditorBg.then(
+                        Modifier
+                            .fillMaxWidth()
+                            .height(70.dp)
+                            .padding(5.dp)
+                    ),
                     state = descriptionTextFieldState,
                     readOnly = dialogType == DiaryBookDialogType.VIEW,
                     textStyle = OneDayTypography.bodyMedium
@@ -291,6 +301,23 @@ fun DiaryBookDialog(
                         )
                     }
                 }
+            }
+        }
+    }
+
+    if (isShowCoverImage) {
+        ((imageUrl as? Uri) ?: (imageUrl as? String)?.rememberImageUrl())?.let { url ->
+            Dialog(
+                onDismissRequest = { isShowCoverImage = false }
+            ) {
+                AsyncImage(
+                    modifier = Modifier
+                        .padding(30.dp)
+                        .fillMaxWidth()
+                        .clip(RoundedCornerShape(10.dp)),
+                    model = url,
+                    contentDescription = null
+                )
             }
         }
     }
