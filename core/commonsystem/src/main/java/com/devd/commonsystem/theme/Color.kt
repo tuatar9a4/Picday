@@ -30,7 +30,7 @@ val BlackOpacity40Color = Color(0x66000000)
 val BlackOpacity30Color = Color(0x4d000000)
 val BlackOpacity90Color = Color(0x1a000000)
 val RedColor = Color(0xFFE3242B)
-val YellowColor = Color(0xFFFFF4BD)
+val YellowColor = Color(0xFFd6c80d)
 val GreyColor = Color(0xFF8F8A84)
 val GreyOpacity40Color = Color(0x668F8A84)
 

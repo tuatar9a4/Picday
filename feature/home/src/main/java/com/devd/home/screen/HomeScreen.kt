@@ -59,6 +59,7 @@ fun HomeScreenRoute(
     modifier: Modifier = Modifier,
     onEditorMove: (imageUrl: String?, bookId: Long, diaryId: Long?) -> Unit = { _, _, _ -> },
     onCalendarMove: (bookId: Long, selectMillis: Long) -> Unit = { _, _ -> },
+    onBookcaseMove: (userId: String) -> Unit = {},
     onMoveDiaryList: (List<DiaryInfo>, Int) -> Unit = { _, _ -> },
     viewModel: HomeViewModel = hiltViewModel()
 ) {
@@ -126,6 +127,10 @@ fun HomeScreenRoute(
         uiState = uiState,
         diaryState = diaryState,
         onShowCalendar = viewModel::showCalendarDialog,
+        onBookcaseClick = {
+            viewModel.storedUUID ?: return@HomeScreen
+            onBookcaseMove(viewModel.storedUUID!!)
+        },
         onEditorClick = { checkDiaryInfoBeforeMove() },
         onCalendarClick = {
             uiState.bookInfo?.bookId ?: return@HomeScreen
@@ -176,6 +181,7 @@ fun HomeScreen(
     uiState: HomeUiState = HomeUiState(),
     diaryState: LazyListState = rememberLazyListState(),
     onShowCalendar: () -> Unit = {},
+    onBookcaseClick: () -> Unit = {},
     onEditorClick: () -> Unit = {},
     onCalendarClick: () -> Unit = {},
     onDiaryCardClick: (Int) -> Unit = {},
@@ -195,7 +201,7 @@ fun HomeScreen(
                 modifier = Modifier.background(color = PrimaryColor),
                 title = "",
                 leftButtonIcon = R.drawable.icon_library,
-                leftButtonClick = {},
+                leftButtonClick = onBookcaseClick,
                 rightButtonIcon = R.drawable.icon_setting,
                 rightButtonClick = {})
             Spacer(Modifier.height(20.dp))

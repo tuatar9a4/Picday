@@ -7,6 +7,8 @@ import androidx.compose.ui.Modifier
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.rememberNavController
+import com.devd.bookcase.navigation.BookcaseNaviRoute
+import com.devd.bookcase.navigation.bookcaseScreen
 import com.devd.calendar.navigation.CustomCalendarRoute
 import com.devd.calendar.navigation.customCalendarScreen
 import com.devd.commonsystem.utils.LocalSharedTransitionScope
@@ -54,6 +56,14 @@ fun MyNavHost(
                             )
                         )
                     },
+                    onBookcaseMove = { userId ->
+                        navController.navigate(
+                            BookcaseNaviRoute(
+                                userUUID = userId
+                            )
+                        )
+
+                    },
                     onNavigateToCalendar = { bookId, selectMillis ->
                         navController.navigate(
                             CustomCalendarRoute(
@@ -93,6 +103,11 @@ fun MyNavHost(
                 )
 
                 customCalendarScreen(
+                    modifier = modifier,
+                    onBackClick = { navController.popBackStack() }
+                )
+
+                bookcaseScreen(
                     modifier = modifier,
                     onBackClick = { navController.popBackStack() }
                 )

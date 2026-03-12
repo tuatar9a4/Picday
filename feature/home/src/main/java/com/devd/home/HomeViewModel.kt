@@ -49,11 +49,13 @@ class HomeViewModel @Inject constructor(
     private val _homeUiState = MutableStateFlow(HomeUiState())
     val homeUiState: StateFlow<HomeUiState> get() = _homeUiState.asStateFlow()
 
+    var storedUUID : String? = null
+
     fun fetchMainDiaryBook() {
         viewModelScope.launch {
             _homeUiState.update { it.copy(isLoading = true) }
-            val uuid = dataStoreRepository.getPreferData(DataStoreKey.UserUID)!!
-            diaryBookRepository.fetchMajorDiaryBook(uuid)?.let { diaryBook ->
+            storedUUID = dataStoreRepository.getPreferData(DataStoreKey.UserUID)!!
+            diaryBookRepository.fetchMajorDiaryBook(storedUUID!!)?.let { diaryBook ->
                 fetchDairiesByDiaryBook(diaryBook)
             } ?: run {
                 showMessageDialog(R.string.fail_fetch_diary_book)

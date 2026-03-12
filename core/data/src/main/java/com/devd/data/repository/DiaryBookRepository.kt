@@ -6,6 +6,7 @@ import com.devd.commonsystem.utils.getStartEndRangeMillis
 import com.devd.data.utils.CallResult
 import com.devd.data.utils.SafeNetCall
 import com.devd.model.local.CreateDiaryRequest
+import com.devd.model.local.DiaryBookInfo
 import com.devd.model.local.DiaryInfo
 import com.devd.model.local.UpdateDiaryRequest
 import com.devd.room.dao.DiaryBookDao
@@ -87,6 +88,28 @@ class DiaryBookRepository @Inject constructor(
                     is CallResult.NetworkError -> null
                 }
             }
+
+    suspend fun updateBookInfo(
+        updateBook: DiaryBookInfo,
+    ): String? =
+        safeApiCall(Dispatchers.IO) {
+            val originBook = diaryBookDao.selectDiaryBook(updateBook.bookId)
+            diaryBookDao.updateDiaryBook(
+                originBook.copy(
+                    bookImage = updateBook.bookImage ?: originBook.bookImage,
+                    title = updateBook.title,
+                    description = updateBook.description,
+                    bookPhaseType = updateBook.bookPhaseType.ordinal,
+                    updatedAt = System.currentTimeMillis()
+                )
+            )
+        }.run {
+            return@run when (this) {
+                is CallResult.Success -> null
+                is CallResult.NetworkError -> this.message
+
+            }
+        }
 
 
     suspend fun hasDiaryBook(uuid: String) = safeApiCall(Dispatchers.IO) {

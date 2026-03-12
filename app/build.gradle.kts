@@ -50,5 +50,6 @@ dependencies {
     implementation(projects.feature.editor)
     implementation(projects.feature.diary)
     implementation(projects.feature.calendar)
+    implementation(projects.feature.bookcase)
 
 }

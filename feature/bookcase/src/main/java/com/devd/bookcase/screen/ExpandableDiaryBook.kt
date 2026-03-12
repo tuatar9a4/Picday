@@ -29,6 +29,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -41,10 +42,12 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.TransformOrigin
 import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalWindowInfo
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import coil3.compose.AsyncImage
 import com.devd.bookcase.BookcaseInterface
 import com.devd.commonsystem.R
 import com.devd.commonsystem.theme.AccentColor
@@ -54,9 +57,13 @@ import com.devd.commonsystem.theme.GreyOpacity40Color
 import com.devd.commonsystem.theme.OneDayTypography
 import com.devd.commonsystem.theme.YellowColor
 import com.devd.commonsystem.utils.noRippleClickable
+import com.devd.commonsystem.utils.rememberImageUrl
 import com.devd.model.local.DiaryBookInfo
 import com.devd.model.local.DiaryPhaseType
 import kotlinx.coroutines.delay
+import java.time.Instant
+import java.time.ZoneId
+import java.time.format.DateTimeFormatter
 
 
 @Preview
@@ -64,6 +71,7 @@ import kotlinx.coroutines.delay
 fun ExpandableDiaryBookPreview() {
     ExpandableDiaryBook(
         pagerState = rememberPagerState(pageCount = { 4 }),
+        isOpened = mutableStateOf(false),
         bookList = listOf(
             DiaryBookInfo(
                 bookId = 9764,
@@ -73,7 +81,7 @@ fun ExpandableDiaryBookPreview() {
                 bookPhaseType = DiaryPhaseType.MOON,
                 createDate = 7837,
                 monthWritePercent = 2.3f,
-                isMajor = false
+                isMajor = true
             ), DiaryBookInfo(
                 bookId = 3851,
                 bookImage = "verterem",
@@ -103,7 +111,7 @@ fun ExpandableDiaryBookPreview() {
 
             )
         ),
-        {}
+        bookClickAction = {}
     )
 }
 
@@ -112,6 +120,7 @@ fun ExpandableDiaryBookPreview() {
 @Composable
 fun ExpandableDiaryBook(
     pagerState: PagerState,
+    isOpened: MutableState<Boolean> = mutableStateOf(false),
     bookList: List<DiaryBookInfo>,
     bookClickAction: (BookcaseInterface) -> Unit,
 ) {
@@ -121,10 +130,9 @@ fun ExpandableDiaryBook(
     val bookWidth = LocalWindowInfo.current.containerDpSize.width - 150.dp
     val bookHeight = bookWidth * 16 / 9f
 
-    var isOpened by remember { mutableStateOf(false) }
     //선택된 일기장의 확장 Scale
     val scale by animateFloatAsState(
-        targetValue = if (isOpened) 1.2f else 1f,
+        targetValue = if (isOpened.value) 1.2f else 1f,
         animationSpec = tween(1000)
     )
     Column(
@@ -194,18 +202,18 @@ fun ExpandableDiaryBook(
 
                         LaunchedEffect(Unit) {
                             delay(100)
-                            isOpened = true
+                            isOpened.value = true
                         }
 
                         // 회전 애니메이션
                         val rotation by animateFloatAsState(
-                            targetValue = if (isOpened) -180f else 0f,
+                            targetValue = if (isOpened.value) -180f else 0f,
                             animationSpec = tween(800, easing = FastOutSlowInEasing),
                             label = "FlipAnimation"
                         )
 
                         LaunchedEffect(rotation) {
-                            if (!isOpened && rotation > -60f && rotation != 0f) selectedBookId =
+                            if (!isOpened.value && rotation > -60f && rotation != 0f) selectedBookId =
                                 null
                         }
 
@@ -222,7 +230,7 @@ fun ExpandableDiaryBook(
                                     animatedVisibilityScope = this@AnimatedContent
                                 )
                                 .noRippleClickable {
-                                    isOpened = false
+                                    isOpened.value = false
                                 }
                         ) {
                             //본 페이지
@@ -281,26 +289,26 @@ fun BookCover(
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         bookInfo?.let {
-            Image(
+            val createDate = remember {
+                Instant.ofEpochMilli(bookInfo.createDate)
+                    .atZone(ZoneId.systemDefault())
+                    .format(DateTimeFormatter.ofPattern("yyyy.MM.dd"))
+            }
+            AsyncImage(
                 modifier = Modifier
-                    .padding(horizontal = 10.dp)
+                    .padding(horizontal = 30.dp)
                     .fillMaxWidth()
                     .aspectRatio(1 / 1f)
                     .clip(RoundedCornerShape(5.dp))
                     .background(BlackColor),
-                painter = painterResource(R.drawable.icon_pencil),
-                contentDescription = null,
+                model = bookInfo.bookImage?.rememberImageUrl(),
+                contentScale = ContentScale.Crop,
+                contentDescription = null
             )
+            Spacer(Modifier.height(20.dp))
+            Text(text = "생성일", style = OneDayTypography.labelLarge)
+            Spacer(Modifier.height(5.dp))
+            Text(text = createDate, style = OneDayTypography.bodyMedium)
         }
-//        AsyncImage(
-//            modifier = Modifier
-//                .padding(horizontal = 30.dp)
-//                .fillMaxWidth()
-//                .aspectRatio(1 / 1f)
-//                .clip(RoundedCornerShape(5.dp))
-//                .background(BlackColor),
-//            model = bookInfo.bookImage?.rememberImageUrl(),
-//            contentDescription = null
-//        )
     }
 }
