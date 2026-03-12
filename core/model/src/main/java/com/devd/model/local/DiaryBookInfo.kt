@@ -7,5 +7,6 @@ data class DiaryBookInfo(
     val description: String?,
     val bookPhaseType: DiaryPhaseType,
     val createDate: Long,
-    var monthWritePercent: Float = 0f
+    var monthWritePercent: Float = 0f,
+    var isMajor: Boolean = false
 )

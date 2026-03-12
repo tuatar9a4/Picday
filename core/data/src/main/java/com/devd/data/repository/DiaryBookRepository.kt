@@ -19,6 +19,7 @@ import com.devd.room.entity.DiaryImageEntity
 import com.devd.room.entity.DiaryTagCrossEntity
 import com.devd.room.entity.TagEntity
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.map
 import java.time.Instant
 import java.time.YearMonth
 import java.time.ZoneId
@@ -57,13 +58,10 @@ class DiaryBookRepository @Inject constructor(
     }
 
 
-    suspend fun fetchAllDairies(uuid: String) =
-        safeApiCall(Dispatchers.IO) { diaryBookDao.selectAllDiaryBook(uuid) }.run {
-            return@run when (this) {
-                is CallResult.Success -> this.res.map { it.transToModel() }
-                is CallResult.NetworkError -> emptyList()
-            }
-        }
+    fun fetchAllDairies(uuid: String) = diaryBookDao.selectAllDiaryBookFlow(uuid).map {
+        it.map { bookDaoItem -> bookDaoItem.transToModel() }
+    }
+
 
     suspend fun fetchMajorDiaryBook(uuid: String) =
         safeApiCall(Dispatchers.IO) {

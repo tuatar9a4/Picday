@@ -6,6 +6,7 @@ import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Update
 import com.devd.room.entity.DiaryBookEntity
+import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface DiaryBookDao {
@@ -23,6 +24,15 @@ interface DiaryBookDao {
         """
     )
     suspend fun selectAllDiaryBook(uuid: String): List<DiaryBookEntity>
+
+    @Query(
+        """
+    SELECT * FROM diary_book 
+    WHERE userLocalUUId = :uuid AND isDeleted = 0 
+    ORDER BY createdAt ASC
+    """
+    )
+    fun selectAllDiaryBookFlow(uuid: String): Flow<List<DiaryBookEntity>>
 
     @Query("SELECT * FROM diary_book WHERE userLocalUUId = :uuid AND isMajor = 1")
     suspend fun selectMainDiaryBook(uuid: String): DiaryBookEntity

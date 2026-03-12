@@ -37,6 +37,7 @@ data class DiaryBookEntity(
         title = title,
         description = description,
         createDate = createdAt,
-        bookPhaseType = DiaryPhaseType.entries[bookPhaseType]
+        bookPhaseType = DiaryPhaseType.entries[bookPhaseType],
+        isMajor = isMajor,
     )
 }
