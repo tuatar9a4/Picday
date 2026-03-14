@@ -156,7 +156,8 @@ sealed interface RegisterUIState {
 data class SimpleMessageState(val message: String)
 
 data class DiaryBookDialog(
-    val isShow: Boolean = false, val bookInfo: DiaryBookInfo = DiaryBookInfo(
+    val isShow: Boolean = false,
+    val bookInfo: DiaryBookInfo = DiaryBookInfo(
         bookId = -1,
         title = "First Diary",
         description = "My First Diary",

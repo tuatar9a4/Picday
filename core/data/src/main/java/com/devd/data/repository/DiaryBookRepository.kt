@@ -111,6 +111,15 @@ class DiaryBookRepository @Inject constructor(
             }
         }
 
+    suspend fun deleteBookInfo(bookId: Long) =
+        safeApiCall(Dispatchers.IO) {
+            diaryBookDao.softDeleteDiaryBook(bookId.toString())
+        }.run {
+            return@run when (this) {
+                is CallResult.Success -> null
+                is CallResult.NetworkError -> this.message
+            }
+        }
 
     suspend fun hasDiaryBook(uuid: String) = safeApiCall(Dispatchers.IO) {
         diaryBookDao.selectAllDiaryBook(uuid).isNotEmpty()

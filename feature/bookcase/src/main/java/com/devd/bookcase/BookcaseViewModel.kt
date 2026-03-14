@@ -4,17 +4,23 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.toRoute
+import com.devd.bookcase.data.FAIL_DELETE_BOOK
+import com.devd.bookcase.data.FAIL_SAVE_BOOK
 import com.devd.bookcase.data.FAIL_UPDATE_BOOK
 import com.devd.bookcase.data.MessageInfo
 import com.devd.bookcase.data.NONE
+import com.devd.bookcase.data.SUCCESS_DELETE_BOOK
+import com.devd.bookcase.data.SUCCESS_SAVE_BOOK
 import com.devd.bookcase.data.SUCCESS_UPDATE_BOOK
 import com.devd.bookcase.navigation.BookcaseNaviRoute
 import com.devd.commonsystem.R
 import com.devd.data.repository.DiaryBookRepository
 import com.devd.data.repository.OracleRepository
+import com.devd.data.utils.CallResult
 import com.devd.datastore.DataStoreKey
 import com.devd.datastore.DataStoreRepository
 import com.devd.model.local.DiaryBookInfo
+import com.devd.model.local.DiaryPhaseType
 import com.devd.model.local.FailUpload
 import com.devd.model.local.SuccessUpload
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -44,6 +50,8 @@ class BookcaseViewModel @Inject constructor(
     savedStateHandle: SavedStateHandle
 ) : ViewModel() {
     private val route = savedStateHandle.toRoute<BookcaseNaviRoute>()
+
+    val newBookInfo = DiaryBookInfo(-1L, null, "Title", "Description", DiaryPhaseType.MOON, 0)
 
     private val _bookcaseUiState = MutableStateFlow(BookcaseUiState())
     val bookcaseUiState get() = _bookcaseUiState.asStateFlow()
@@ -85,6 +93,10 @@ class BookcaseViewModel @Inject constructor(
         _scrollEvent.emit(pos)
     }
 
+    fun showMessageDialog(messageInfo: MessageInfo) {
+        _bookcaseUiState.update { it.copy(messageDialog = messageInfo) }
+    }
+
     fun dismissMessageDialog() {
         _bookcaseUiState.update { it.copy(messageDialog = MessageInfo(NONE)) }
     }
@@ -104,10 +116,50 @@ class BookcaseViewModel @Inject constructor(
                         it.copy(
                             isLoading = false,
                             messageDialog = MessageInfo(
-                                FAIL_UPDATE_BOOK,
+                                type = FAIL_UPDATE_BOOK,
                                 messageId = R.string.fail_update_diary_message
                             )
                         )
+                    }
+                }
+            }
+        }
+    }
+
+    fun insertDiaryBook(
+        bookInfo: DiaryBookInfo
+    ) {
+        viewModelScope.launch {
+            val userUUID = dataStoreRepository.getPreferData(DataStoreKey.UserUID) ?: return@launch
+            diaryBookRepository.insertNewDiaryBook(
+                uuid = userUUID,
+                bookImage = bookInfo.bookImage!!,
+                bookTitle = bookInfo.title.trim(),
+                bookDescription = bookInfo.description!!
+            ).run {
+                when (this) {
+                    is CallResult.NetworkError -> {
+                        _bookcaseUiState.update {
+                            it.copy(
+                                isLoading = false,
+                                messageDialog = MessageInfo(
+                                    type = FAIL_SAVE_BOOK,
+                                    messageId = R.string.fail_save_new_book_message
+                                )
+                            )
+                        }
+                    }
+
+                    is CallResult.Success -> {
+                        _bookcaseUiState.update {
+                            it.copy(
+                                isLoading = false,
+                                messageDialog = MessageInfo(
+                                    type = SUCCESS_SAVE_BOOK,
+                                    messageId = R.string.success_save_new_book_message
+                                )
+                            )
+                        }
                     }
                 }
             }
@@ -145,6 +197,25 @@ class BookcaseViewModel @Inject constructor(
                     )
                 }
             }
+        }
+    }
+
+    fun deleteDiaryBook(deleteID: Long) {
+        _bookcaseUiState.update { it.copy(isLoading = true) }
+        viewModelScope.launch {
+            val errorMessage = diaryBookRepository.deleteBookInfo(deleteID)
+            val (code, message) = if (errorMessage == null) {
+                SUCCESS_DELETE_BOOK to R.string.success_delete_book_message
+            } else {
+                FAIL_DELETE_BOOK to R.string.fail_delete_book_message
+            }
+            _bookcaseUiState.update {
+                it.copy(
+                    isLoading = true,
+                    messageDialog = MessageInfo(code, message)
+                )
+            }
+
         }
     }
 

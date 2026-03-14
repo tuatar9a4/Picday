@@ -19,7 +19,11 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.devd.bookcase.data.FAIL_SAVE_BOOK
 import com.devd.bookcase.data.FAIL_UPDATE_BOOK
+import com.devd.bookcase.data.MessageInfo
+import com.devd.bookcase.data.NEED_BOOK_IMAGE
+import com.devd.bookcase.data.SUCCESS_SAVE_BOOK
 import com.devd.bookcase.data.SUCCESS_UPDATE_BOOK
 import com.devd.bookcase.screen.DiaryBookActionButton
 import com.devd.bookcase.screen.ExpandableDiaryBook
@@ -49,6 +53,7 @@ fun BookcaseRoute(
 ) {
     val uiState by viewModel.bookcaseUiState.collectAsState()
 
+    val context = LocalContext.current
     var bookInfo by remember { mutableStateOf<DiaryBookInfo?>(null) }
 
     val pagerState = rememberPagerState(0) { uiState.bookList.size }
@@ -61,7 +66,8 @@ fun BookcaseRoute(
         launch {
             viewModel.uploadImageEvent.collect { imageStr ->
                 bookInfo = bookInfo!!.copy(bookImage = imageStr)
-                viewModel.updateBookInfo(bookInfo!!)
+                if (bookInfo!!.bookId == -1L) viewModel.insertDiaryBook(bookInfo!!)
+                else viewModel.updateBookInfo(bookInfo!!)
             }
         }
     }
@@ -73,11 +79,11 @@ fun BookcaseRoute(
         bookcaseInterface = { actionItem ->
             when (actionItem) {
                 BookcaseInterface.OnAddDiaryBook -> {
-
+                    bookInfo = viewModel.newBookInfo.copy(createDate = System.currentTimeMillis())
                 }
 
                 is BookcaseInterface.OnDeleteDiaryBook -> {
-
+                    viewModel.deleteDiaryBook(actionItem.bookID)
                 }
 
                 is BookcaseInterface.OnOpenDiaryBook -> {}
@@ -92,14 +98,15 @@ fun BookcaseRoute(
     uiState.messageDialog.getMessage()?.ShowMessageDialog(
         onRightButtonClick = {
             when (uiState.messageDialog.type) {
-                FAIL_UPDATE_BOOK, SUCCESS_UPDATE_BOOK -> bookInfo = null
+                FAIL_UPDATE_BOOK, SUCCESS_UPDATE_BOOK,
+                FAIL_SAVE_BOOK, SUCCESS_SAVE_BOOK -> bookInfo = null
+
                 else -> Unit
             }
             viewModel.dismissMessageDialog()
         }
     )
     if (bookInfo != null) {
-        val context = LocalContext.current
         DiaryBookDialog(
             dialogType = DiaryBookDialogType.EDIT,
             bookInfo = bookInfo!!,
@@ -107,13 +114,18 @@ fun BookcaseRoute(
                 if (uri != null) {
                     val file = uri.let { context.uriToFile(it) }
                     viewModel.uploadImage(file)
-                } else {
+                } else if (bookInfo!!.bookImage != null) {
                     bookInfo = bookInfo!!.copy(
                         title = title,
                         description = description,
                         bookPhaseType = monthType
                     )
-                    viewModel.updateBookInfo(bookInfo!!)
+                    if (bookInfo!!.bookId == -1L) viewModel.insertDiaryBook(bookInfo!!)
+                    else viewModel.updateBookInfo(bookInfo!!)
+                } else {
+                    viewModel.showMessageDialog(
+                        MessageInfo(NEED_BOOK_IMAGE, R.string.request_diary_image_message)
+                    )
                 }
             },
             onDismissRequest = { bookInfo = null }
