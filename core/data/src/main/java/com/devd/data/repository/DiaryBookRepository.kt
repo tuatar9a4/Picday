@@ -59,7 +59,7 @@ class DiaryBookRepository @Inject constructor(
     }
 
 
-    fun fetchAllDairies(uuid: String) = diaryBookDao.selectAllDiaryBookFlow(uuid).map {
+    fun fetchAllDairyBooks(uuid: String) = diaryBookDao.selectAllDiaryBookFlow(uuid).map {
         it.map { bookDaoItem -> bookDaoItem.transToModel() }
     }
 
@@ -128,8 +128,13 @@ class DiaryBookRepository @Inject constructor(
     }
 
     /* Diary */
+    suspend fun fetchAllDairiesByDiaryBook(diaryBookId: Long) = safeApiCall(Dispatchers.IO) {
+        diaryDao.getDiariesByDiaryBook(diaryBookId)
+    }.run {
+        return@run if (this is CallResult.Success) this.res.map { it.transToModel() } else emptyList()
+    }
 
-    suspend fun fetchDairiesByDiaryBook(diaryBookId: Long, diaryId: Long) =
+    suspend fun fetchDairyByDiaryBook(diaryBookId: Long, diaryId: Long) =
         safeApiCall(Dispatchers.IO) {
             diaryDao.getDiariesWithExtras(diaryBookId, diaryId).transToModel()
         }.run {

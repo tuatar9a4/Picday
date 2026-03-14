@@ -38,11 +38,13 @@ import com.devd.commonsystem.ui.dialog.ShowMessageDialog
 import com.devd.commonsystem.ui.loading.LoadingDialog
 import com.devd.commonsystem.utils.uriToFile
 import com.devd.model.local.DiaryBookInfo
+import com.devd.model.local.DiaryInfo
 import com.devd.model.local.DiaryPhaseType
 import kotlinx.coroutines.launch
 
 sealed interface BookcaseInterface {
     data class OnOpenDiaryBook(val bookID: Long) : BookcaseInterface
+    data object OnColesDiaryBook : BookcaseInterface
     data object OnAddDiaryBook : BookcaseInterface
     data class OnDeleteDiaryBook(val bookID: Long, val isMajor: Boolean) : BookcaseInterface
     data class OnUpdateDiaryBook(val bookInfo: DiaryBookInfo) : BookcaseInterface
@@ -104,6 +106,7 @@ fun BookcaseRoute(
     BookcaseScreen(
         modifier = modifier,
         bookList = uiState.bookList,
+        diaryList = uiState.diaryList,
         pagerState = pagerState,
         bookcaseInterface = { actionItem ->
             when (actionItem) {
@@ -116,7 +119,11 @@ fun BookcaseRoute(
                 is BookcaseInterface.OnUpdateDiaryBook ->
                     modifyDiaryBook(actionItem.bookInfo)
 
-                is BookcaseInterface.OnOpenDiaryBook -> {}
+                is BookcaseInterface.OnOpenDiaryBook ->
+                    viewModel.fetchDiaryListWithBook(actionItem.bookID)
+
+                is BookcaseInterface.OnColesDiaryBook ->
+                    viewModel.closeBook()
             }
         },
         onBackPress = onBackPress
@@ -191,6 +198,7 @@ fun BookcaseScreenPreview() {
             )
         ),
         pagerState = rememberPagerState(0) { 1 },
+        diaryList = emptyList(),
         bookcaseInterface = {}
     )
 }
@@ -200,6 +208,7 @@ fun BookcaseScreen(
     modifier: Modifier = Modifier,
     pagerState: PagerState = rememberPagerState(0) { 5 },
     bookList: List<DiaryBookInfo>,
+    diaryList: List<DiaryInfo>,
     bookcaseInterface: (BookcaseInterface) -> Unit,
     onBackPress: () -> Unit = {}
 ) {
@@ -222,6 +231,7 @@ fun BookcaseScreen(
             pagerState = pagerState,
             isOpened = isOpenBook,
             bookList = bookList,
+            diaryList = diaryList,
             bookClickAction = bookcaseInterface
         )
         Spacer(Modifier.height(20.dp))

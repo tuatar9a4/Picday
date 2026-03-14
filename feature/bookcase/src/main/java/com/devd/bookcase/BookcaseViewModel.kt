@@ -22,6 +22,7 @@ import com.devd.data.utils.CallResult
 import com.devd.datastore.DataStoreKey
 import com.devd.datastore.DataStoreRepository
 import com.devd.model.local.DiaryBookInfo
+import com.devd.model.local.DiaryInfo
 import com.devd.model.local.DiaryPhaseType
 import com.devd.model.local.FailUpload
 import com.devd.model.local.SuccessUpload
@@ -41,6 +42,7 @@ import javax.inject.Inject
 data class BookcaseUiState(
     val isLoading: Boolean = false,
     val bookList: List<DiaryBookInfo> = emptyList(),
+    val diaryList: List<DiaryInfo> = emptyList(),
     val messageDialog: MessageInfo = MessageInfo(type = NONE)
 )
 
@@ -78,7 +80,7 @@ class BookcaseViewModel @Inject constructor(
     }
 
     suspend fun collectDiaryBook() {
-        diaryBookRepository.fetchAllDairies(route.userUUID)
+        diaryBookRepository.fetchAllDairyBooks(route.userUUID)
             .stateIn(
                 scope = viewModelScope,
                 started = SharingStarted.WhileSubscribed(2000L),
@@ -96,6 +98,20 @@ class BookcaseViewModel @Inject constructor(
                 }
             }
     }
+
+    fun fetchDiaryListWithBook(bookId: Long) {
+        viewModelScope.launch {
+            _bookcaseUiState.update { it.copy(isLoading = true) }
+            val diaryList = diaryBookRepository.fetchAllDairiesByDiaryBook(bookId)
+            Timber.d("CheckDiary List => $diaryList")
+            _bookcaseUiState.update { it.copy(isLoading = false, diaryList = diaryList) }
+        }
+    }
+
+    fun closeBook() {
+        _bookcaseUiState.update { it.copy(diaryList = emptyList()) }
+    }
+
 
     suspend fun scrollToPosition(pos: Int) {
         _scrollEvent.emit(pos)

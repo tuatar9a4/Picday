@@ -90,7 +90,7 @@ class EditorViewModel @Inject constructor(
         Timber.d("Call initDiaryInfo")
         viewModelScope.launch {
             diaryId?.let { // 편집
-                val diary = diaryBookRepository.fetchDairiesByDiaryBook(bookId, it)
+                val diary = diaryBookRepository.fetchDairyByDiaryBook(bookId, it)
                     ?: return@launch _messageDialog.emit(
                         MessageInfo(
                             type = FAIL_LOAD_DIARY,

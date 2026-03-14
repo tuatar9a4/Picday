@@ -47,6 +47,12 @@ val OneDayTypography = Typography(
         fontWeight = FontWeight(400),
         fontSize = 11.sp,
     ),
+    labelSmall = TextStyle(
+        fontFamily = FontFamily(Font(R.font.suit_semi_bold)),
+        fontWeight = FontWeight(400),
+        fontSize = 9.sp,
+    ),
+
 )
 
 val textHashTagStyle = TextStyle(
@@ -54,6 +60,12 @@ val textHashTagStyle = TextStyle(
     fontWeight = FontWeight(600),
     fontStyle = FontStyle.Italic,
     fontSize = 11.sp,
+)
+val textHashTagSmallStyle = TextStyle(
+    fontFamily = FontFamily(Font(R.font.suit_semi_bold)),
+    fontWeight = FontWeight(600),
+    fontStyle = FontStyle.Italic,
+    fontSize = 9.sp,
 )
 
 val LocalCustomTypography = staticCompositionLocalOf {

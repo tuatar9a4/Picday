@@ -50,7 +50,7 @@ class DiaryListViewModel @Inject constructor(
             val currentList = _diaryListUiState.value.diaryList
             val oldItem = currentList.find { it.diaryId == diaryId } ?: return@launch
 
-            diaryBookRepository.fetchDairiesByDiaryBook(oldItem.diaryBookId, diaryId)
+            diaryBookRepository.fetchDairyByDiaryBook(oldItem.diaryBookId, diaryId)
                 ?.let { updatedItem ->
                     Timber.d("_diaryListUiState Before => ${ _diaryListUiState.value}")
                     _diaryListUiState.update { state ->

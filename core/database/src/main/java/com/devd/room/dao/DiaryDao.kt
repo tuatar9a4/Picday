@@ -44,8 +44,8 @@ interface DiaryDao {
     """
     )
     suspend fun getDiariesByDiaryBook(
-        diaryBookId: String
-    ): List<DiaryEntity>
+        diaryBookId: Long
+    ): List<DiaryWithExtras>
 
 
     @Query(

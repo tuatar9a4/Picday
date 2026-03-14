@@ -59,6 +59,7 @@ import com.devd.commonsystem.theme.YellowColor
 import com.devd.commonsystem.utils.noRippleClickable
 import com.devd.commonsystem.utils.rememberImageUrl
 import com.devd.model.local.DiaryBookInfo
+import com.devd.model.local.DiaryInfo
 import com.devd.model.local.DiaryPhaseType
 import kotlinx.coroutines.delay
 import java.time.Instant
@@ -111,6 +112,7 @@ fun ExpandableDiaryBookPreview() {
 
             )
         ),
+        diaryList = emptyList(),
         bookClickAction = {}
     )
 }
@@ -122,6 +124,7 @@ fun ExpandableDiaryBook(
     pagerState: PagerState,
     isOpened: MutableState<Boolean> = mutableStateOf(false),
     bookList: List<DiaryBookInfo>,
+    diaryList: List<DiaryInfo>,
     bookClickAction: (BookcaseInterface) -> Unit,
 ) {
     // 선택된 책의 ID (null이면 리스트 화면, 값이 있으면 상세 화면)
@@ -129,6 +132,9 @@ fun ExpandableDiaryBook(
 
     val bookWidth = LocalWindowInfo.current.containerDpSize.width - 150.dp
     val bookHeight = bookWidth * 16 / 9f
+
+    // diaryListState
+    val state = rememberPagerState(0) { diaryList.size }
 
     //선택된 일기장의 확장 Scale
     val scale by animateFloatAsState(
@@ -213,8 +219,11 @@ fun ExpandableDiaryBook(
                         )
 
                         LaunchedEffect(rotation) {
-                            if (!isOpened.value && rotation > -60f && rotation != 0f) selectedBookId =
-                                null
+                            if (!isOpened.value && rotation > -60f && rotation != 0f) {
+                                selectedBookId = null
+                                bookClickAction(BookcaseInterface.OnColesDiaryBook)
+                            }
+
                         }
 
                         Box(
@@ -234,11 +243,15 @@ fun ExpandableDiaryBook(
                                 }
                         ) {
                             //본 페이지
-                            Box(
-                                Modifier
+                            HorizontalPager(
+                                modifier = Modifier
                                     .fillMaxSize()
                                     .background(Color.White)
-                            )
+                                    .padding(20.dp),
+                                state = state
+                            ) { page ->
+                                DiaryCardScreen(diaryInfo = diaryList[page])
+                            }
                             Box(
                                 modifier = Modifier
                                     .align(Alignment.CenterStart)
