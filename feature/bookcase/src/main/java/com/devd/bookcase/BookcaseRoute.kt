@@ -69,13 +69,6 @@ fun BookcaseRoute(
             }
         }
         launch {
-            viewModel.uploadImageEvent.collect { imageStr ->
-                bookInfo = bookInfo!!.copy(bookImage = imageStr)
-                if (bookInfo!!.bookId == -1L) viewModel.insertDiaryBook(bookInfo!!)
-                else viewModel.updateBookInfo(bookInfo!!)
-            }
-        }
-        launch {
             viewModel.adResultEvent.collect { adResult ->
                 if (adResult) bookInfo =
                     viewModel.newBookInfo.copy(createDate = System.currentTimeMillis())
@@ -160,15 +153,15 @@ fun BookcaseRoute(
             dialogType = DiaryBookDialogType.EDIT,
             bookInfo = bookInfo!!,
             onSaveClick = { uri, title, description, monthType ->
+                bookInfo = bookInfo!!.copy(
+                    title = title,
+                    description = description,
+                    bookPhaseType = monthType
+                )
                 if (uri != null) {
                     val file = uri.let { context.uriToFile(it) }
-                    viewModel.uploadImage(file)
+                    viewModel.uploadImage(file, bookInfo!!)
                 } else if (bookInfo!!.bookImage != null) {
-                    bookInfo = bookInfo!!.copy(
-                        title = title,
-                        description = description,
-                        bookPhaseType = monthType
-                    )
                     if (bookInfo!!.bookId == -1L) viewModel.insertDiaryBook(bookInfo!!)
                     else viewModel.updateBookInfo(bookInfo!!)
                 } else {

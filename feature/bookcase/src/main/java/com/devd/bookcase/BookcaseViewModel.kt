@@ -142,7 +142,7 @@ class BookcaseViewModel @Inject constructor(
     /**
      * file : 업로드 이미지 파일
      */
-    fun uploadImage(file: File) {
+    fun uploadImage(file: File, updateBookInfo: DiaryBookInfo) {
         viewModelScope.launch {
             val userUUID = dataStoreRepository.getPreferData(DataStoreKey.UserUID) ?: return@launch
             _bookcaseUiState.update { it.copy(isLoading = true) }
@@ -151,7 +151,8 @@ class BookcaseViewModel @Inject constructor(
                 file = file
             ).collect { result ->
                 if (result is SuccessUpload) { // 이미지 업로드 성공
-                    _uploadImageEvent.emit("$userUUID/${result.uploadFileName}")
+                    val book = updateBookInfo.copy(bookImage = "$userUUID/${result.uploadFileName}")
+                    if (book.bookId == -1L) insertDiaryBook(book) else updateBookInfo(book)
                 } else if (result is FailUpload) {  // 이미지 업로드 실패[일기 저장실패]
                     _bookcaseUiState.update {
                         it.copy(
