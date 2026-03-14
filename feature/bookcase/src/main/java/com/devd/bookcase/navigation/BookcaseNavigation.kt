@@ -17,7 +17,8 @@ fun NavGraphBuilder.bookcaseScreen(
 ) {
     composable<BookcaseNaviRoute> {
         BookcaseRoute(
-            modifier = modifier
+            modifier = modifier,
+            onBackPress = onBackClick
         )
     }
 }

@@ -44,6 +44,7 @@ import com.devd.commonsystem.theme.BlackColor
 import com.devd.commonsystem.theme.BlackOpacity40Color
 import com.devd.commonsystem.theme.GreyColor
 import com.devd.commonsystem.theme.OneDayTypography
+import com.devd.commonsystem.theme.RedColor
 import com.devd.commonsystem.theme.TextDefaultColor
 import com.devd.commonsystem.theme.WhiteColor
 import com.devd.commonsystem.ui.TextButton
@@ -101,6 +102,7 @@ fun DiaryBookDialog(
     val descriptionTextFieldState = rememberTextFieldState(bookInfo.description ?: "")
     var monthTypeState by remember { mutableStateOf(bookInfo.bookPhaseType) }
     var showMonthTypeSelectSheet by remember { mutableStateOf(false) }
+    var isErrorTitle by remember { mutableStateOf(false) }
 
     val createDate = remember {
         Instant.ofEpochMilli(bookInfo.createDate)
@@ -176,22 +178,36 @@ fun DiaryBookDialog(
                         )
                     }
                     Spacer(Modifier.width(10.dp))
-                    BasicTextField(
+                    Column(
                         modifier = Modifier
                             .weight(1f)
-                            .then(
-                                if (dialogType == DiaryBookDialogType.VIEW) Modifier
-                                else Modifier.bottomBorder(1.dp, BlackOpacity40Color)
+                            .align(Alignment.Bottom),
+                    ) {
+                        BasicTextField(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .then(
+                                    if (dialogType == DiaryBookDialogType.VIEW) Modifier
+                                    else Modifier.bottomBorder(1.dp, BlackOpacity40Color)
+                                ),
+                            state = titleTextFieldState,
+                            textStyle = OneDayTypography.titleMedium.copy(
+                                color = TextDefaultColor
                             ),
-                        state = titleTextFieldState,
-                        textStyle = OneDayTypography.titleMedium.copy(
-                            color = TextDefaultColor
-                        ),
-                        readOnly = dialogType == DiaryBookDialogType.VIEW,
-                        inputTransformation = {
-                            if (asCharSequence().length > 10) revertAllChanges()
-                        }
-                    )
+                            readOnly = dialogType == DiaryBookDialogType.VIEW,
+                            inputTransformation = {
+                                if (asCharSequence().length > 10) revertAllChanges()
+                                isErrorTitle = false
+                            }
+                        )
+                        Spacer(Modifier.height(5.dp))
+                        Text(
+                            text = if (isErrorTitle) stringResource(R.string.error_title_message) else "",
+                            style = OneDayTypography.labelLarge.copy(
+                                color = RedColor
+                            )
+                        )
+                    }
                 }
                 Spacer(Modifier.height(15.dp))
                 BasicTextField(
@@ -251,6 +267,10 @@ fun DiaryBookDialog(
                         modifier = Modifier.weight(1f),
                         text = stringResource(if (dialogType == DiaryBookDialogType.EDIT) R.string.save else R.string.confirm),
                         onClick = {
+                            if (titleTextFieldState.text.length < 2) {
+                                isErrorTitle = true
+                                return@TextButton
+                            }
                             onSaveClick?.invoke(
                                 (imageUrl as? Uri),
                                 titleTextFieldState.text.toString(),

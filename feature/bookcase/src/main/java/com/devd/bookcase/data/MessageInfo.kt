@@ -13,7 +13,9 @@ const val SUCCESS_SAVE_BOOK = "successSaveBook"
 const val SUCCESS_DELETE_BOOK = "successDeleteBook"
 const val FAIL_DELETE_BOOK = "failDeleteBook"
 const val NEED_BOOK_IMAGE = "needBookImage"
-
+const val LIMIT_BOOK_LIST_COUNT = "limitBookListCount"
+const val CAN_NOT_DELETE_MAJOR = "cannotDeleteMajor"
+const val ASK_DELETE_BOOK = "askDeleteBook"
 
 data class MessageInfo @SuppressLint("SupportAnnotationUsage") constructor(
     val type: String,

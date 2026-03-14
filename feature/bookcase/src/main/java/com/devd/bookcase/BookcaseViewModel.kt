@@ -4,6 +4,8 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.toRoute
+import com.devd.bookcase.data.ASK_DELETE_BOOK
+import com.devd.bookcase.data.CAN_NOT_DELETE_MAJOR
 import com.devd.bookcase.data.FAIL_DELETE_BOOK
 import com.devd.bookcase.data.FAIL_SAVE_BOOK
 import com.devd.bookcase.data.FAIL_UPDATE_BOOK
@@ -53,6 +55,8 @@ class BookcaseViewModel @Inject constructor(
 
     val newBookInfo = DiaryBookInfo(-1L, null, "Title", "Description", DiaryPhaseType.MOON, 0)
 
+    var storeDeleteId: Long? = null
+
     private val _bookcaseUiState = MutableStateFlow(BookcaseUiState())
     val bookcaseUiState get() = _bookcaseUiState.asStateFlow()
 
@@ -61,6 +65,10 @@ class BookcaseViewModel @Inject constructor(
 
     private val _uploadImageEvent = MutableSharedFlow<String>()
     val uploadImageEvent get() = _uploadImageEvent.asSharedFlow()
+
+    private val _adResultEvent = MutableSharedFlow<Boolean>()
+    val adResultEvent get() = _adResultEvent.asSharedFlow()
+
 
     init {
         viewModelScope.launch {
@@ -101,6 +109,23 @@ class BookcaseViewModel @Inject constructor(
         _bookcaseUiState.update { it.copy(messageDialog = MessageInfo(NONE)) }
     }
 
+    fun showAdVideo() {
+        //TODO : 광고 보는거 나중에 추가
+        viewModelScope.launch { _adResultEvent.emit(true) }
+    }
+
+    fun requestDiaryBook(deleteID: Long, isMajor: Boolean) {
+        val (type, message) = if (isMajor) CAN_NOT_DELETE_MAJOR to R.string.cannot_delete_major
+        else ASK_DELETE_BOOK to R.string.ask_delete_diary_message
+
+        storeDeleteId = deleteID
+        showMessageDialog(MessageInfo(type, message))
+
+    }
+
+    /**
+     * file : 업로드 이미지 파일
+     */
     fun uploadImage(file: File) {
         viewModelScope.launch {
             val userUUID = dataStoreRepository.getPreferData(DataStoreKey.UserUID) ?: return@launch
@@ -166,12 +191,6 @@ class BookcaseViewModel @Inject constructor(
         }
     }
 
-    /**
-     * uri : upload 해야하는 이미지 Uri, null 일 경우 변경 없는거
-     * title : 일기장 title
-     * description : 일기장 description
-     * monthType : 일기장 한달 표현 타입
-     */
     fun updateBookInfo(
         bookInfo: DiaryBookInfo
     ) {
@@ -200,10 +219,11 @@ class BookcaseViewModel @Inject constructor(
         }
     }
 
-    fun deleteDiaryBook(deleteID: Long) {
+    fun deleteDiaryBook() {
+        storeDeleteId ?: return
         _bookcaseUiState.update { it.copy(isLoading = true) }
         viewModelScope.launch {
-            val errorMessage = diaryBookRepository.deleteBookInfo(deleteID)
+            val errorMessage = diaryBookRepository.deleteBookInfo(storeDeleteId!!)
             val (code, message) = if (errorMessage == null) {
                 SUCCESS_DELETE_BOOK to R.string.success_delete_book_message
             } else {

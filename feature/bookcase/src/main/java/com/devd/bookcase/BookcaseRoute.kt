@@ -19,8 +19,10 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.devd.bookcase.data.ASK_DELETE_BOOK
 import com.devd.bookcase.data.FAIL_SAVE_BOOK
 import com.devd.bookcase.data.FAIL_UPDATE_BOOK
+import com.devd.bookcase.data.LIMIT_BOOK_LIST_COUNT
 import com.devd.bookcase.data.MessageInfo
 import com.devd.bookcase.data.NEED_BOOK_IMAGE
 import com.devd.bookcase.data.SUCCESS_SAVE_BOOK
@@ -42,14 +44,15 @@ import kotlinx.coroutines.launch
 sealed interface BookcaseInterface {
     data class OnOpenDiaryBook(val bookID: Long) : BookcaseInterface
     data object OnAddDiaryBook : BookcaseInterface
-    data class OnDeleteDiaryBook(val bookID: Long) : BookcaseInterface
+    data class OnDeleteDiaryBook(val bookID: Long, val isMajor: Boolean) : BookcaseInterface
     data class OnUpdateDiaryBook(val bookInfo: DiaryBookInfo) : BookcaseInterface
 }
 
 @Composable
 fun BookcaseRoute(
     modifier: Modifier = Modifier,
-    viewModel: BookcaseViewModel = hiltViewModel()
+    viewModel: BookcaseViewModel = hiltViewModel(),
+    onBackPress: () -> Unit
 ) {
     val uiState by viewModel.bookcaseUiState.collectAsState()
 
@@ -70,6 +73,32 @@ fun BookcaseRoute(
                 else viewModel.updateBookInfo(bookInfo!!)
             }
         }
+        launch {
+            viewModel.adResultEvent.collect { adResult ->
+                if (adResult) bookInfo =
+                    viewModel.newBookInfo.copy(createDate = System.currentTimeMillis())
+            }
+        }
+    }
+
+    /* ADD */
+    fun addNewDiaryBook() {
+        if (uiState.bookList.size >= 3) {   // 3개 초과는 광고보고 생성
+            viewModel.showMessageDialog(
+                MessageInfo(
+                    type = LIMIT_BOOK_LIST_COUNT,
+                    messageId = R.string.limit_book_list_count
+                )
+            )
+        } else {
+            bookInfo =
+                viewModel.newBookInfo.copy(createDate = System.currentTimeMillis())
+        }
+    }
+
+    /* MODIFY */
+    fun modifyDiaryBook(modifyBookInfo: DiaryBookInfo) {
+        bookInfo = modifyBookInfo
     }
 
     BookcaseScreen(
@@ -78,31 +107,44 @@ fun BookcaseRoute(
         pagerState = pagerState,
         bookcaseInterface = { actionItem ->
             when (actionItem) {
-                BookcaseInterface.OnAddDiaryBook -> {
-                    bookInfo = viewModel.newBookInfo.copy(createDate = System.currentTimeMillis())
-                }
+                BookcaseInterface.OnAddDiaryBook ->
+                    addNewDiaryBook()
 
-                is BookcaseInterface.OnDeleteDiaryBook -> {
-                    viewModel.deleteDiaryBook(actionItem.bookID)
-                }
+                is BookcaseInterface.OnDeleteDiaryBook ->
+                    viewModel.requestDiaryBook(actionItem.bookID, actionItem.isMajor)
+
+                is BookcaseInterface.OnUpdateDiaryBook ->
+                    modifyDiaryBook(actionItem.bookInfo)
 
                 is BookcaseInterface.OnOpenDiaryBook -> {}
-                is BookcaseInterface.OnUpdateDiaryBook -> {
-                    bookInfo = actionItem.bookInfo
-                }
             }
-        }
+        },
+        onBackPress = onBackPress
     )
 
     uiState.isLoading.LoadingDialog()
     uiState.messageDialog.getMessage()?.ShowMessageDialog(
+        rightButtonMessage =
+            when (uiState.messageDialog.type) {
+                LIMIT_BOOK_LIST_COUNT, ASK_DELETE_BOOK -> R.string.yes
+                else -> R.string.confirm
+            },
         onRightButtonClick = {
             when (uiState.messageDialog.type) {
                 FAIL_UPDATE_BOOK, SUCCESS_UPDATE_BOOK,
                 FAIL_SAVE_BOOK, SUCCESS_SAVE_BOOK -> bookInfo = null
 
+                ASK_DELETE_BOOK -> viewModel.deleteDiaryBook()
+                LIMIT_BOOK_LIST_COUNT -> viewModel.showAdVideo()
                 else -> Unit
             }
+            viewModel.dismissMessageDialog()
+        },
+        leftButtonMessage = when (uiState.messageDialog.type) {
+            LIMIT_BOOK_LIST_COUNT, ASK_DELETE_BOOK -> R.string.no
+            else -> null
+        },
+        onLeftButtonClick = {
             viewModel.dismissMessageDialog()
         }
     )
@@ -159,6 +201,7 @@ fun BookcaseScreen(
     pagerState: PagerState = rememberPagerState(0) { 5 },
     bookList: List<DiaryBookInfo>,
     bookcaseInterface: (BookcaseInterface) -> Unit,
+    onBackPress: () -> Unit = {}
 ) {
     val isOpenBook = remember { mutableStateOf(false) }
 
@@ -172,7 +215,7 @@ fun BookcaseScreen(
         Toolbar(
             title = "",
             leftButtonIcon = R.drawable.icon_back_arrow,
-            leftButtonClick = {}
+            leftButtonClick = onBackPress
         )
         Spacer(Modifier.height(40.dp))
         ExpandableDiaryBook(
@@ -186,7 +229,14 @@ fun BookcaseScreen(
             DiaryBookActionButton(
                 onEditDiaryBook = { bookcaseInterface(BookcaseInterface.OnUpdateDiaryBook(bookList[pagerState.currentPage])) },
                 onAddDiaryBook = { bookcaseInterface(BookcaseInterface.OnAddDiaryBook) },
-                onDeleteDiaryBook = { bookcaseInterface(BookcaseInterface.OnDeleteDiaryBook(bookList[pagerState.currentPage].bookId)) }
+                onDeleteDiaryBook = {
+                    bookcaseInterface(
+                        BookcaseInterface.OnDeleteDiaryBook(
+                            bookList[pagerState.currentPage].bookId,
+                            bookList[pagerState.currentPage].isMajor
+                        )
+                    )
+                }
             )
         }
     }
