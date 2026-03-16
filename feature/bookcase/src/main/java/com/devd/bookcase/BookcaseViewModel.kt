@@ -80,7 +80,7 @@ class BookcaseViewModel @Inject constructor(
     }
 
     suspend fun collectDiaryBook() {
-        diaryBookRepository.fetchAllDairyBooks(route.userUUID)
+        diaryBookRepository.fetchAllDairyBooksFlow(route.userUUID)
             .stateIn(
                 scope = viewModelScope,
                 started = SharingStarted.WhileSubscribed(2000L),

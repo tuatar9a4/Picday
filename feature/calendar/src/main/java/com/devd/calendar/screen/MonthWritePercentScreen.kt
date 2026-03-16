@@ -34,6 +34,7 @@ import com.devd.commonsystem.theme.GreyColor
 import com.devd.commonsystem.theme.OneDayTypography
 import com.devd.commonsystem.theme.WhiteColor
 import com.devd.model.local.DiaryPhaseType
+import java.util.Locale
 
 @Preview
 @Composable
@@ -52,8 +53,7 @@ fun MonthWritePercentScreen(
         CustomLinearProgress(
             modifier = Modifier.fillMaxSize(),
             progress = percent,
-            activeColor = BlackColor,
-
+            activeColor = BlackColor
         )
         MultiMoonProgressBar(
             modifier = Modifier
@@ -77,7 +77,7 @@ fun MonthWritePercentScreen(
             )
             Spacer(Modifier.height(3.dp))
             Text(
-                text = "${percent * 100} %",
+                text = "${String.format(Locale.US, "%.1f", percent * 100)} %",
                 style = OneDayTypography.labelMedium.copy(
                     color = WhiteColor
                 )

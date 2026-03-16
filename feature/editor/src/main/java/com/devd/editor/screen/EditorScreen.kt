@@ -1,17 +1,25 @@
 package com.devd.editor.screen
 
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.scrollBy
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.ime
 import androidx.compose.foundation.layout.imePadding
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.input.rememberTextFieldState
 import androidx.compose.foundation.text.input.setTextAndPlaceCursorAtEnd
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -20,24 +28,27 @@ import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalFocusManager
-import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.core.net.toUri
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.devd.commonsystem.R
-import com.devd.commonsystem.ui.Toolbar
+import com.devd.commonsystem.theme.OneDayTypography
 import com.devd.commonsystem.ui.calendar.CustomDatePickerDialog
 import com.devd.commonsystem.ui.calendar.RangeType
 import com.devd.commonsystem.ui.cropImageDialog.ShowCropDialog
+import com.devd.commonsystem.ui.dialog.OptionBottomSheet
 import com.devd.commonsystem.ui.dialog.ShowImagePicker
 import com.devd.commonsystem.ui.dialog.ShowMessageDialog
 import com.devd.commonsystem.ui.loading.LoadingDialog
+import com.devd.commonsystem.utils.noRippleClickable
 import com.devd.commonsystem.utils.rememberImagePicker
 import com.devd.commonsystem.utils.uriToFile
 import com.devd.editor.EditorViewModel
@@ -46,7 +57,8 @@ import com.devd.editor.data.DiaryInfoState
 import com.devd.editor.data.Local
 import com.devd.editor.data.SAVE_SUCCESS
 import com.devd.editor.data.SAVE_UPDATE
-import com.devd.model.local.EditMode
+import com.devd.model.local.DiaryBookInfo
+import com.devd.model.local.SheetItem
 
 @Composable
 fun rememberImeBottomSize(): Int {
@@ -58,29 +70,20 @@ fun rememberImeBottomSize(): Int {
 fun EditorScreenRoute(
     modifier: Modifier = Modifier,
     viewModel: EditorViewModel = hiltViewModel(),
-    editMode: EditMode,
-    currentTime: Long,
-    diaryImage: String?,
-    bookId: Long,
-    diaryId: Long?,
     onBackIconClick: (id: Long?) -> Unit
 ) {
     val context = LocalContext.current
-    LaunchedEffect(Unit) {
-        viewModel.initSelectDate(currentTime, editMode)
-        viewModel.initDiaryInfo(bookId, diaryId, diaryImage)
-    }
+
+    /* UiState */
+    val uiState by viewModel.editorUiState.collectAsStateWithLifecycle()
 
     /* Resolvation Move Back */
     LaunchedEffect(viewModel.shouldBackPage) {
         if (viewModel.shouldBackPage) {
-            onBackIconClick.invoke(viewModel.diaryInfoState.value.diaryId)
+            onBackIconClick.invoke(uiState.diaryInfo.diaryId)
             viewModel.shouldBackPage = false
         }
     }
-
-    /* UiState */
-    val uiState by viewModel.editorUiState.collectAsStateWithLifecycle()
 
     /* MessageDialog */
     val messageDialog by viewModel.messageDialog.collectAsStateWithLifecycle(null)
@@ -94,19 +97,61 @@ fun EditorScreenRoute(
     /* CalendarDialog */
     val customDatePickerDialogState by viewModel.customDatePickerDialogState.collectAsState()
 
-    val diaryInfoState by viewModel.diaryInfoState.collectAsState()
+    /* BookSelectPopup */
+    var isShowBookSelect by remember { mutableStateOf(false) }
+
     EditorScreen(
         modifier = modifier,
         writeDate = customDatePickerDialogState.selectedDate,
         isCanChangeDate = customDatePickerDialogState.isCanChangeDate,
-        diaryState = diaryInfoState,
+        diaryState = uiState.diaryInfo,
         onShowImagePicker = { isShowPickerDialog = true },
+        selectDiary = uiState.bookList.getOrNull(uiState.bookPos),
+        onBookTitleClick = { isShowBookSelect = true },
         onChangeDiaryText = viewModel::setDiaryText,
         onChangeHashTag = viewModel::changeHashTag,
         onSaveDairy = viewModel::showAskSavePopup,
         onBackIconClick = { onBackIconClick(null) },
         onChangeCalendar = viewModel::showDatePickerDialog,
     )
+
+    /* MessageDialog */
+    messageDialog?.getMessage()?.ShowMessageDialog(
+        leftButtonMessage = if (messageDialog?.type == ASK_SAVE) R.string.cancel else null,
+        onLeftButtonClick = { viewModel.dismissMessageDialog() },
+        rightButtonMessage = R.string.confirm,
+        onRightButtonClick = {
+            when (messageDialog?.type) {
+                SAVE_SUCCESS, SAVE_UPDATE -> {
+                    viewModel.dismissMessageDialog()
+                    viewModel.shouldBackPage = true
+                }
+
+                ASK_SAVE -> {
+                    val file =
+                        (uiState.diaryInfo.imageUrl as? Local)?.uri?.let { context.uriToFile(it) }
+                    viewModel.uploadImageToBuket(fileUrl = file)
+                }
+
+                else -> {
+                    viewModel.dismissMessageDialog()
+                }
+            }
+        }
+    )
+
+    /* ImagePicker */
+    isShowPickerDialog.ShowImagePicker(
+        onCameraClick = imagePicker.launchCamera,
+        onGalleryClick = imagePicker.launchGallery,
+        onDismiss = { isShowPickerDialog = false }
+    )
+    uiState.imageUrlForCrop?.ShowCropDialog { cropFile ->
+        viewModel.changeCropImageDialog(null)
+        cropFile?.let { viewModel.updateImageUrl(it.toUri()) }
+    }
+
+    /* CalendarDialog */
     if (customDatePickerDialogState.isShowDialog) {
         CustomDatePickerDialog(
             title = "일기 작성 날짜를 선택하세요",
@@ -117,40 +162,27 @@ fun EditorScreenRoute(
         )
     }
 
-    isShowPickerDialog.ShowImagePicker(
-        onCameraClick = imagePicker.launchCamera,
-        onGalleryClick = imagePicker.launchGallery,
-        onDismiss = { isShowPickerDialog = false }
-    )   // ImagePicker
-    uiState.isShowLoading.LoadingDialog()   // LoadingDialog TODO : MoveMainActivity로 옮기기
-    uiState.imageUrlForCrop?.ShowCropDialog { cropFile ->
-        viewModel.changeCropImageDialog(null)
-        cropFile?.let { viewModel.updateImageUrl(it.toUri()) }
-    }   // CropDialog
-    messageDialog?.getMessage()
-        ?.ShowMessageDialog(
-            leftButtonMessage = if (messageDialog?.type == ASK_SAVE) R.string.cancel else null,
-            onLeftButtonClick = { viewModel.dismissMessageDialog() },
-            rightButtonMessage = R.string.confirm,
-            onRightButtonClick = {
-                when (messageDialog?.type) {
-                    SAVE_SUCCESS, SAVE_UPDATE -> {
-                        viewModel.dismissMessageDialog()
-                        viewModel.shouldBackPage = true
-                    }
+    /* BookSelectPopup */
+    if (isShowBookSelect) {
+        OptionBottomSheet(
+            title = "Select Book",
+            items = uiState.bookList.mapIndexed { index, info ->
+                SheetItem(
+                    id = index.toString(),
+                    text = info.title,
+                    isSelected = index == uiState.bookPos
+                )
+            },
+            onItemSelected = { item ->
+                viewModel.changeBookPos(item.id.toInt())
+                isShowBookSelect = false
+            },
+            onDismissRequest = { isShowBookSelect = false }
+        )
+    }
 
-                    ASK_SAVE -> {
-                        val file =
-                            (diaryInfoState.imageUrl as? Local)?.uri?.let { context.uriToFile(it) }
-                        viewModel.uploadImageToBuket(fileUrl = file)
-                    }
-
-                    else -> {
-                        viewModel.dismissMessageDialog()
-                    }
-                }
-            }
-        )   // MessageDialog
+    /* LoadingDialog */
+    uiState.isShowLoading.LoadingDialog()   //TODO : MoveMainActivity로 옮기기
 }
 
 @Preview
@@ -160,7 +192,9 @@ fun EditorScreen(
     writeDate: Long = System.currentTimeMillis(),
     isCanChangeDate: Boolean = true,
     diaryState: DiaryInfoState? = null,
+    selectDiary: DiaryBookInfo? = null,
     onShowImagePicker: () -> Unit = {},
+    onBookTitleClick: () -> Unit = {},
     onSaveDairy: () -> Unit = {},
     onBackIconClick: () -> Unit = {},
     onChangeCalendar: () -> Unit = {},
@@ -203,13 +237,43 @@ fun EditorScreen(
                 .imePadding()
         )
     ) {
-        Toolbar(
-            title = stringResource(R.string.editor_page_title),
-            leftButtonIcon = R.drawable.icon_back_arrow,
-            leftButtonClick = onBackIconClick,
-            rightButtonIcon = R.drawable.icon_pencil,
-            rightButtonClick = onSaveDairy
-        )
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 20.dp, vertical = 15.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.SpaceBetween
+        ) {
+            Image(
+                modifier = Modifier
+                    .height(24.dp)
+                    .noRippleClickable(onClick = onBackIconClick),
+                painter = painterResource(R.drawable.icon_back_arrow),
+                contentDescription = null,
+            )
+            Row(
+                modifier = Modifier.clickable(onClick = onBookTitleClick),
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                Text(
+                    text = selectDiary?.title ?: "",
+                    style = OneDayTypography.titleMedium
+                )
+                Spacer(Modifier.width(5.dp))
+                Image(
+                    modifier = Modifier.height(16.dp),
+                    painter = painterResource(R.drawable.icon_drop_down),
+                    contentDescription = null
+                )
+            }
+            Image(
+                modifier = Modifier
+                    .height(24.dp)
+                    .noRippleClickable(onClick = onSaveDairy),
+                painter = painterResource(R.drawable.icon_pencil),
+                contentDescription = null,
+            )
+        }
         Spacer(Modifier.height(15.dp))
         EditorDateItem(
             writeDate = writeDate,

@@ -3,7 +3,6 @@ package com.devd.editor.navigation
 import androidx.compose.ui.Modifier
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
-import androidx.navigation.toRoute
 import com.devd.editor.screen.EditorScreenRoute
 import com.devd.model.local.EditMode
 import kotlinx.serialization.Serializable
@@ -24,16 +23,9 @@ fun NavGraphBuilder.editorScreen(
     backListener: (Long?) -> Unit
 ) {
     composable<EditorRoute> { backstackEntry ->
-        val route = backstackEntry.toRoute<EditorRoute>()
-
         EditorScreenRoute(
             modifier = modifier,
             onBackIconClick = backListener,
-            currentTime = route.currentTime,
-            editMode = route.editMode,
-            diaryImage = route.imageUrl,
-            bookId = route.bookId,
-            diaryId = route.diaryId
         )
     }
 }

@@ -43,7 +43,6 @@ class DiaryBookRepository @Inject constructor(
         uuid: String,
         bookDescription: String
     ) = safeApiCall(Dispatchers.IO) {
-        val isFirstBook = diaryBookDao.selectAllDiaryBook(uuid).isEmpty()
         val currentMillis = Date().time
         diaryBookDao.insertDiaryBook(
             DiaryBookEntity(
@@ -51,18 +50,25 @@ class DiaryBookRepository @Inject constructor(
                 bookImage = bookImage,
                 userLocalUUId = uuid,
                 description = bookDescription,
-                isMajor = isFirstBook,
+                isMajor = !hasDiaryBook(uuid),
                 createdAt = currentMillis,
                 updatedAt = currentMillis,
             )
         )
     }
 
-
-    fun fetchAllDairyBooks(uuid: String) = diaryBookDao.selectAllDiaryBookFlow(uuid).map {
-        it.map { bookDaoItem -> bookDaoItem.transToModel() }
+    suspend fun fetchAllDiaryBooks(uuid: String) = safeApiCall(Dispatchers.IO) {
+        diaryBookDao.selectAllDiaryBook(uuid)
+    }.run {
+        when (this) {
+            is CallResult.Success -> this.res.map { it.transToModel() }
+            is CallResult.NetworkError -> emptyList()
+        }
     }
 
+    fun fetchAllDairyBooksFlow(uuid: String) = diaryBookDao.selectAllDiaryBookFlow(uuid).map {
+        it.map { bookDaoItem -> bookDaoItem.transToModel() }
+    }
 
     suspend fun fetchMajorDiaryBook(uuid: String) =
         safeApiCall(Dispatchers.IO) {
