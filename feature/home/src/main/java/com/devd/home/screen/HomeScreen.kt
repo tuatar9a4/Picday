@@ -71,9 +71,7 @@ fun HomeScreenRoute(
     val diaryState = rememberLazyListState()
 
     val imagePicker = rememberImagePicker { uri ->
-        uri?.let {
-            viewModel.changeCropImageDialog(it)
-        }
+        uri?.let { viewModel.changeCropImageDialog(it) }
     }
 
     suspend fun checkPermission() {
@@ -120,6 +118,13 @@ fun HomeScreenRoute(
 
     LaunchedEffect(Unit) {
         viewModel.fetchMainDiaryBook()
+    }
+
+    LaunchedEffect(Unit) {
+        viewModel.scrollPosition.collect { index ->
+            if (index == -1) return@collect
+            diaryState.scrollToItem(index)
+        }
     }
 
     HomeScreen(
