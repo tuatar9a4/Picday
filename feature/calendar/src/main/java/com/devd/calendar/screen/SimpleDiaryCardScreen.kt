@@ -1,6 +1,7 @@
 package com.devd.calendar.screen
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -53,7 +54,8 @@ fun SimpleDiaryCardScreen(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(horizontal = 40.dp)
-                .aspectRatio(9 / 16f),
+                .aspectRatio(9 / 16f)
+                .clickable(onClick = onBackPress),
         ) {
 
             Box(
