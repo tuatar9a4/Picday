@@ -1,10 +1,14 @@
 package com.devd.bookcase
 
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.pager.PagerState
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.runtime.Composable
@@ -16,6 +20,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -216,8 +221,16 @@ fun BookcaseScreen(
     ) {
         Toolbar(
             title = "",
-            leftButtonIcon = R.drawable.icon_back_arrow,
-            leftButtonClick = onBackPress
+            leftButtons = {
+                Image(
+                    modifier = Modifier
+                        .size(32.dp)
+                        .padding(4.dp)
+                        .clickable(onClick = onBackPress),
+                    painter = painterResource(R.drawable.icon_back_arrow),
+                    contentDescription = null
+                )
+            }
         )
         Spacer(Modifier.height(40.dp))
         ExpandableDiaryBook(

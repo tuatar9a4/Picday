@@ -2,6 +2,7 @@ package com.devd.home.screen
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -205,10 +206,27 @@ fun HomeScreen(
             Toolbar(
                 modifier = Modifier.background(color = PrimaryColor),
                 title = "",
-                leftButtonIcon = R.drawable.icon_library,
-                leftButtonClick = onBookcaseClick,
-                rightButtonIcon = R.drawable.icon_setting,
-                rightButtonClick = {})
+                leftButtons = {
+                    Image(
+                        modifier = Modifier
+                            .size(32.dp)
+                            .padding(4.dp)
+                            .clickable(onClick = onBookcaseClick),
+                        painter = painterResource(R.drawable.icon_library),
+                        contentDescription = null
+                    )
+                },
+                rightButtons = {
+                    Image(
+                        modifier = Modifier
+                            .size(32.dp)
+                            .padding(4.dp)
+                            .clickable(onClick = { }),
+                        painter = painterResource(R.drawable.icon_setting),
+                        contentDescription = null
+                    )
+                }
+            )
             Spacer(Modifier.height(20.dp))
             BookCardScreen(
                 modifier = Modifier.align(Alignment.CenterHorizontally),

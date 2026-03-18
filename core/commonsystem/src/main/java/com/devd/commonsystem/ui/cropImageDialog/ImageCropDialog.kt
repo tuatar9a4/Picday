@@ -1,11 +1,15 @@
 package com.devd.commonsystem.ui.cropImageDialog
 
 import android.net.Uri
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -13,6 +17,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
@@ -50,19 +55,34 @@ fun ImageCropDialog(
             Toolbar(
                 title = "Crop",
                 useWhitIcon = true,
-                leftButtonClick = {
-                    onCropResult.invoke(null)
-                },
-                rightButtonIcon = R.drawable.icon_pencil,
-                rightButtonClick = {
-                    val savedFile = context.cropAndSave(
-                        bitmap = imageBitmap.value,
-                        containerSize = containerSize.value,
-                        imageOffset = imageOffset.value,
-                        cropRect = cropRect.value
+                leftButtons = {
+                    Image(
+                        modifier = Modifier
+                            .size(32.dp)
+                            .padding(4.dp)
+                            .clickable(onClick = { onCropResult.invoke(null) }),
+                        painter = painterResource(R.drawable.icon_back_arrow),
+                        contentDescription = null
                     )
-                    onCropResult.invoke(savedFile)
-                }
+                },
+                rightButtons = {
+                    Image(
+                        modifier = Modifier
+                            .size(32.dp)
+                            .padding(4.dp)
+                            .clickable(onClick = {
+                                val savedFile = context.cropAndSave(
+                                    bitmap = imageBitmap.value,
+                                    containerSize = containerSize.value,
+                                    imageOffset = imageOffset.value,
+                                    cropRect = cropRect.value
+                                )
+                                onCropResult.invoke(savedFile)
+                            }),
+                        painter = painterResource(R.drawable.icon_pencil),
+                        contentDescription = null
+                    )
+                },
             )
             Spacer(Modifier.height(30.dp))
             CropImageBox(

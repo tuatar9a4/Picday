@@ -1,8 +1,6 @@
 package com.devd.commonsystem.ui
 
-import androidx.annotation.DrawableRes
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -13,12 +11,10 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.devd.commonsystem.R
-import com.devd.commonsystem.theme.BlackColor
 import com.devd.commonsystem.theme.OneDayTypography
 import com.devd.commonsystem.theme.TextDefaultColor
 import com.devd.commonsystem.theme.WhiteColor
@@ -28,13 +24,10 @@ fun Toolbar(
     modifier: Modifier = Modifier,
     title: String,
     useWhitIcon: Boolean = false,
-    @DrawableRes leftButtonIcon: Int = R.drawable.icon_back_arrow,
-    leftButtonClick: (() -> Unit)? = null,
-    @DrawableRes rightButtonIcon: Int = R.drawable.icon_hamburger,
-    rightButtonClick: (() -> Unit)? = null,
+    leftButtons: @Composable (() -> Unit)? = null,
+    rightButtons: @Composable (() -> Unit)? = null,
 ) {
 
-    val colorFilter = ColorFilter.tint(color = if (useWhitIcon) WhiteColor else BlackColor)
     Row(
         modifier = modifier.then(
             Modifier
@@ -44,34 +37,16 @@ fun Toolbar(
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.SpaceBetween
     ) {
-        leftButtonClick?.let {
-            Image(
-                modifier = Modifier
-                    .clickable(onClick = leftButtonClick)
-                    .size(32.dp)
-                    .padding(4.dp),
-                painter = painterResource(leftButtonIcon),
-                colorFilter = colorFilter,
-                contentDescription = "Back"
-            )
-        } ?: Spacer(Modifier.size(32.dp))
+        leftButtons?.invoke() ?: Spacer(Modifier.size(32.dp))
+
         Text(
             text = title,
             style = OneDayTypography.titleMedium.copy(
                 color = if (useWhitIcon) WhiteColor else TextDefaultColor
             )
         )
-        rightButtonClick?.let {
-            Image(
-                modifier = Modifier
-                    .clickable(onClick = rightButtonClick)
-                    .size(32.dp)
-                    .padding(4.dp),
-                painter = painterResource(rightButtonIcon),
-                colorFilter = colorFilter,
-                contentDescription = "Back"
-            )
-        } ?: Spacer(Modifier.size(32.dp))
+
+        rightButtons?.invoke() ?: Spacer(Modifier.size(32.dp))
     }
 }
 
@@ -84,17 +59,40 @@ fun ToolbarPreview() {
 @Preview
 @Composable
 fun ToolbarUseLeftPreview() {
-    Toolbar(title = "Title", leftButtonClick = {})
+    Toolbar(
+        title = "Title",
+        leftButtons = {
+            Image(
+                painter = painterResource(R.drawable.icon_back_arrow),
+                contentDescription = null
+            )
+        }
+    )
 }
 
 @Preview
 @Composable
 fun ToolbarUseRightPreview() {
-    Toolbar(title = "Title", rightButtonClick = {})
+    Toolbar(title = "Title", rightButtons = {
+        Image(
+            painter = painterResource(R.drawable.icon_delete_trash),
+            contentDescription = null
+        )
+    })
 }
 
 @Preview
 @Composable
 fun ToolbarUseBothPreview() {
-    Toolbar(title = "Title", leftButtonClick = {}, rightButtonClick = {})
+    Toolbar(title = "Title", leftButtons = {
+        Image(
+            painter = painterResource(R.drawable.icon_back_arrow),
+            contentDescription = null
+        )
+    }, rightButtons = {
+        Image(
+            painter = painterResource(R.drawable.icon_delete_trash),
+            contentDescription = null
+        )
+    })
 }
