@@ -5,6 +5,7 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -198,6 +199,18 @@ fun DiaryBookDialog(
                             inputTransformation = {
                                 if (asCharSequence().length > 10) revertAllChanges()
                                 isErrorTitle = false
+                            },
+                            decorator = { innerTextField ->
+                                Box(contentAlignment = Alignment.CenterStart) {
+                                    if (titleTextFieldState.text.isEmpty()) {
+                                        Text(
+                                            text = "Title", // 원하는 힌트 문구
+                                            style = OneDayTypography.titleMedium,
+                                            color = BlackOpacity40Color // 힌트 컬러
+                                        )
+                                    }
+                                    innerTextField() // 실제 입력창 호출
+                                }
                             }
                         )
                         Spacer(Modifier.height(5.dp))
@@ -219,7 +232,19 @@ fun DiaryBookDialog(
                     ),
                     state = descriptionTextFieldState,
                     readOnly = dialogType == DiaryBookDialogType.VIEW,
-                    textStyle = OneDayTypography.bodyMedium
+                    textStyle = OneDayTypography.bodyMedium,
+                    decorator = { innerTextField ->
+                        Box(contentAlignment = Alignment.TopStart) {
+                            if (titleTextFieldState.text.isEmpty()) {
+                                Text(
+                                    text = "Diary Description", // 원하는 힌트 문구
+                                    style = OneDayTypography.titleMedium,
+                                    color = BlackOpacity40Color // 힌트 컬러
+                                )
+                            }
+                            innerTextField() // 실제 입력창 호출
+                        }
+                    }
                 )
                 Spacer(Modifier.height(10.dp))
                 Row(

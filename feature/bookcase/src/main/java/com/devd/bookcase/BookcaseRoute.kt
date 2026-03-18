@@ -1,6 +1,7 @@
 package com.devd.bookcase
 
 import android.net.Uri
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -17,6 +18,7 @@ import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -90,6 +92,8 @@ fun BookcaseRoute(
     val context = LocalContext.current
     var bookInfo by remember { mutableStateOf<DiaryBookInfo?>(null) }
 
+    val isOpenBook = remember { mutableStateOf(false) }
+
     /* ImagePicker */
     val showImagePicker = remember { mutableStateOf(false) }
     val showCropUi = remember { mutableStateOf<Uri?>(null) }
@@ -130,6 +134,11 @@ fun BookcaseRoute(
         }
     }
 
+    BackHandler(enabled = true) {
+        if(isOpenBook.value) isOpenBook.value = false
+        else onBackPress()
+    }
+
     /* ADD */
     fun addNewDiaryBook() {
         if (uiState.bookList.size >= 3) {   // 3개 초과는 광고보고 생성
@@ -154,6 +163,7 @@ fun BookcaseRoute(
         modifier = modifier,
         bookList = uiState.bookList,
         diaryList = uiState.diaryList,
+        isOpenBook = isOpenBook,
         pagerState = pagerState,
         bookcaseInterface = { actionItem ->
             when (actionItem) {
@@ -275,6 +285,7 @@ fun BookcaseScreenPreview() {
             )
         ),
         pagerState = rememberPagerState(0) { 1 },
+        isOpenBook = remember { mutableStateOf(false) },
         diaryList = emptyList(),
         onAddDiaryPress = {},
         bookcaseInterface = {}
@@ -286,12 +297,12 @@ fun BookcaseScreen(
     modifier: Modifier = Modifier,
     pagerState: PagerState = rememberPagerState(0) { 5 },
     bookList: List<DiaryBookInfo>,
+    isOpenBook: MutableState<Boolean>,
     diaryList: List<DiaryInfo>,
     bookcaseInterface: (BookcaseInterface) -> Unit,
     onAddDiaryPress: () -> Unit,
     onBackPress: () -> Unit = {}
 ) {
-    val isOpenBook = remember { mutableStateOf(false) }
 
     Column(
         modifier = modifier.then(

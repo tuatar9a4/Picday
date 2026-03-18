@@ -55,7 +55,7 @@ class BookcaseViewModel @Inject constructor(
 ) : ViewModel() {
     private val route = savedStateHandle.toRoute<BookcaseNaviRoute>()
 
-    val newBookInfo = DiaryBookInfo(-1L, null, "Title", "Description", DiaryPhaseType.MOON, 0)
+    val newBookInfo = DiaryBookInfo(-1L, null, "", "", DiaryPhaseType.MOON, 0)
 
     var storeDeleteId: Long? = null
     var isInitScroll = true
