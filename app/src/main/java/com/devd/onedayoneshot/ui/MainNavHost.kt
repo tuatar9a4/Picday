@@ -109,6 +109,17 @@ fun MyNavHost(
 
                 bookcaseScreen(
                     modifier = modifier,
+                    onNaviToEditor = { bookId, uri, diaryId ->
+                        navController.navigate(
+                            EditorRoute(
+                                currentTime = System.currentTimeMillis(),
+                                editMode = EditMode.Edit,
+                                imageUrl = uri,
+                                bookId = bookId,
+                                diaryId = diaryId
+                            )
+                        )
+                    },
                     onBackClick = { navController.popBackStack() }
                 )
             }

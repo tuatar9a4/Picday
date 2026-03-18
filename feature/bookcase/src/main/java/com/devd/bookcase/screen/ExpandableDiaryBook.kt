@@ -72,7 +72,7 @@ import java.time.format.DateTimeFormatter
 fun ExpandableDiaryBookPreview() {
     ExpandableDiaryBook(
         pagerState = rememberPagerState(pageCount = { 4 }),
-        isOpened = mutableStateOf(false),
+        isOpened = remember { mutableStateOf(false) },
         bookList = listOf(
             DiaryBookInfo(
                 bookId = 9764,
@@ -149,6 +149,13 @@ fun ExpandableDiaryBook(
             verticalAlignment = Alignment.CenterVertically
         ) {
             Image(
+                modifier = Modifier.noRippleClickable(
+                    onClick = {
+                        if (bookList[pagerState.currentPage].isMajor) return@noRippleClickable
+                        val bookId = bookList[pagerState.currentPage].bookId
+                        bookClickAction.invoke(BookcaseInterface.OnUpdateMajorBook(bookId))
+                    }
+                ),
                 painter = painterResource(R.drawable.icon_stroke_crown),
                 contentDescription = null,
                 colorFilter = ColorFilter.tint(
@@ -196,6 +203,16 @@ fun ExpandableDiaryBook(
                                         selectedBookId = bookInfo
                                     },
                                 bookInfo = bookInfo
+                            )
+                            Image(
+                                modifier = Modifier
+                                    .align(Alignment.TopEnd)
+                                    .padding(top = 15.dp, end = 15.dp)
+                                    .clickable(onClick = {
+                                        bookClickAction(BookcaseInterface.OnUpdateDiaryBook(bookInfo))
+                                    }),
+                                painter = painterResource(R.drawable.icon_setting),
+                                contentDescription = null,
                             )
                         }
                     }

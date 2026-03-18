@@ -133,6 +133,13 @@ class DiaryBookRepository @Inject constructor(
         return@run this is CallResult.Success && this.res
     }
 
+    suspend fun changeMajorBook(bookId: Long, uuid: String) = safeApiCall(Dispatchers.IO) {
+        val originMainBook = diaryBookDao.selectMainDiaryBook(uuid).copy(isMajor = false)
+        val newMainBook = diaryBookDao.selectDiaryBook(bookId).copy(isMajor = true)
+        diaryBookDao.updateDiaryBook(originMainBook)
+        diaryBookDao.updateDiaryBook(newMainBook)
+    }
+
     /* Diary */
     suspend fun fetchAllDairiesByDiaryBook(diaryBookId: Long) = safeApiCall(Dispatchers.IO) {
         diaryDao.getDiariesByDiaryBook(diaryBookId)

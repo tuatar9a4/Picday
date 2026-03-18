@@ -16,6 +16,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Rect
+import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
@@ -25,6 +26,7 @@ import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import com.devd.commonsystem.R
 import com.devd.commonsystem.theme.BlackColor
+import com.devd.commonsystem.theme.WhiteColor
 import com.devd.commonsystem.ui.Toolbar
 import java.io.File
 
@@ -62,7 +64,8 @@ fun ImageCropDialog(
                             .padding(4.dp)
                             .clickable(onClick = { onCropResult.invoke(null) }),
                         painter = painterResource(R.drawable.icon_back_arrow),
-                        contentDescription = null
+                        contentDescription = null,
+                        colorFilter = ColorFilter.tint(color = WhiteColor)
                     )
                 },
                 rightButtons = {
@@ -80,7 +83,8 @@ fun ImageCropDialog(
                                 onCropResult.invoke(savedFile)
                             }),
                         painter = painterResource(R.drawable.icon_pencil),
-                        contentDescription = null
+                        contentDescription = null,
+                        colorFilter = ColorFilter.tint(color = WhiteColor)
                     )
                 },
             )

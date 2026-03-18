@@ -16,6 +16,7 @@ const val NEED_BOOK_IMAGE = "needBookImage"
 const val LIMIT_BOOK_LIST_COUNT = "limitBookListCount"
 const val CAN_NOT_DELETE_MAJOR = "cannotDeleteMajor"
 const val ASK_DELETE_BOOK = "askDeleteBook"
+const val NEED_CAMERA_PERMISSION = "needCameraPermission"
 
 data class MessageInfo @SuppressLint("SupportAnnotationUsage") constructor(
     val type: String,

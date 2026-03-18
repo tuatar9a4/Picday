@@ -58,19 +58,13 @@ class BookcaseViewModel @Inject constructor(
     val newBookInfo = DiaryBookInfo(-1L, null, "Title", "Description", DiaryPhaseType.MOON, 0)
 
     var storeDeleteId: Long? = null
+    var isInitScroll = true
 
     private val _bookcaseUiState = MutableStateFlow(BookcaseUiState())
     val bookcaseUiState get() = _bookcaseUiState.asStateFlow()
 
-    private val _scrollEvent = MutableSharedFlow<Int>()
-    val scrollEvent get() = _scrollEvent.asSharedFlow()
-
-    private val _uploadImageEvent = MutableSharedFlow<String>()
-    val uploadImageEvent get() = _uploadImageEvent.asSharedFlow()
-
     private val _adResultEvent = MutableSharedFlow<Boolean>()
     val adResultEvent get() = _adResultEvent.asSharedFlow()
-
 
     init {
         viewModelScope.launch {
@@ -87,9 +81,6 @@ class BookcaseViewModel @Inject constructor(
                 initialValue = emptyList()
             ).collect { bookItems ->
                 Timber.d("CheckChangeBook -> $bookItems")
-                val pos = bookItems.indexOfFirst { it.isMajor }
-                if (bookItems.isEmpty()) scrollToPosition(pos)
-
                 _bookcaseUiState.update {
                     it.copy(
                         isLoading = false,
@@ -112,11 +103,6 @@ class BookcaseViewModel @Inject constructor(
         _bookcaseUiState.update { it.copy(diaryList = emptyList()) }
     }
 
-
-    suspend fun scrollToPosition(pos: Int) {
-        _scrollEvent.emit(pos)
-    }
-
     fun showMessageDialog(messageInfo: MessageInfo) {
         _bookcaseUiState.update { it.copy(messageDialog = messageInfo) }
     }
@@ -137,6 +123,20 @@ class BookcaseViewModel @Inject constructor(
         storeDeleteId = deleteID
         showMessageDialog(MessageInfo(type, message))
 
+    }
+
+    fun updateMajorBook(bookId: Long) {
+        viewModelScope.launch {
+            _bookcaseUiState.update { it.copy(isLoading = true) }
+            diaryBookRepository.changeMajorBook(bookId, route.userUUID)
+            _bookcaseUiState.update { it.copy(isLoading = false) }
+        }
+    }
+
+    suspend fun hasWriteToDayDiary(bookId: Long): Long? {
+        val todayDiary =
+            diaryBookRepository.fetchOneDiaryForDate(bookId, System.currentTimeMillis())
+        return todayDiary?.diaryId
     }
 
     /**

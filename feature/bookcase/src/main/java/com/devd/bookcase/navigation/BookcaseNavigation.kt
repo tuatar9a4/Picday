@@ -13,11 +13,13 @@ data class BookcaseNaviRoute(
 
 fun NavGraphBuilder.bookcaseScreen(
     modifier: Modifier = Modifier,
+    onNaviToEditor: (bookId: Long,url: String?, diaryId: Long?) -> Unit,
     onBackClick: () -> Unit = {}
 ) {
     composable<BookcaseNaviRoute> {
         BookcaseRoute(
             modifier = modifier,
+            onNaviToEditor = onNaviToEditor,
             onBackPress = onBackClick
         )
     }

@@ -22,7 +22,7 @@ fun NavGraphBuilder.editorScreen(
     modifier: Modifier = Modifier,
     backListener: (Long?) -> Unit
 ) {
-    composable<EditorRoute> { backstackEntry ->
+    composable<EditorRoute> {
         EditorScreenRoute(
             modifier = modifier,
             onBackIconClick = backListener,
