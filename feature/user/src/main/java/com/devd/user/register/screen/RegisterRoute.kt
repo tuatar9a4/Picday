@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -24,7 +25,9 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.devd.commonsystem.R
+import com.devd.commonsystem.theme.OneDayTypography
 import com.devd.commonsystem.theme.PrimaryColor
+import com.devd.commonsystem.theme.TextDefaultColor
 import com.devd.commonsystem.ui.TextButton
 import com.devd.commonsystem.ui.Toolbar
 import com.devd.commonsystem.ui.dialog.DiaryBookDialog
@@ -79,7 +82,9 @@ fun RegisterRoute(
         )
     ) {
         Toolbar(
-            title = "Register",
+            titleBox = {
+                Text("Register", style = OneDayTypography.titleMedium.copy(color = TextDefaultColor))
+            },
             leftButtons = {
                 Image(
                     modifier = Modifier

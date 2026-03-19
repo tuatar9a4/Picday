@@ -19,11 +19,15 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.CornerRadius
 import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.geometry.Rect
+import androidx.compose.ui.geometry.RoundRect
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.BlendMode
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.CompositingStrategy
+import androidx.compose.ui.graphics.Path
+import androidx.compose.ui.graphics.drawscope.clipPath
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
@@ -41,7 +45,7 @@ import java.util.Locale
 fun MonthWritePercentScreen(
     modifier: Modifier = Modifier,
     type: DiaryPhaseType = DiaryPhaseType.MOON,
-    percent: Float = 0.2f
+    percent: Float = 0.05f
 ) {
     Box(
         modifier = modifier.then(
@@ -58,7 +62,7 @@ fun MonthWritePercentScreen(
         MultiMoonProgressBar(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(horizontal = 10.dp, vertical = 5.dp),
+                .padding(horizontal = 5.dp, vertical = 5.dp),
             iconList = type.ids,
             currentProgress = percent,
         )
@@ -154,7 +158,7 @@ fun MoonProgressIcon(
 @Preview
 @Composable
 fun CustomLinearProgress(
-    progress: Float = 0.5f,
+    progress: Float = 0.05f,
     modifier: Modifier = Modifier,
     activeColor: Color = AccentColor,
     inactiveColor: Color = BlackColor.copy(alpha = 0.3f)
@@ -166,21 +170,31 @@ fun CustomLinearProgress(
     ) {
         val width = size.width
         val height = size.height
-        val cornerRadius = CornerRadius(height / 2, height / 2)
+        val cornerRadius = CornerRadius(height, height)
 
-        // 1. 전체 배경 (Inactive) - 둥근 사각형
-        drawRoundRect(
-            color = inactiveColor,
-            size = size,
-            cornerRadius = cornerRadius
-        )
+        // 1. 전체 영역을 둥근 사각형(캡슐) 모양의 Path로 생성
+        val path = Path().apply {
+            addRoundRect(
+                RoundRect(
+                    rect = Rect(Offset.Zero, size),
+                    cornerRadius = cornerRadius
+                )
+            )
+        }
 
-        // 2. 진행 바 (Active) - 왼쪽부터 progress만큼만 그림
-        // 배경 위에 덮어씌워도 Canvas는 순차적으로 그리기 때문에 색 혼합이 덜함
-        drawRoundRect(
-            color = activeColor,
-            size = Size(width * progress, height),
-            cornerRadius = cornerRadius
-        )
+        // 2. 해당 Path로 Clipping (이 안에서 그리는 건 무조건 이 모양에 잘림)
+        clipPath(path) {
+            // 배경 그리기
+            drawRect(
+                color = inactiveColor,
+                size = size
+            )
+
+            // 진행 바 그리기 (이제 직사각형으로 그려도 외곽선에 맞춰 잘림)
+            drawRect(
+                color = activeColor,
+                size = Size(width * progress, height)
+            )
+        }
     }
 }

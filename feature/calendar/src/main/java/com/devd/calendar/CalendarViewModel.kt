@@ -10,6 +10,9 @@ import com.devd.calendar.navigation.CustomCalendarRoute
 import com.devd.commonsystem.utils.getCurrentMonthRangeMillis
 import com.devd.commonsystem.utils.getFirstDayMillis
 import com.devd.data.repository.DiaryBookRepository
+import com.devd.datastore.DataStoreKey
+import com.devd.datastore.DataStoreRepository
+import com.devd.model.local.DiaryBookInfo
 import com.devd.model.local.DiaryInfo
 import com.devd.model.local.DiaryPhaseType
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -30,6 +33,8 @@ data class CalendarUiState(
     val isLoading: Boolean = false,
     val selectDate: Long = System.currentTimeMillis(),
     val writeDisplayType: DiaryPhaseType = DiaryPhaseType.MOON,
+    var bookName: String = "",
+    var bookList: List<DiaryBookInfo> = emptyList(),
     @param:FloatRange(from = 0.0, to = 1.0) val writePercent: Float = 0f,
     val monthToList: Map<YearMonth, List<CalendarImageInfo>> = hashMapOf(),
 )
@@ -37,35 +42,75 @@ data class CalendarUiState(
 @HiltViewModel
 class CalendarViewModel @Inject constructor(
     private val diaryRepository: DiaryBookRepository,
+    private val dataStoreRepository: DataStoreRepository,
     savedStateHandle: SavedStateHandle
 ) : ViewModel() {
 
     private val route = savedStateHandle.toRoute<CustomCalendarRoute>()
-    private val bookId = route.selectBookID
+    var bookId = route.selectBookID
     private val _calendarUiState =
         MutableStateFlow(CalendarUiState(selectDate = route.selectMillis))
     val calendarUiState = _calendarUiState.asStateFlow()
+
+    private val _optionBookList = MutableStateFlow<List<DiaryBookInfo>?>(null)
+    val optionBookList = _optionBookList.asStateFlow()
 
 
     init {
         viewModelScope.launch {
             val bookInfo = diaryRepository.fetchBookInfo(bookId)
             bookInfo?.let { bookInfo ->
-                _calendarUiState.update { it.copy(writeDisplayType = bookInfo.bookPhaseType) }
+                _calendarUiState.update {
+                    it.copy(
+                        writeDisplayType = bookInfo.bookPhaseType,
+                        bookName = bookInfo.title
+                    )
+                }
             }
+        }
+    }
+
+    fun fetchBookList() {
+        viewModelScope.launch {
+            if (calendarUiState.value.bookList.isNotEmpty()) {
+                _optionBookList.emit(calendarUiState.value.bookList)
+            } else {
+                val uuid = dataStoreRepository.getPreferData(DataStoreKey.UserUID)!!
+                val bookList = diaryRepository.fetchAllDiaryBooks(uuid)
+                _calendarUiState.update { it.copy(bookList = bookList) }
+                _optionBookList.emit(calendarUiState.value.bookList)
+            }
+        }
+    }
+
+    fun dismissBookList() {
+        viewModelScope.launch {
+            _optionBookList.emit(null)
+        }
+    }
+
+    fun fetchNewBookDiaryImage(title: String) {
+        viewModelScope.launch {
+            dismissBookList()
+            _calendarUiState.update { it.copy(bookName = title, monthToList = hashMapOf()) }
+            fetchDiaryImageWithMonth(
+                millis = calendarUiState.value.selectDate,
+                isPreMove = false,
+                isNextMove = false
+            )
         }
     }
 
     fun fetchDiaryImageWithMonth(millis: Long, isPreMove: Boolean, isNextMove: Boolean) {
         viewModelScope.launch {
-            if (!isPreMove && !isNextMove && calendarUiState.value.monthToList.isNotEmpty()) return@launch
-            _calendarUiState.update { it.copy(isLoading = true) }
-
-            val newList = calendarUiState.value.monthToList.toMutableMap()
-
             //이번달 데이터 확인 후 삽입
             val currentYM = Instant.ofEpochMilli(millis).atZone(ZoneId.systemDefault())
                 .toLocalDate().let { YearMonth.from(it) }
+            if (!isPreMove && !isNextMove && calendarUiState.value.monthToList.isNotEmpty()) return@launch
+            _calendarUiState.update { it.copy(isLoading = true, selectDate = millis) }
+
+            val newList = calendarUiState.value.monthToList.toMutableMap()
+
             if (!calendarUiState.value.monthToList.contains(currentYM)) {
                 val currentDeferred = async { fetchMonthData(millis) }
                 val diaryList = currentDeferred.await()
@@ -74,8 +119,9 @@ class CalendarViewModel @Inject constructor(
                 val currentMonthDayCount = writeCount / dayCount
                 _calendarUiState.update { it.copy(writePercent = currentMonthDayCount) }
                 newList[currentYM] = currentDeferred.await()
-            }else{
-                val writeCount =  newList[currentYM]!!.filter { it.isCurrentMonth && it.diaryId != null }.size
+            } else {
+                val writeCount =
+                    newList[currentYM]!!.filter { it.isCurrentMonth && it.diaryId != null }.size
                 val dayCount = currentYM.lengthOfMonth().toFloat()
                 val currentMonthDayCount = writeCount / dayCount
                 _calendarUiState.update { it.copy(writePercent = currentMonthDayCount) }

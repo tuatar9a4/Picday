@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -26,6 +27,7 @@ import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import com.devd.commonsystem.R
 import com.devd.commonsystem.theme.BlackColor
+import com.devd.commonsystem.theme.OneDayTypography
 import com.devd.commonsystem.theme.WhiteColor
 import com.devd.commonsystem.ui.Toolbar
 import java.io.File
@@ -55,8 +57,13 @@ fun ImageCropDialog(
                 .background(color = BlackColor)
         ) {
             Toolbar(
-                title = "Crop",
-                useWhitIcon = true,
+                titleBox = {
+                    Text(
+                        "Crop", style = OneDayTypography.titleMedium.copy(
+                            color = WhiteColor
+                        )
+                    )
+                },
                 leftButtons = {
                     Image(
                         modifier = Modifier

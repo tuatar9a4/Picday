@@ -17,13 +17,11 @@ import androidx.compose.ui.unit.dp
 import com.devd.commonsystem.R
 import com.devd.commonsystem.theme.OneDayTypography
 import com.devd.commonsystem.theme.TextDefaultColor
-import com.devd.commonsystem.theme.WhiteColor
 
 @Composable
 fun Toolbar(
     modifier: Modifier = Modifier,
-    title: String,
-    useWhitIcon: Boolean = false,
+    titleBox: @Composable (() -> Unit)? = null,
     leftButtons: @Composable (() -> Unit)? = null,
     rightButtons: @Composable (() -> Unit)? = null,
 ) {
@@ -39,12 +37,7 @@ fun Toolbar(
     ) {
         leftButtons?.invoke() ?: Spacer(Modifier.size(32.dp))
 
-        Text(
-            text = title,
-            style = OneDayTypography.titleMedium.copy(
-                color = if (useWhitIcon) WhiteColor else TextDefaultColor
-            )
-        )
+        titleBox?.invoke()
 
         rightButtons?.invoke() ?: Spacer(Modifier.size(32.dp))
     }
@@ -53,14 +46,28 @@ fun Toolbar(
 @Preview
 @Composable
 fun ToolbarPreview() {
-    Toolbar(title = "Title")
+    Toolbar(
+        titleBox = {
+            Text(
+                "Title", style = OneDayTypography.titleMedium.copy(
+                    color = TextDefaultColor
+                )
+            )
+        }
+    )
 }
 
 @Preview
 @Composable
 fun ToolbarUseLeftPreview() {
     Toolbar(
-        title = "Title",
+        titleBox = {
+            Text(
+                "Title", style = OneDayTypography.titleMedium.copy(
+                    color = TextDefaultColor
+                )
+            )
+        },
         leftButtons = {
             Image(
                 painter = painterResource(R.drawable.icon_back_arrow),
@@ -73,7 +80,13 @@ fun ToolbarUseLeftPreview() {
 @Preview
 @Composable
 fun ToolbarUseRightPreview() {
-    Toolbar(title = "Title", rightButtons = {
+    Toolbar(titleBox = {
+        Text(
+            "Title", style = OneDayTypography.titleMedium.copy(
+                color = TextDefaultColor
+            )
+        )
+    }, rightButtons = {
         Image(
             painter = painterResource(R.drawable.icon_delete_trash),
             contentDescription = null
@@ -84,7 +97,13 @@ fun ToolbarUseRightPreview() {
 @Preview
 @Composable
 fun ToolbarUseBothPreview() {
-    Toolbar(title = "Title", leftButtons = {
+    Toolbar(titleBox = {
+        Text(
+            "Title", style = OneDayTypography.titleMedium.copy(
+                color = TextDefaultColor
+            )
+        )
+    }, leftButtons = {
         Image(
             painter = painterResource(R.drawable.icon_back_arrow),
             contentDescription = null

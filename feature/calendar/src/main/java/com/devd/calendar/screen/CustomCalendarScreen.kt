@@ -88,10 +88,11 @@ fun CustomCalendarScreen(
 
     val currentMonth = remember(pagerState.targetPage) {
         val isPreMove = pagerState.targetPage < pagerState.settledPage
-        val isNextMove = pagerState.targetPage < pagerState.settledPage
+        val isNextMove = pagerState.targetPage > pagerState.settledPage
         val newMonth =
             anchorMonth.plusMonths((pagerState.targetPage - (Int.MAX_VALUE / 2)).toLong())
         onChangeDate(newMonth.getFirstDayMillis(), isPreMove, isNextMove)
+
         newMonth
     }
 
