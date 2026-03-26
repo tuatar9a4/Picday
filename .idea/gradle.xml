@@ -38,6 +38,7 @@
             <option value="$PROJECT_DIR$/feature/editor" />
             <option value="$PROJECT_DIR$/feature/home" />
             <option value="$PROJECT_DIR$/feature/intro" />
+            <option value="$PROJECT_DIR$/feature/setting" />
             <option value="$PROJECT_DIR$/feature/user" />
           </set>
         </option>

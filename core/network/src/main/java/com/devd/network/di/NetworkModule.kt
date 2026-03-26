@@ -33,7 +33,8 @@ class NetworkModule {
 
     @DiaryServer
     @Provides
-    fun provideDiaryServerUri() = "http://10.0.2.2:8080/"
+    fun provideDiaryServerUri() = "http://121.169.196.247:8080/"
+//    fun provideDiaryServerUri() = "http://10.0.2.2:8080/"
 
     @OciServer
     @Provides
@@ -43,14 +44,12 @@ class NetworkModule {
     @DiaryClient
     @Singleton
     @Provides
-    fun provideDiaryOkHttpClient(
-//        @DiaryServer url: String,
-    ): OkHttpClient {
+    fun provideDiaryOkHttpClient(): OkHttpClient {
         val loggingInterceptor = HttpLoggingInterceptor { message ->
             Timber.tag("OkHttpInterceptor").d(message)
         }.apply {
             if (BuildConfig.DEBUG) {
-                setLevel(HttpLoggingInterceptor.Level.BASIC)
+                setLevel(HttpLoggingInterceptor.Level.BODY)
             } else {
                 setLevel(HttpLoggingInterceptor.Level.NONE)
             }

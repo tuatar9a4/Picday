@@ -41,6 +41,11 @@
             android:exported="true"
             android:theme="@style/Theme.OneDayOneShot">
         </activity>
+        <activity
+            android:name="com.devd.user.register.login.LoginActivity"
+            android:exported="true"
+            android:theme="@style/Theme.OneDayOneShot">
+        </activity>
 
         <provider
             android:name="androidx.core.content.FileProvider"

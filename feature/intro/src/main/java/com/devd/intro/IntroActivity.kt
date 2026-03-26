@@ -13,7 +13,6 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.lifecycleScope
 import com.devd.commonsystem.theme.OneDayOneShotTheme
-import com.devd.intro.data.Loading
 import com.devd.intro.data.MoveToHome
 import com.devd.intro.screen.IntroScreenRoute
 import dagger.hilt.android.AndroidEntryPoint
@@ -43,7 +42,7 @@ class IntroActivity : ComponentActivity() {
                         modifier = Modifier.padding(innerPadding),
                         viewModel = viewModel,
                         onMakeDiaryClick = ::moveToRegisterPage,
-                        onLoginClick = ::moveToHomePage
+                        onLoginClick = ::moveToLoginPage
                     )
                 }
             }
@@ -55,7 +54,6 @@ class IntroActivity : ComponentActivity() {
             viewModel.introUiState.collect {
                 Timber.d("Check -> $it")
                 when (it) {
-                    is Loading -> viewModel.changeLoadingState(it.isShow)
                     MoveToHome -> moveToHomePage()
                 }
             }
@@ -68,6 +66,11 @@ class IntroActivity : ComponentActivity() {
         registerResult.launch(intent)
     }
 
+    private fun moveToLoginPage(){
+        val intent = Intent()
+        intent.setClassName(this, "com.devd.user.register.login.LoginActivity")
+        registerResult.launch(intent)
+    }
 
     private fun moveToHomePage() {
         lifecycleScope.launch {

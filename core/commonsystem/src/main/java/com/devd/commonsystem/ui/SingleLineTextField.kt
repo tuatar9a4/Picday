@@ -56,6 +56,7 @@ fun SingleLineTextField(
     hintColor: Color = TextOpacity80Color,
     isPassword: Boolean = false,
     imeAction: ImeAction = ImeAction.None,
+    bottomLine: Boolean = true,
     onDone: (() -> Unit)? = null,
     onNext: (() -> Unit)? = null
 ) {
@@ -136,8 +137,17 @@ fun SingleLineTextField(
                         Box(
                             modifier = Modifier
                                 .padding(horizontal = 20.dp)
-                                .bottomBorder(1.dp, if (isError) RedColor else BlackColor)
                                 .padding(vertical = 8.dp, horizontal = 5.dp)
+                                .then(
+                                    if (bottomLine) {
+                                        Modifier.bottomBorder(
+                                            1.dp,
+                                            if (isError) RedColor else BlackColor
+                                        )
+                                    } else {
+                                        Modifier
+                                    }
+                                )
                         )
                     }
                 )

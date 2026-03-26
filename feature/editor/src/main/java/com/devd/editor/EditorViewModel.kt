@@ -13,7 +13,6 @@ import com.devd.commonsystem.R
 import com.devd.commonsystem.ui.calendar.CustomDatePickerDialogState
 import com.devd.data.repository.DiaryBookRepository
 import com.devd.data.repository.OracleRepository
-import com.devd.datastore.DataStoreKey
 import com.devd.datastore.DataStoreRepository
 import com.devd.editor.data.ASK_SAVE
 import com.devd.editor.data.DiaryInfoState
@@ -92,7 +91,7 @@ class EditorViewModel @Inject constructor(
     }
 
     private suspend fun fetchBookList() {
-        val uuid = dataStoreRepository.getPreferData(DataStoreKey.UserUID)!!
+        val uuid = dataStoreRepository.getUserInfo()?.uuid!!
         val bookList = diaryBookRepository.fetchAllDiaryBooks(uuid)
         val currentBookPos = bookList.indexOfFirst { it.bookId == route.bookId }
         _editorUiState.update {
@@ -213,7 +212,7 @@ class EditorViewModel @Inject constructor(
 
     fun uploadImageToBuket(fileUrl: File?) {
         viewModelScope.launch {
-            val userUUID = dataStoreRepository.getPreferData(DataStoreKey.UserUID) ?: return@launch
+            val userUUID = dataStoreRepository.getUserInfo()?.uuid ?: return@launch
             _editorUiState.update { it.copy(isShowLoading = true) }
             _messageDialog.emit(MessageInfo(type = NONE))
             fileUrl?.let {  // fileUrl 이 있을 경우 서버에 업로드 필요!

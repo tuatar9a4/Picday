@@ -3,6 +3,7 @@ package com.devd.user.register.screen
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
@@ -32,6 +33,7 @@ import com.devd.commonsystem.ui.TextButton
 import com.devd.commonsystem.ui.Toolbar
 import com.devd.commonsystem.ui.dialog.DiaryBookDialog
 import com.devd.commonsystem.ui.dialog.DiaryBookDialogType
+import com.devd.commonsystem.ui.loading.LoadingDialog
 import com.devd.commonsystem.utils.uriToFile
 import com.devd.user.register.RegisterViewModel
 import com.devd.user.register.data.RegisterStep
@@ -46,10 +48,12 @@ fun RegisterRoute(
 ) {
     val context = LocalContext.current
 
-    val currentStep = remember { mutableStateOf(RegisterStep.Step3) }
+    val currentStep = remember { mutableStateOf(RegisterStep.Step1) }
     val bookDialogInfo = viewmodel.diaryBookDialog.collectAsState()
 
     val messageDialog = viewmodel.simpleMessage.collectAsState(null)
+
+    val loadingState = viewmodel.isLoading.collectAsState()
 
     LaunchedEffect(messageDialog.value) {
         messageDialog.value?.let { state ->
@@ -83,7 +87,10 @@ fun RegisterRoute(
     ) {
         Toolbar(
             titleBox = {
-                Text("Register", style = OneDayTypography.titleMedium.copy(color = TextDefaultColor))
+                Text(
+                    "Register",
+                    style = OneDayTypography.titleMedium.copy(color = TextDefaultColor)
+                )
             },
             leftButtons = {
                 Image(
@@ -95,7 +102,6 @@ fun RegisterRoute(
                                 RegisterStep.Step1 -> backClick.invoke()
                                 RegisterStep.Step2 -> currentStep.value = RegisterStep.Step1
                                 RegisterStep.Step3 -> currentStep.value = RegisterStep.Step2
-
                             }
                         }),
                     painter = painterResource(R.drawable.icon_back_arrow),
@@ -149,30 +155,51 @@ fun RegisterRoute(
         )
     }
 
+    loadingState.value.LoadingDialog()
 }
 
 @Preview
 @Composable
 fun NickNamePreview() {
-    NickNameScreen(
-        editText = remember { mutableStateOf("") },
-        isCheckDuplicate = remember { mutableStateOf(false) },
-    )
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(color = PrimaryColor)
+    ) {
+        NickNameScreen(
+            editText = remember { mutableStateOf("") },
+            isCheckDuplicate = remember { mutableStateOf(false) },
+        )
+    }
 }
 
 @Preview
 @Composable
 fun PasswordPreview() {
-    PasswordScreen(
-        passwordText = remember { mutableStateOf("") },
-        onSnackBarMessage = {}
-    )
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(color = PrimaryColor)
+    ) {
+        PasswordScreen(
+            passwordText = remember { mutableStateOf("") },
+            onSnackBarMessage = {}
+        )
+
+    }
 }
 
 @Preview
 @Composable
 fun InfoPreview() {
-    InfoScreen(
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(color = PrimaryColor)
+    ) {
+        InfoScreen(
 
-    )
+        )
+
+    }
 }

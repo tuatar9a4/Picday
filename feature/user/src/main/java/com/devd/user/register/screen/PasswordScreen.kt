@@ -69,6 +69,7 @@ fun PasswordScreen(
             editText = passwordText,
             onTextChange = { text ->
                 passwordError.value = !text.checkValidateRex(PASSWORD_REGEX)
+                rePasswordError.value = rePasswordText.value != text
                 passwordText.value = text
             },
             isError = passwordError.value,

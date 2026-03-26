@@ -3,10 +3,8 @@ package com.devd.intro
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.devd.data.repository.DiaryBookRepository
-import com.devd.datastore.DataStoreKey
 import com.devd.datastore.DataStoreRepository
 import com.devd.intro.data.IntroUiState
-import com.devd.intro.data.Loading
 import com.devd.intro.data.MoveToHome
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.delay
@@ -28,13 +26,13 @@ class IntroViewModel @Inject constructor(
 
     init {
         viewModelScope.launch {
-            _introUiState.emit(Loading(true))
+            isLoading.emit(true)
             delay(3000)
             if (existsUid()) {
                 changeLoadingState(false)
                 _introUiState.emit(MoveToHome)
             } else {
-                _introUiState.emit(Loading(false))
+                isLoading.emit(false)
             }
         }
     }
@@ -45,11 +43,11 @@ class IntroViewModel @Inject constructor(
 
 
     suspend fun fetchSavedNickName(): Boolean {
-        val savedUUID = dataStoreRepository.getPreferData(DataStoreKey.UserUID) ?: return false
+        val savedUUID = dataStoreRepository.getUserInfo()?.uuid ?: return false
         return diaryBookRepository.hasDiaryBook(savedUUID)
     }
 
 
-    suspend fun existsUid() = dataStoreRepository.getPreferData(DataStoreKey.UserUID) != null
+    suspend fun existsUid() = dataStoreRepository.getUserInfo()?.uuid != null
 
 }

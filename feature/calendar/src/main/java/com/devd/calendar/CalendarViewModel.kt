@@ -10,7 +10,6 @@ import com.devd.calendar.navigation.CustomCalendarRoute
 import com.devd.commonsystem.utils.getCurrentMonthRangeMillis
 import com.devd.commonsystem.utils.getFirstDayMillis
 import com.devd.data.repository.DiaryBookRepository
-import com.devd.datastore.DataStoreKey
 import com.devd.datastore.DataStoreRepository
 import com.devd.model.local.DiaryBookInfo
 import com.devd.model.local.DiaryInfo
@@ -75,7 +74,7 @@ class CalendarViewModel @Inject constructor(
             if (calendarUiState.value.bookList.isNotEmpty()) {
                 _optionBookList.emit(calendarUiState.value.bookList)
             } else {
-                val uuid = dataStoreRepository.getPreferData(DataStoreKey.UserUID)!!
+                val uuid = dataStoreRepository.getUserInfo()?.uuid!!
                 val bookList = diaryRepository.fetchAllDiaryBooks(uuid)
                 _calendarUiState.update { it.copy(bookList = bookList) }
                 _optionBookList.emit(calendarUiState.value.bookList)

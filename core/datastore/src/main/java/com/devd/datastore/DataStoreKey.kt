@@ -8,13 +8,17 @@ sealed class DataStoreKey<T>(
 ) {
     abstract fun preferencesKey(): Preferences.Key<T>
 
-    object UserNickName : DataStoreKey<String>("user_nick_name") {
+    object UserToken : DataStoreKey<String>("user_token") {
         override fun preferencesKey() = stringPreferencesKey(key)
     }
 
-    object UserUID : DataStoreKey<String>("user_uuid") {
+    object UserReToken : DataStoreKey<String>("user_re_token") {
         override fun preferencesKey() = stringPreferencesKey(key)
     }
 
+    object UserInfo : DataStoreKey<String>("user_info") {
+        override fun preferencesKey() = stringPreferencesKey(key)
+    }
 
 }
+

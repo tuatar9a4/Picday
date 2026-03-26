@@ -19,7 +19,6 @@ import com.devd.commonsystem.R
 import com.devd.data.repository.DiaryBookRepository
 import com.devd.data.repository.OracleRepository
 import com.devd.data.utils.CallResult
-import com.devd.datastore.DataStoreKey
 import com.devd.datastore.DataStoreRepository
 import com.devd.model.local.DiaryBookInfo
 import com.devd.model.local.DiaryInfo
@@ -144,7 +143,7 @@ class BookcaseViewModel @Inject constructor(
      */
     fun uploadImage(file: File, updateBookInfo: DiaryBookInfo) {
         viewModelScope.launch {
-            val userUUID = dataStoreRepository.getPreferData(DataStoreKey.UserUID) ?: return@launch
+            val userUUID = dataStoreRepository.getUserInfo()?.uuid ?: return@launch
             _bookcaseUiState.update { it.copy(isLoading = true) }
             oracleRepository.uploadImageFile(
                 header = userUUID,
@@ -172,7 +171,7 @@ class BookcaseViewModel @Inject constructor(
         bookInfo: DiaryBookInfo
     ) {
         viewModelScope.launch {
-            val userUUID = dataStoreRepository.getPreferData(DataStoreKey.UserUID) ?: return@launch
+            val userUUID = dataStoreRepository.getUserInfo()?.uuid ?: return@launch
             diaryBookRepository.insertNewDiaryBook(
                 uuid = userUUID,
                 bookImage = bookInfo.bookImage!!,

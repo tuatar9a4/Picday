@@ -10,7 +10,6 @@ import com.devd.commonsystem.R
 import com.devd.commonsystem.utils.getCurrentMonthRangeMillis
 import com.devd.commonsystem.utils.isCurrentMonth
 import com.devd.data.repository.DiaryBookRepository
-import com.devd.datastore.DataStoreKey
 import com.devd.datastore.DataStoreRepository
 import com.devd.model.local.DiaryBookInfo
 import com.devd.model.local.DiaryInfo
@@ -60,7 +59,7 @@ class HomeViewModel @Inject constructor(
     fun fetchMainDiaryBook() {
         viewModelScope.launch {
             _homeUiState.update { it.copy(isLoading = true) }
-            storedUUID = dataStoreRepository.getPreferData(DataStoreKey.UserUID)!!
+            storedUUID = dataStoreRepository.getUserInfo()?.uuid!!
             diaryBookRepository.fetchMajorDiaryBook(storedUUID!!)?.let { diaryBook ->
                 fetchDairiesByDiaryBook(diaryBook, false)
             } ?: run {

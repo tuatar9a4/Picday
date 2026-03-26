@@ -7,7 +7,6 @@ import com.devd.data.repository.DiaryBookRepository
 import com.devd.data.repository.OracleRepository
 import com.devd.data.repository.UserRepository
 import com.devd.data.utils.CallResult
-import com.devd.datastore.DataStoreKey
 import com.devd.datastore.DataStoreRepository
 import com.devd.model.local.DiaryBookInfo
 import com.devd.model.local.DiaryPhaseType
@@ -15,6 +14,7 @@ import com.devd.model.local.FailUpload
 import com.devd.model.local.StartUpload
 import com.devd.model.local.SuccessUpload
 import com.devd.model.local.Uploading
+import com.devd.model.remote.SignupResponse
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -23,9 +23,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.last
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import timber.log.Timber
 import java.io.File
-import java.util.UUID
 import javax.inject.Inject
 
 @HiltViewModel
@@ -50,19 +48,19 @@ class RegisterViewModel @Inject constructor(
     private val _diaryBookDialog = MutableStateFlow(DiaryBookDialog())
     val diaryBookDialog get() = _diaryBookDialog.asStateFlow()
 
+    private val _isLoading = MutableStateFlow(false)
+    val isLoading get() = _isLoading.asStateFlow()
+
+    private var userInfo: SignupResponse? = null
 
     suspend fun checkValidateId(id: String) {
-        isCheckDuplicate.value = userRepository.checkExistsId(id)
-    }
-
-    suspend fun requestMakeId(): String {
-        Timber.d("Finish : ${id.value} ${password.value} ${nickname.value}")
-        val userUUID =
-            dataStoreRepository.getPreferData(DataStoreKey.UserUID) ?: UUID.randomUUID().toString()
-
-        dataStoreRepository.setPreferData(DataStoreKey.UserNickName, nickname.value.trim())
-        dataStoreRepository.setPreferData(DataStoreKey.UserUID, userUUID)
-        return userUUID
+        _isLoading.emit(true)
+        val result = userRepository.checkExistsId(id)
+        isCheckDuplicate.value = result
+        if(!result){
+            _simpleMessage.emit(SimpleMessageState("중복된 아이디입니다."))
+        }
+        _isLoading.emit(false)
     }
 
     fun showDiaryBookDialog() {
@@ -73,36 +71,54 @@ class RegisterViewModel @Inject constructor(
         _diaryBookDialog.update { it.copy(isShow = false) }
     }
 
+    private suspend fun requestNewUserId(): Boolean {
+        _isLoading.emit(true)
+        userInfo = userRepository.registerNewId(
+            email = id.value,
+            password = password.value,
+            nickname = nickname.value,
+        )
+        userInfo?.let {
+            dataStoreRepository.setUserInfo(it.toUserInfo())
+        }
+        return userInfo != null
+    }
+
     fun saveAndMakeBookInfo(
         imageFile: File?, title: String, description: String, monthType: DiaryPhaseType
     ) {
         viewModelScope.launch {
             if (!validateDiaryInfo(imageFile, title)) return@launch
-            val newUserId = requestMakeId()
-            var uploadImagePath: String? = null
-            if (imageFile != null) {
-                when (val result = oracleRepository.uploadImageFile(newUserId, imageFile).last()) {
-                    is SuccessUpload -> uploadImagePath = "$newUserId/${result.uploadFileName}"
-                    is FailUpload -> return@launch _simpleMessage.emit(
-                        SimpleMessageState(result.errorMessage)
-                    )
+            if (requestNewUserId()) {
+                val newUserId = userInfo?.uuid!!
+                var uploadImagePath: String? = null
+                if (imageFile != null) {
+                    when (val result =
+                        oracleRepository.uploadImageFile(newUserId, imageFile).last()) {
+                        is SuccessUpload -> uploadImagePath = "$newUserId/${result.uploadFileName}"
+                        is FailUpload -> return@launch _simpleMessage.emit(
+                            SimpleMessageState(result.errorMessage)
+                        )
 
-                    is Uploading, StartUpload -> Unit
+                        is Uploading, StartUpload -> Unit
+                    }
                 }
-            }
 
-            _diaryBookDialog.update {
-                it.copy(
-                    isShow = false,
-                    bookInfo = it.bookInfo.copy(
-                        bookImage = uploadImagePath,
-                        title = title,
-                        description = description,
-                        bookPhaseType = monthType
+                _diaryBookDialog.update {
+                    it.copy(
+                        isShow = false,
+                        bookInfo = it.bookInfo.copy(
+                            bookImage = uploadImagePath,
+                            title = title,
+                            description = description,
+                            bookPhaseType = monthType
+                        )
                     )
-                )
+                }
+                insertDiaryBook(newUserId)
+            } else {
+                _isLoading.emit(false)
             }
-            insertDiaryBook(newUserId)
         }
     }
 
@@ -116,10 +132,12 @@ class RegisterViewModel @Inject constructor(
         ).run {
             when (this) {
                 is CallResult.NetworkError -> {
+                    _isLoading.emit(false)
                     _simpleMessage.emit(SimpleMessageState(this.message))
                 }
 
                 is CallResult.Success -> {
+                    _isLoading.emit(false)
                     _uiState.emit(RegisterUIState.SuccessMakeId)
                 }
             }

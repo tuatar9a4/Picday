@@ -5,6 +5,9 @@
     <string name="make_diary_text">"일기장 만들기"</string>
     <string name="already_diary_text">"이미 일기장을 가지고 계신가요?  "</string>
     <string name="login_text">"로그인"</string>
+    <string name="id_text">"아이디"</string>
+    <string name="pw_text">"비밀번호"</string>
+    <string name="fail_login_message">"로그인 실패"</string>
     <string name="nickname_input_hint">"닉네임을 입력하세요"</string>
     <string name="password_input_hint">"비밀번호를 입력하세요"</string>
     <string name="password_repeat_input_hint">"비밀번호를 다시 입력하세요"</string>
@@ -41,4 +44,9 @@
     <string name="no">"아니오"</string>
     <string name="cannot_delete_major">"대표 일기장은 삭제 할 수 없습니다."</string>
     <string name="error_title_message">"2자 이상 입력이 필요합니다."</string>
+    <string name="setting_cloud_sync">"클라우드 동기화"</string>
+    <string name="setting_font_type">"글꼴 선택"</string>
+    <string name="setting_alert_time">"작성 알림 시간"</string>
+    <string name="setting_month_type">"한달 표시 타입"</string>
+    <string name="setting_app_version">"App Version"</string>
 </resources>
