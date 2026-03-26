@@ -42,6 +42,16 @@ class UserRepository @Inject constructor(
         }
     }
 
+
+    suspend fun checkHasToken(token: String): Boolean {
+        safeApiCall(Dispatchers.IO) {
+            diaryService.checkToken("Bearer $token")
+        }.run {
+            return this is CallResult.Success
+        }
+    }
+
+
     suspend fun requestLoginUser(id: String, pw: String): LoginResponse? {
         safeApiCall(Dispatchers.IO) {
             diaryService.loginUser(LoginRequest(id, pw))
@@ -75,9 +85,4 @@ class UserRepository @Inject constructor(
         }
     }
 
-    suspend fun checkSyncTime() {
-//        safeApiCall(Dispatchers.IO){
-//            diaryService.fetchSyncTime()
-//        }
-    }
 }

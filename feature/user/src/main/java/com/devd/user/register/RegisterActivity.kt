@@ -63,6 +63,7 @@ class RegisterActivity : ComponentActivity() {
                         intent.setClassName(
                             this@RegisterActivity, "com.devd.onedayoneshot.MainActivity"
                         )
+                        intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
                         startActivity(intent)
                         finish()
                     }

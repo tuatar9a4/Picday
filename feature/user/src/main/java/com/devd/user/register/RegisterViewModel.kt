@@ -7,6 +7,7 @@ import com.devd.data.repository.DiaryBookRepository
 import com.devd.data.repository.OracleRepository
 import com.devd.data.repository.UserRepository
 import com.devd.data.utils.CallResult
+import com.devd.datastore.DataStoreKey
 import com.devd.datastore.DataStoreRepository
 import com.devd.model.local.DiaryBookInfo
 import com.devd.model.local.DiaryPhaseType
@@ -57,7 +58,7 @@ class RegisterViewModel @Inject constructor(
         _isLoading.emit(true)
         val result = userRepository.checkExistsId(id)
         isCheckDuplicate.value = result
-        if(!result){
+        if (!result) {
             _simpleMessage.emit(SimpleMessageState("중복된 아이디입니다."))
         }
         _isLoading.emit(false)
@@ -79,6 +80,10 @@ class RegisterViewModel @Inject constructor(
             nickname = nickname.value,
         )
         userInfo?.let {
+            val loginInfo =
+                userRepository.requestLoginUser(id.value, password.value) ?: return false
+            dataStoreRepository.setPreferData(DataStoreKey.UserToken, loginInfo.accessToken)
+            dataStoreRepository.setPreferData(DataStoreKey.UserReToken, loginInfo.refreshToken)
             dataStoreRepository.setUserInfo(it.toUserInfo())
         }
         return userInfo != null

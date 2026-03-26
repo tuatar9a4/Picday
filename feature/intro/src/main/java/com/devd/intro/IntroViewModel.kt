@@ -3,6 +3,8 @@ package com.devd.intro
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.devd.data.repository.DiaryBookRepository
+import com.devd.data.repository.UserRepository
+import com.devd.datastore.DataStoreKey
 import com.devd.datastore.DataStoreRepository
 import com.devd.intro.data.IntroUiState
 import com.devd.intro.data.MoveToHome
@@ -12,12 +14,14 @@ import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.launch
+import timber.log.Timber
 import javax.inject.Inject
 
 @HiltViewModel
 class IntroViewModel @Inject constructor(
     private val dataStoreRepository: DataStoreRepository,
-    private val diaryBookRepository: DiaryBookRepository
+    private val diaryBookRepository: DiaryBookRepository,
+    private val userRepository: UserRepository
 ) : ViewModel() {
 
     val isLoading = MutableStateFlow(false)
@@ -48,6 +52,13 @@ class IntroViewModel @Inject constructor(
     }
 
 
-    suspend fun existsUid() = dataStoreRepository.getUserInfo()?.uuid != null
+    suspend fun existsUid(): Boolean {
+        val token = dataStoreRepository.getPreferData(DataStoreKey.UserToken)
+        Timber.d("Check => ${token}")
+        token ?: return false
+        val result = userRepository.checkHasToken(token)
+        Timber.d("Check => ${result}")
+        return false
+    }
 
 }
