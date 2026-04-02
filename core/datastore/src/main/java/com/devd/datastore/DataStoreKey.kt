@@ -20,5 +20,9 @@ sealed class DataStoreKey<T>(
         override fun preferencesKey() = stringPreferencesKey(key)
     }
 
+    object LocalSettingKey : DataStoreKey<String>("local_setting_Data") {
+        override fun preferencesKey() = stringPreferencesKey(key)
+    }
+
 }
 

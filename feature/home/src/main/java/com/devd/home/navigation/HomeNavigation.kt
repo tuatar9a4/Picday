@@ -18,6 +18,7 @@ fun NavGraphBuilder.homeScreen(
     onNavigateToList: (list: List<DiaryInfo>, pos: Int) -> Unit,
     onNavigateToEditor: (String?, Long, Long?) -> Unit,
     onBookcaseMove: (userId: String) -> Unit,
+    onSettingClick :(userId: String) -> Unit,
     onNavigateToCalendar: (bookId: Long, selectMillis: Long) -> Unit
 ) {
     composable<HomeRoute> {
@@ -29,6 +30,7 @@ fun NavGraphBuilder.homeScreen(
                 onEditorMove = onNavigateToEditor,
                 onCalendarMove = onNavigateToCalendar,
                 onBookcaseMove = onBookcaseMove,
+                onSettingClick = onSettingClick,
                 onMoveDiaryList = onNavigateToList
             )
         }

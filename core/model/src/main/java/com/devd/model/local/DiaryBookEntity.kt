@@ -1,14 +1,12 @@
-package com.devd.room.entity
+package com.devd.model.local
 
 import androidx.room.Entity
 import androidx.room.Index
 import androidx.room.PrimaryKey
-import com.devd.model.local.DiaryBookInfo
-import com.devd.model.local.DiaryPhaseType
 
 @Entity(
     tableName = "diary_book",
-    indices = [Index("userLocalUUId")]
+    indices = [Index("userUuid")]
 )
 data class DiaryBookEntity(
 
@@ -17,7 +15,7 @@ data class DiaryBookEntity(
 
     val remoteID: Long? = null,
 
-    val userLocalUUId: String? = null,
+    val userUuid: String? = null,
 
     val bookImage: String,
     val title: String,        // 맛집 일기장, 여행 일기장 등

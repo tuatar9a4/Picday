@@ -5,7 +5,7 @@ import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Update
-import com.devd.room.entity.DiaryBookEntity
+import com.devd.model.local.DiaryBookEntity
 import kotlinx.coroutines.flow.Flow
 
 @Dao
@@ -19,7 +19,7 @@ interface DiaryBookDao {
     @Query(
         """
         SELECT * FROM diary_book 
-        WHERE userLocalUUId = :uuid AND isDeleted = 0 
+        WHERE userUuid = :uuid AND isDeleted = 0 
         ORDER BY createdAt ASC
         """
     )
@@ -28,18 +28,29 @@ interface DiaryBookDao {
     @Query(
         """
     SELECT * FROM diary_book 
-    WHERE userLocalUUId = :uuid AND isDeleted = 0 
+    WHERE userUuid = :uuid AND isDeleted = 0 
     ORDER BY createdAt ASC
     """
     )
     fun selectAllDiaryBookFlow(uuid: String): Flow<List<DiaryBookEntity>>
 
-    @Query("SELECT * FROM diary_book WHERE userLocalUUId = :uuid AND isMajor = 1")
+    @Query(
+        """
+        SELECT * FROM diary_book 
+        WHERE userUuid = :uuid AND remoteID is NULL
+        ORDER BY createdAt ASC
+        """
+    )
+    suspend fun selectAllNotSyncDiaryBook(uuid: String): List<DiaryBookEntity>
+
+    @Query("SELECT * FROM diary_book WHERE userUuid = :uuid AND isMajor = 1")
     suspend fun selectMainDiaryBook(uuid: String): DiaryBookEntity
 
     @Query("SELECT * FROM diary_book WHERE localId = :bookId")
     suspend fun selectDiaryBook(bookId: Long): DiaryBookEntity
 
+    @Query("UPDATE diary_book SET remoteID = :remoteID ,updatedAt = :updateAt WHERE localId = :localId")
+    suspend fun updateRemoteId(remoteID: Long, localId: Long,updateAt : Long = System.currentTimeMillis())
 
     /* =====================
      * Delete (Soft Delete)

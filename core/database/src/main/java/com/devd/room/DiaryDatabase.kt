@@ -4,12 +4,12 @@ import android.content.Context
 import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
+import com.devd.model.local.DiaryBookEntity
 import com.devd.room.dao.DiaryBookDao
 import com.devd.room.dao.DiaryDao
 import com.devd.room.dao.DiaryImageDao
 import com.devd.room.dao.DiaryTagDao
 import com.devd.room.dao.TagDao
-import com.devd.room.entity.DiaryBookEntity
 import com.devd.room.entity.DiaryEntity
 import com.devd.room.entity.DiaryImageEntity
 import com.devd.room.entity.DiaryTagCrossEntity

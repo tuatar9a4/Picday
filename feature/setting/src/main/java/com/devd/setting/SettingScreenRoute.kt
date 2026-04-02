@@ -1,6 +1,7 @@
 package com.devd.setting
 
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -11,6 +12,8 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
@@ -25,22 +28,39 @@ import com.devd.commonsystem.theme.OneDayTypography
 import com.devd.commonsystem.ui.Toolbar
 import com.devd.setting.data.ItemType
 import com.devd.setting.data.SettingType
-import com.devd.setting.data.settingList
 
 @Composable
 fun SettingScreenRoute(
     modifier: Modifier = Modifier,
     viewModel: SettingViewModel = hiltViewModel()
 ) {
+    val uiState by viewModel.settingUiState.collectAsState()
 
+    SettingScreen(
+        modifier = modifier,
+        uiState = uiState,
+        onItemClick = {
+            when(it){
+                SettingType.CLOUD_SYNC -> viewModel.syncDiaryData()
+                SettingType.FONT_TYPE -> TODO()
+                SettingType.ALERT_TIME -> TODO()
+                SettingType.MONTH_TYPE -> TODO()
+                SettingType.APP_VERSION -> TODO()
+            }
+        }
+    )
 
 }
 
 @Preview
 @Composable
-fun SettingScreen() {
+fun SettingScreen(
+    modifier: Modifier = Modifier,
+    uiState : SettingUiState = SettingUiState(),
+    onItemClick: (type: SettingType) -> Unit = {}
+) {
     Column(
-        modifier = Modifier.fillMaxSize()
+        modifier = modifier.then(Modifier.fillMaxSize())
     ) {
         Toolbar(
             titleBox = {
@@ -55,10 +75,14 @@ fun SettingScreen() {
                 )
             }
         )
-        settingList.forEach { item ->
+        uiState.settingData.forEach { item ->
             when (item.settingType) {
                 is ItemType.Action -> ActionItem(item.type, item.settingType)
-                is ItemType.ActionValue -> ActionValueItem(item.type, item.settingType)
+                is ItemType.ActionValue -> ActionValueItem(
+                    item.type,
+                    item.settingType,
+                    onItemClick = { onItemClick(item.type) })
+
                 is ItemType.Value -> ValueItem(item.type, item.settingType)
             }
 
@@ -97,12 +121,14 @@ fun ActionItem(
 @Composable
 fun ActionValueItem(
     key: SettingType = SettingType.MONTH_TYPE,
-    type: ItemType.ActionValue = ItemType.ActionValue(true, "2026-03-13")
+    type: ItemType.ActionValue = ItemType.ActionValue(true, "2026-03-13"),
+    onItemClick: () -> Unit = {}
 ) {
     Row(
         modifier = Modifier
             .padding(vertical = 10.dp, horizontal = 15.dp)
-            .fillMaxWidth(),
+            .fillMaxWidth()
+            .clickable(onClick = onItemClick),
         horizontalArrangement = Arrangement.SpaceBetween
     ) {
         Text(

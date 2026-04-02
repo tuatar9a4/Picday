@@ -90,4 +90,8 @@ interface DiaryDao {
         diaryId: Long,
         deletedAt: Long = System.currentTimeMillis()
     )
+
+    // 💡 :lastSyncTime 파라미터를 받아서, 마지막 동기화 시간보다 나중에 수정된 것만 필터링
+    @Query("SELECT * FROM diary WHERE remoteId IS NULL OR updatedAt > :lastSyncTime")
+    suspend fun getUnsyncedDiaries(lastSyncTime: Long): List<DiaryWithExtras>
 }

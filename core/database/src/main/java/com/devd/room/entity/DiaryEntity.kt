@@ -5,6 +5,7 @@ import androidx.room.ForeignKey
 import androidx.room.ForeignKey.Companion.CASCADE
 import androidx.room.Index
 import androidx.room.PrimaryKey
+import com.devd.model.local.DiaryBookEntity
 
 @Entity(
     tableName = "diary",

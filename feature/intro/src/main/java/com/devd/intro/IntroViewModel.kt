@@ -14,7 +14,6 @@ import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.launch
-import timber.log.Timber
 import javax.inject.Inject
 
 @HiltViewModel
@@ -31,7 +30,7 @@ class IntroViewModel @Inject constructor(
     init {
         viewModelScope.launch {
             isLoading.emit(true)
-            delay(3000)
+            delay(1000)
             if (existsUid()) {
                 changeLoadingState(false)
                 _introUiState.emit(MoveToHome)
@@ -53,12 +52,8 @@ class IntroViewModel @Inject constructor(
 
 
     suspend fun existsUid(): Boolean {
-        val token = dataStoreRepository.getPreferData(DataStoreKey.UserToken)
-        Timber.d("Check => ${token}")
-        token ?: return false
-        val result = userRepository.checkHasToken(token)
-        Timber.d("Check => ${result}")
-        return false
+        val token = dataStoreRepository.getPreferData(DataStoreKey.UserToken) ?: return false
+        return userRepository.checkHasToken(token)
     }
 
 }

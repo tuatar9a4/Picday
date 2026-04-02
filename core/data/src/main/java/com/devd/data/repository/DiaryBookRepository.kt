@@ -6,15 +6,18 @@ import com.devd.commonsystem.utils.getStartEndRangeMillis
 import com.devd.data.utils.CallResult
 import com.devd.data.utils.SafeNetCall
 import com.devd.model.local.CreateDiaryRequest
+import com.devd.model.local.DiaryBookEntity
 import com.devd.model.local.DiaryBookInfo
 import com.devd.model.local.DiaryInfo
 import com.devd.model.local.UpdateDiaryRequest
+import com.devd.model.remote.DiaryBookBatchSyncReq
+import com.devd.network.di.NetworkModule
+import com.devd.network.service.DiaryService
 import com.devd.room.dao.DiaryBookDao
 import com.devd.room.dao.DiaryDao
 import com.devd.room.dao.DiaryImageDao
 import com.devd.room.dao.DiaryTagDao
 import com.devd.room.dao.TagDao
-import com.devd.room.entity.DiaryBookEntity
 import com.devd.room.entity.DiaryEntity
 import com.devd.room.entity.DiaryImageEntity
 import com.devd.room.entity.DiaryTagCrossEntity
@@ -28,6 +31,7 @@ import java.util.Date
 import javax.inject.Inject
 
 class DiaryBookRepository @Inject constructor(
+    @param:NetworkModule.DiaryServer private val diaryService: DiaryService,
     private val diaryBookDao: DiaryBookDao,
     private val diaryDao: DiaryDao,
     private val diaryImageDao: DiaryImageDao,
@@ -36,7 +40,6 @@ class DiaryBookRepository @Inject constructor(
 ) : SafeNetCall() {
 
     /* Diary Book */
-
     suspend fun insertNewDiaryBook(
         bookImage: String,
         bookTitle: String,
@@ -48,7 +51,7 @@ class DiaryBookRepository @Inject constructor(
             DiaryBookEntity(
                 title = bookTitle,
                 bookImage = bookImage,
-                userLocalUUId = uuid,
+                userUuid = uuid,
                 description = bookDescription,
                 isMajor = !hasDiaryBook(uuid),
                 createdAt = currentMillis,
@@ -261,5 +264,21 @@ class DiaryBookRepository @Inject constructor(
         diaryDao.softDeleteDiary(id)
         return targetDiary.transToModel()
     }
+
+    suspend fun fetchNotSyncDiaryBooks(
+        uuid: String
+    ): Boolean {
+        safeApiCall(Dispatchers.IO) {
+            val notSyncBooks = diaryBookDao.selectAllNotSyncDiaryBook(uuid)
+            val bookSyncResult =
+                diaryService.syncDiaryBooksBatch(DiaryBookBatchSyncReq(notSyncBooks))
+            bookSyncResult.syncedItems.forEach {
+                diaryBookDao.updateRemoteId(it.remoteId, it.localId)
+            }
+        }.run {
+            return this is CallResult.Success
+        }
+    }
+
 
 }

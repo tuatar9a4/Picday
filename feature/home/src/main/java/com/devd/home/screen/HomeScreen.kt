@@ -63,6 +63,7 @@ fun HomeScreenRoute(
     onEditorMove: (imageUrl: String?, bookId: Long, diaryId: Long?) -> Unit = { _, _, _ -> },
     onCalendarMove: (bookId: Long, selectMillis: Long) -> Unit = { _, _ -> },
     onBookcaseMove: (userId: String) -> Unit = {},
+    onSettingClick: (userId: String) -> Unit = {},
     onMoveDiaryList: (List<DiaryInfo>, Int) -> Unit = { _, _ -> },
     viewModel: HomeViewModel = hiltViewModel()
 ) {
@@ -147,6 +148,9 @@ fun HomeScreenRoute(
                 uiState.searchDate.toInstant().toEpochMilli()
             )
         },
+        onSettingClick = {
+            onSettingClick(viewModel.storedUUID!!)
+        },
         onDiaryCardClick = { moveToDiaryList(uiState.diaryList, it) },
         onBookClick = viewModel::showBookDialog
     )
@@ -193,6 +197,7 @@ fun HomeScreen(
     onEditorClick: () -> Unit = {},
     onCalendarClick: () -> Unit = {},
     onDiaryCardClick: (Int) -> Unit = {},
+    onSettingClick: () -> Unit = {},
     onBookClick: () -> Unit = {}
 ) {
     Box(
@@ -225,7 +230,7 @@ fun HomeScreen(
                         modifier = Modifier
                             .size(32.dp)
                             .padding(4.dp)
-                            .clickable(onClick = { }),
+                            .clickable(onClick = onSettingClick),
                         painter = painterResource(R.drawable.icon_setting),
                         contentDescription = null
                     )

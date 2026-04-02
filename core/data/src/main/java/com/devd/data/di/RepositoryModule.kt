@@ -6,6 +6,7 @@ import com.devd.data.repository.DiaryBookRepository
 import com.devd.data.repository.OracleRepository
 import com.devd.data.repository.UserRepository
 import com.devd.network.di.NetworkModule
+import com.devd.network.di.NetworkModule.DiaryServer
 import com.devd.network.service.DiaryService
 import com.devd.network.service.OracleService
 import com.devd.room.dao.DiaryBookDao
@@ -38,12 +39,14 @@ class RepositoryModule {
     @Singleton
     @Provides
     fun provideDiaryBookRepository(
+        @DiaryServer diaryService: DiaryService,
         diaryBookDao: DiaryBookDao,
         diaryDao: DiaryDao,
         diaryImageDao: DiaryImageDao,
         diaryTagDao: DiaryTagDao,
         tagDao: TagDao,
     ): DiaryBookRepository = DiaryBookRepository(
+        diaryService,
         diaryBookDao,
         diaryDao,
         diaryImageDao,

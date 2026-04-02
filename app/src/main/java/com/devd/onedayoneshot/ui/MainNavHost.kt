@@ -19,6 +19,8 @@ import com.devd.editor.navigation.editorScreen
 import com.devd.home.navigation.HomeRoute
 import com.devd.home.navigation.homeScreen
 import com.devd.model.local.EditMode
+import com.devd.setting.navigation.SettingNaviRoute
+import com.devd.setting.navigation.settingScreen
 
 @Composable
 fun MyNavHost(
@@ -71,6 +73,11 @@ fun MyNavHost(
                                 selectMillis = selectMillis
                             )
                         )
+                    },
+                    onSettingClick = { uuid ->
+                        navController.navigate(
+                            SettingNaviRoute(uuid)
+                        )
                     }
                 )
 
@@ -121,6 +128,12 @@ fun MyNavHost(
                         )
                     },
                     onBackClick = { navController.popBackStack() }
+                )
+                settingScreen(
+                    modifier = modifier,
+                    onBackClick = {
+                        navController.popBackStack()
+                    }
                 )
             }
         }

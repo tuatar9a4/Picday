@@ -1,5 +1,9 @@
 package com.devd.network.service
 
+import com.devd.model.remote.DiaryBatchSyncReq
+import com.devd.model.remote.DiaryBatchSyncRes
+import com.devd.model.remote.DiaryBookBatchSyncReq
+import com.devd.model.remote.DiaryBookBatchSyncRes
 import com.devd.model.remote.LoginRequest
 import com.devd.model.remote.LoginResponse
 import com.devd.model.remote.RefreshRequest
@@ -31,6 +35,16 @@ interface DiaryService {
     suspend fun loginUser(@Body request: LoginRequest): LoginResponse
 
     @POST("auth/refresh")
-    suspend fun tokenRefresh(@Body request : RefreshRequest): TokenResponse
+    suspend fun tokenRefresh(@Body request: RefreshRequest): TokenResponse
+
+    @POST("api/v1/diary-books/sync/batch")
+    suspend fun syncDiaryBooksBatch(
+        @Body request: DiaryBookBatchSyncReq
+    ): DiaryBookBatchSyncRes
+
+    @POST("api/v1/diaries/sync/batch")
+    suspend fun syncDiariesBatch(
+        @Body request: DiaryBatchSyncReq
+    ): DiaryBatchSyncRes
 
 }

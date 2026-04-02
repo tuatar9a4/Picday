@@ -15,6 +15,7 @@ import java.time.LocalTime
 import java.time.YearMonth
 import java.time.ZoneId
 import java.time.ZonedDateTime
+import java.time.format.DateTimeFormatter
 import kotlin.math.ceil
 
 object StringRexFormat {
@@ -107,4 +108,12 @@ fun LazyListState.centerItemIndex(): Int? {
         val itemCenter = item.offset + item.size / 2
         kotlin.math.abs(itemCenter - viewportCenter)
     }?.index
+}
+
+
+fun Long.getDateStr(pattern: String = "yyyy-MM-dd"): String {
+    val instant = Instant.ofEpochMilli(this)
+    val formatter = DateTimeFormatter.ofPattern(pattern)
+        .withZone(ZoneId.systemDefault())
+    return formatter.format(instant)
 }

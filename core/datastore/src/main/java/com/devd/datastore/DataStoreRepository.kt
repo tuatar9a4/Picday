@@ -5,6 +5,7 @@ import androidx.datastore.core.IOException
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.emptyPreferences
+import com.devd.model.local.LocalSettingData
 import com.devd.model.local.UserInfo
 import com.google.gson.Gson
 import kotlinx.coroutines.flow.catch
@@ -55,6 +56,18 @@ class DataStoreRepository @Inject constructor(
     suspend fun getUserInfo(): UserInfo? {
         val jsonStr = getPreferData(DataStoreKey.UserInfo) ?: return null
         val item = Gson().fromJson(jsonStr, UserInfo::class.java)
+        return item
+    }
+
+    suspend fun setLocalSettingData(settingData: LocalSettingData): LocalSettingData {
+        val jsonSting = Gson().toJson(settingData).toString()
+        setPreferData(DataStoreKey.LocalSettingKey, jsonSting)
+        return settingData
+    }
+
+    suspend fun getLocalSettingData(): LocalSettingData {
+        val jsonStr = getPreferData(DataStoreKey.LocalSettingKey) ?: return LocalSettingData()
+        val item = Gson().fromJson(jsonStr, LocalSettingData::class.java)
         return item
     }
 
