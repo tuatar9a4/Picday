@@ -52,10 +52,10 @@ import com.devd.commonsystem.theme.PrimaryColor
 import com.devd.commonsystem.theme.WhiteColor
 import com.devd.commonsystem.ui.Toolbar
 import com.devd.commonsystem.ui.cropImageDialog.ShowCropDialog
-import com.devd.commonsystem.ui.dialog.DiaryBookDialog
-import com.devd.commonsystem.ui.dialog.DiaryBookDialogType
 import com.devd.commonsystem.ui.dialog.ShowImagePicker
 import com.devd.commonsystem.ui.dialog.ShowMessageDialog
+import com.devd.commonsystem.ui.dialog.book.DiaryBookDialog
+import com.devd.commonsystem.ui.dialog.book.DiaryBookDialogType
 import com.devd.commonsystem.ui.loading.LoadingDialog
 import com.devd.commonsystem.utils.rememberImagePicker
 import com.devd.commonsystem.utils.uriToFile
@@ -232,7 +232,7 @@ fun BookcaseRoute(
         DiaryBookDialog(
             dialogType = DiaryBookDialogType.EDIT,
             bookInfo = bookInfo!!,
-            onSaveClick = { uri, title, description, monthType ->
+            onSaveClick = { uri, title, description, monthType,color ->
                 bookInfo = bookInfo!!.copy(
                     title = title,
                     description = description,

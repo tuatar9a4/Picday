@@ -21,6 +21,7 @@ data class DiaryBookEntity(
     val title: String,        // 맛집 일기장, 여행 일기장 등
     val description: String?,
     val bookPhaseType: Int = 0,
+    val bookColor: Int = 0,
 
     val isMajor: Boolean = false,
 
@@ -36,6 +37,7 @@ data class DiaryBookEntity(
         description = description,
         createDate = createdAt,
         bookPhaseType = DiaryPhaseType.entries[bookPhaseType],
+        bookColor = bookColor,
         isMajor = isMajor,
     )
 }

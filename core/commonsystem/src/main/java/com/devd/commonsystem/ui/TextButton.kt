@@ -20,7 +20,6 @@ import com.devd.commonsystem.theme.AccentColor
 import com.devd.commonsystem.theme.AccentOpacity40Color
 import com.devd.commonsystem.theme.OneDayTypography
 import com.devd.commonsystem.theme.WhiteColor
-import com.devd.commonsystem.theme.WhiteOpacity40Color
 
 
 @Composable
@@ -28,10 +27,11 @@ fun TextButton(
     modifier: Modifier = Modifier,
     enable: Boolean = true,
     text: String,
-    enableButtonColor : Color = AccentColor,
-    disableButtonColor : Color = AccentOpacity40Color,
-    contentsPadding : PaddingValues = PaddingValues(horizontal = 10.dp, vertical = 5.dp),
-    textSize : TextUnit = 15.sp,
+    textColor: Color = WhiteColor,
+    enableButtonColor: Color = AccentColor,
+    disableButtonColor: Color = AccentOpacity40Color,
+    contentsPadding: PaddingValues = PaddingValues(horizontal = 10.dp, vertical = 5.dp),
+    textSize: TextUnit = 15.sp,
     onClick: () -> Unit
 ) {
     Text(
@@ -49,7 +49,7 @@ fun TextButton(
         text = text,
         style = OneDayTypography.bodyMedium.copy(
             fontSize = textSize,
-            color = if (enable) WhiteColor else WhiteOpacity40Color,
+            color = if (enable) textColor else textColor.copy(0.4f),
             textAlign = TextAlign.Center
         )
     )

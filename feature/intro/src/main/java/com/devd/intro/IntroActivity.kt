@@ -13,11 +13,9 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.lifecycleScope
 import com.devd.commonsystem.theme.OneDayOneShotTheme
-import com.devd.intro.data.MoveToHome
 import com.devd.intro.screen.IntroScreenRoute
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
-import timber.log.Timber
 
 @AndroidEntryPoint
 class IntroActivity : ComponentActivity() {
@@ -51,11 +49,8 @@ class IntroActivity : ComponentActivity() {
 
     private fun collectData() {
         lifecycleScope.launch {
-            viewModel.introUiState.collect {
-                Timber.d("Check -> $it")
-                when (it) {
-                    MoveToHome -> moveToHomePage()
-                }
+            viewModel.naviToHome.collect {
+                moveToHomePage()
             }
         }
     }
@@ -66,7 +61,7 @@ class IntroActivity : ComponentActivity() {
         registerResult.launch(intent)
     }
 
-    private fun moveToLoginPage(){
+    private fun moveToLoginPage() {
         val intent = Intent()
         intent.setClassName(this, "com.devd.user.register.login.LoginActivity")
         registerResult.launch(intent)

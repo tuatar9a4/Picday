@@ -39,10 +39,10 @@ import com.devd.commonsystem.theme.WhiteColor
 import com.devd.commonsystem.ui.Toolbar
 import com.devd.commonsystem.ui.calendar.CustomDatePickerDialog
 import com.devd.commonsystem.ui.cropImageDialog.ShowCropDialog
-import com.devd.commonsystem.ui.dialog.DiaryBookDialog
-import com.devd.commonsystem.ui.dialog.DiaryBookDialogType
 import com.devd.commonsystem.ui.dialog.ShowImagePicker
 import com.devd.commonsystem.ui.dialog.ShowMessageDialog
+import com.devd.commonsystem.ui.dialog.book.DiaryBookDialog
+import com.devd.commonsystem.ui.dialog.book.DiaryBookDialogType
 import com.devd.commonsystem.ui.loading.LoadingDialog
 import com.devd.commonsystem.utils.centerItemIndex
 import com.devd.commonsystem.utils.isCurrentMonth

@@ -34,8 +34,25 @@ val YellowColor = Color(0xFFd6c80d)
 val GreyColor = Color(0xFF8F8A84)
 val GreyOpacity40Color = Color(0x668F8A84)
 
+/* Book Color Combination */
+val ModernDarkMain = Color(0xFF121212)
+val ModernDarkPoint = Color(0xFFBB86FC)
+val CleanMinimalMain = Color(0xFFF8F9FA)
+val CleanMinimalPoint = Color(0xFF007BFF)
+val CalmNatureMain = Color(0xFFF5F5DC)
+val CalmNaturePoint = Color(0xFF2D5A27)
+val MidnightMain = Color(0xFF1A2238)
+val MidnightPoint = Color(0xFFFFD700)
+val SoftPastelMain = Color(0xFFFFF0F5)
+val SoftPastelPoint = Color(0xFFFF6B6B)
 
-
+val bookColorList = listOf(
+    ModernDarkMain to ModernDarkPoint,
+    CleanMinimalMain to CleanMinimalPoint,
+    CalmNatureMain to CalmNaturePoint,
+    MidnightMain to MidnightPoint,
+    SoftPastelMain to SoftPastelPoint,
+)
 
 val OneDayTextFieldColors
     @Composable

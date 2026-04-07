@@ -44,7 +44,9 @@ class DiaryBookRepository @Inject constructor(
         bookImage: String,
         bookTitle: String,
         uuid: String,
-        bookDescription: String
+        bookDescription: String,
+        bookPhaseType: Int = 0,
+        bookColor: Int = 0
     ) = safeApiCall(Dispatchers.IO) {
         val currentMillis = Date().time
         diaryBookDao.insertDiaryBook(
@@ -53,6 +55,8 @@ class DiaryBookRepository @Inject constructor(
                 bookImage = bookImage,
                 userUuid = uuid,
                 description = bookDescription,
+                bookPhaseType = bookPhaseType,
+                bookColor = bookColor,
                 isMajor = !hasDiaryBook(uuid),
                 createdAt = currentMillis,
                 updatedAt = currentMillis,

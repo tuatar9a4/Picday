@@ -4,7 +4,6 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -21,19 +20,22 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.devd.commonsystem.R
-import com.devd.commonsystem.theme.AccentColor
 import com.devd.commonsystem.theme.OneDayOneShotTheme
 import com.devd.commonsystem.theme.OneDayTypography
 import com.devd.commonsystem.theme.PrimaryColor
 import com.devd.commonsystem.theme.TextDefaultColor
 import com.devd.commonsystem.theme.WhiteColor
+import com.devd.commonsystem.ui.dialog.ShowMessageDialog
+import com.devd.commonsystem.ui.dialog.book.DiaryBookDialog
+import com.devd.commonsystem.ui.dialog.book.DiaryBookDialogType
 import com.devd.commonsystem.ui.loading.LoadingDialog
-import com.devd.commonsystem.utils.noRippleClickable
+import com.devd.commonsystem.utils.uriToFile
 import com.devd.intro.IntroViewModel
 
 @Composable
@@ -44,15 +46,34 @@ fun IntroScreenRoute(
     onLoginClick: () -> Unit = {}
 ) {
 
-    val isShowLoading by viewModel.isLoading.collectAsState()
+    val context = LocalContext.current
+    val uiState by viewModel.introUiState.collectAsState()
+//    val isShowLoading by viewModel.isLoading.collectAsState()
 
     IntroScreen(
         modifier = modifier,
-        onMakeDiaryClick = onMakeDiaryClick,
+        onMakeDiaryClick = {
+            viewModel.showDiaryBookDialog()
+        },
         onLoginClick = onLoginClick
     )
-
-    isShowLoading.LoadingDialog(message = "Checking ID...")
+    if (uiState.isShowBookDialog) {
+        DiaryBookDialog(
+            dialogType = DiaryBookDialogType.EDIT,
+            bookInfo = viewModel.newBookInfo,
+            onDismissRequest = {
+                viewModel.dismissDiaryBookDialog()
+            },
+            onSaveClick = { imageUrl, title, description, monthType, color ->
+                val uploadFile = imageUrl?.let { context.uriToFile(it) }
+                viewModel.saveAndMakeBookInfo(uploadFile, title, description, monthType, color)
+            }
+        )
+    }
+    uiState.isLoading.LoadingDialog(message = "Checking ID...")
+    uiState.simpleMessage?.messageStr?.ShowMessageDialog(
+        onRightButtonClick = { viewModel.dismissSimpleMessageDialog() }
+    )
 }
 
 
@@ -60,7 +81,7 @@ fun IntroScreenRoute(
 @Composable
 fun IntroScreen(
     modifier: Modifier = Modifier,
-    uiState : MutableState<String> = mutableStateOf(""),
+    uiState: MutableState<String> = mutableStateOf(""),
     onMakeDiaryClick: () -> Unit = {},
     onLoginClick: () -> Unit = {}
 ) {
@@ -121,28 +142,28 @@ fun IntroScreen(
                     )
                 )
             }
-            Spacer(Modifier.height(10.dp))
-            Row(
-                modifier = Modifier.noRippleClickable(
-                    onClick = onLoginClick
-                ),
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Text(
-                    text = stringResource(R.string.already_diary_text),
-                    style = OneDayTypography.labelMedium.copy(
-                        color = TextDefaultColor
-                    )
-
-                )
-                Text(
-                    text = stringResource(R.string.login_text),
-                    style = OneDayTypography.labelLarge.copy(
-                        color = AccentColor
-                    )
-                )
-
-            }
+//            Spacer(Modifier.height(10.dp))
+//            Row(
+//                modifier = Modifier.noRippleClickable(
+//                    onClick = onLoginClick
+//                ),
+//                verticalAlignment = Alignment.CenterVertically
+//            ) {
+//                Text(
+//                    text = stringResource(R.string.already_diary_text),
+//                    style = OneDayTypography.labelMedium.copy(
+//                        color = TextDefaultColor
+//                    )
+//
+//                )
+//                Text(
+//                    text = stringResource(R.string.login_text),
+//                    style = OneDayTypography.labelLarge.copy(
+//                        color = AccentColor
+//                    )
+//                )
+//
+//            }
             Spacer(modifier = Modifier.height(15.dp))
         }
     }

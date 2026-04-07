@@ -22,7 +22,6 @@ import com.devd.data.utils.CallResult
 import com.devd.datastore.DataStoreRepository
 import com.devd.model.local.DiaryBookInfo
 import com.devd.model.local.DiaryInfo
-import com.devd.model.local.DiaryPhaseType
 import com.devd.model.local.FailUpload
 import com.devd.model.local.SuccessUpload
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -54,7 +53,7 @@ class BookcaseViewModel @Inject constructor(
 ) : ViewModel() {
     private val route = savedStateHandle.toRoute<BookcaseNaviRoute>()
 
-    val newBookInfo = DiaryBookInfo(-1L, null, "", "", DiaryPhaseType.MOON, 0)
+    val newBookInfo = DiaryBookInfo(bookId = -1L, title = "")
 
     var storeDeleteId: Long? = null
     var isInitScroll = true
@@ -176,7 +175,7 @@ class BookcaseViewModel @Inject constructor(
                 uuid = userUUID,
                 bookImage = bookInfo.bookImage!!,
                 bookTitle = bookInfo.title.trim(),
-                bookDescription = bookInfo.description!!
+                bookDescription = bookInfo.description!!,
             ).run {
                 when (this) {
                     is CallResult.NetworkError -> {

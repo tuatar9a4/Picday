@@ -31,8 +31,8 @@ import com.devd.commonsystem.theme.PrimaryColor
 import com.devd.commonsystem.theme.TextDefaultColor
 import com.devd.commonsystem.ui.TextButton
 import com.devd.commonsystem.ui.Toolbar
-import com.devd.commonsystem.ui.dialog.DiaryBookDialog
-import com.devd.commonsystem.ui.dialog.DiaryBookDialogType
+import com.devd.commonsystem.ui.dialog.book.DiaryBookDialog
+import com.devd.commonsystem.ui.dialog.book.DiaryBookDialogType
 import com.devd.commonsystem.ui.loading.LoadingDialog
 import com.devd.commonsystem.utils.uriToFile
 import com.devd.user.register.RegisterViewModel
@@ -148,7 +148,7 @@ fun RegisterRoute(
             dialogType = DiaryBookDialogType.EDIT,
             bookInfo = bookDialogInfo.value.bookInfo,
             onDismissRequest = viewmodel::dismissBookDialog,
-            onSaveClick = { imageUrl, title, description, monthType ->
+            onSaveClick = { imageUrl, title, description, monthType ,color->
                 val uploadFile = imageUrl?.let { context.uriToFile(it) }
                 viewmodel.saveAndMakeBookInfo(uploadFile, title, description, monthType)
             }
