@@ -45,12 +45,11 @@ fun detectMode(
     touch: Offset, rect: Rect
 ): DragMode {
 
-    val handleSize = 40f
+    val handleSize = 100f
 
     fun isNear(point: Offset): Boolean {
         return (touch - point).getDistance() < handleSize
     }
-
     return when {
         isNear(rect.topLeft) -> DragMode.TopLeft
         isNear(rect.topRight) -> DragMode.TopRight
@@ -144,6 +143,58 @@ fun resizeKeepRatioSafe(
     bottom = bottom.coerceIn(topLimit, bottomLimit)
 
     return Rect(left, top, right, bottom)
+}
+
+/* Scale Zoom */
+fun Rect.scaleSafe(
+    zoom: Float,
+    containerSize: IntSize,
+    imageOffset: Offset
+): Rect {
+    // 1. 현재 중심점 계산
+    val centerX = this.left + this.width / 2f
+    val centerY = this.top + this.height / 2f
+
+    // 2. 새로운 크기 계산
+    val newWidth = this.width * zoom
+    val newHeight = this.height * zoom
+
+    // 3. 중심을 유지하며 새로운 Rect 생성
+    var newRect = Rect(
+        left = centerX - newWidth / 2f,
+        top = centerY - newHeight / 2f,
+        right = centerX + newWidth / 2f,
+        bottom = centerY + newHeight / 2f
+    )
+
+    // 4. 경계 제한 (Container 및 ImageOffset 기준)
+    // 왼쪽/위 제한
+    if (newRect.left < imageOffset.x) {
+        newRect = newRect.translate(imageOffset.x - newRect.left, 0f)
+    }
+    if (newRect.top < imageOffset.y) {
+        newRect = newRect.translate(0f, imageOffset.y - newRect.top)
+    }
+
+    // 오른쪽/아래 제한 (이미지 크기를 벗어나지 않게 하려면 추가 로직 필요)
+    val maxRight = containerSize.width.toFloat() - imageOffset.x
+    val maxBottom = containerSize.height.toFloat() - imageOffset.y
+
+    if (newRect.right > maxRight) {
+        newRect = newRect.translate(maxRight - newRect.right, 0f)
+    }
+    if (newRect.bottom > maxBottom) {
+        newRect = newRect.translate(0f, maxBottom - newRect.bottom)
+    }
+
+    // 최종 크기가 컨테이너보다 커지는 것을 방지
+    return if (newRect.width <= (maxRight - imageOffset.x) &&
+        newRect.height <= (maxBottom - imageOffset.y)
+    ) {
+        newRect
+    } else {
+        this // 너무 커지면 변화 무시
+    }
 }
 
 /* Uri 를 Bitmap으로 전환 */

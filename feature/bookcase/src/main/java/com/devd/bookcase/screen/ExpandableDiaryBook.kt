@@ -27,6 +27,7 @@ import androidx.compose.foundation.pager.PagerState
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Text
+import androidx.compose.material3.VerticalDivider
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.MutableState
@@ -47,17 +48,16 @@ import androidx.compose.ui.platform.LocalWindowInfo
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import coil3.compose.AsyncImage
 import com.devd.bookcase.BookcaseInterface
 import com.devd.commonsystem.R
-import com.devd.commonsystem.theme.AccentColor
 import com.devd.commonsystem.theme.BlackColor
 import com.devd.commonsystem.theme.BlackOpacity90Color
 import com.devd.commonsystem.theme.GreyOpacity40Color
 import com.devd.commonsystem.theme.OneDayTypography
+import com.devd.commonsystem.theme.WhiteColor
 import com.devd.commonsystem.theme.YellowColor
+import com.devd.commonsystem.theme.bookColorList
 import com.devd.commonsystem.utils.noRippleClickable
-import com.devd.commonsystem.utils.rememberImageUrl
 import com.devd.model.local.DiaryBookInfo
 import com.devd.model.local.DiaryInfo
 import com.devd.model.local.DiaryPhaseType
@@ -197,22 +197,14 @@ fun ExpandableDiaryBook(
                                 modifier = Modifier
                                     .width(bookWidth)
                                     .aspectRatio(9 / 16f)
-                                    .background(AccentColor, RoundedCornerShape(4.dp))
                                     .clickable {
                                         bookClickAction(BookcaseInterface.OnOpenDiaryBook(bookInfo.bookId))
                                         selectedBookId = bookInfo
                                     },
-                                bookInfo = bookInfo
-                            )
-                            Image(
-                                modifier = Modifier
-                                    .align(Alignment.TopEnd)
-                                    .padding(top = 15.dp, end = 15.dp)
-                                    .clickable(onClick = {
-                                        bookClickAction(BookcaseInterface.OnUpdateDiaryBook(bookInfo))
-                                    }),
-                                painter = painterResource(R.drawable.icon_setting),
-                                contentDescription = null,
+                                bookInfo = bookInfo,
+                                bookClickAction = {
+                                    bookClickAction(BookcaseInterface.OnUpdateDiaryBook(bookInfo))
+                                }
                             )
                         }
                     }
@@ -240,7 +232,6 @@ fun ExpandableDiaryBook(
                                 selectedBookId = null
                                 bookClickAction(BookcaseInterface.OnColesDiaryBook)
                             }
-
                         }
 
                         Box(
@@ -293,9 +284,9 @@ fun ExpandableDiaryBook(
                                         rotationY = rotation
                                         transformOrigin = TransformOrigin(0f, 0.5f)
                                         cameraDistance = 12f * density
-                                    }
-                                    .background(if (rotation > -90f) AccentColor else Color.White),
-                                bookInfo = if (rotation < -90f) null else selectedBookId
+                                    },
+                                bookInfo = if (rotation < -90f) null else selectedBookId,
+                                bookClickAction = {}
                             )
                         }
                     }
@@ -309,36 +300,77 @@ fun ExpandableDiaryBook(
 @Composable
 fun BookCover(
     modifier: Modifier,
-    bookInfo: DiaryBookInfo?
+    bookInfo: DiaryBookInfo?,
+    bookClickAction: (BookcaseInterface) -> Unit
 ) {
-    Column(
+    val (mainColor, subColor) = remember { bookColorList[bookInfo?.bookColor ?: 0] }
+    Box(
         modifier = modifier.then(
-            Modifier
-                .padding(horizontal = 20.dp, vertical = 50.dp)
-        ),
-        horizontalAlignment = Alignment.CenterHorizontally
+            Modifier.background(
+                color = if (bookInfo == null) WhiteColor else mainColor,
+                shape = RoundedCornerShape(4.dp)
+            )
+        )
     ) {
         bookInfo?.let {
-            val createDate = remember {
-                Instant.ofEpochMilli(bookInfo.createDate)
-                    .atZone(ZoneId.systemDefault())
-                    .format(DateTimeFormatter.ofPattern("yyyy.MM.dd"))
-            }
-            AsyncImage(
+            VerticalDivider(
                 modifier = Modifier
-                    .padding(horizontal = 30.dp)
-                    .fillMaxWidth()
-                    .aspectRatio(1 / 1f)
-                    .clip(RoundedCornerShape(5.dp))
-                    .background(BlackColor),
-                model = bookInfo.bookImage?.rememberImageUrl(),
-                contentScale = ContentScale.Crop,
-                contentDescription = null
+                    .fillMaxHeight()
+                    .padding(start = 20.dp)
+                    .background(color = subColor),
+                color = subColor,
+                thickness = 20.dp
             )
-            Spacer(Modifier.height(20.dp))
-            Text(text = "생성일", style = OneDayTypography.labelLarge)
-            Spacer(Modifier.height(5.dp))
-            Text(text = createDate, style = OneDayTypography.bodyMedium)
+            Image(
+                modifier = Modifier
+                    .align(Alignment.TopEnd)
+                    .padding(top = 15.dp, end = 15.dp)
+                    .clickable(onClick = {
+                        bookClickAction(BookcaseInterface.OnUpdateDiaryBook(bookInfo))
+                    }),
+                painter = painterResource(R.drawable.icon_setting),
+                colorFilter = ColorFilter.tint(color = subColor),
+                contentDescription = null,
+            )
+            Column(
+                modifier = Modifier
+                    .align(Alignment.Center)
+                    .padding(horizontal = 20.dp, vertical = 50.dp),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                val createDate = remember {
+                    Instant.ofEpochMilli(bookInfo.createDate)
+                        .atZone(ZoneId.systemDefault())
+                        .format(DateTimeFormatter.ofPattern("yyyy.MM.dd"))
+                }
+//                AsyncImage(
+                Image(
+                    modifier = Modifier
+                        .padding(horizontal = 30.dp)
+                        .fillMaxWidth()
+                        .aspectRatio(1 / 1f)
+                        .clip(RoundedCornerShape(5.dp))
+                        .background(BlackColor),
+//                    model = bookInfo.bookImage?.rememberImageUrl(),
+                    painter = painterResource(R.drawable.icon_plus),
+                    contentScale = ContentScale.Crop,
+                    contentDescription = null
+                )
+                Spacer(Modifier.height(20.dp))
+                Text(
+                    text = "생성일",
+                    style = OneDayTypography.labelLarge.copy(
+                        color = subColor
+                    )
+                )
+                Spacer(Modifier.height(5.dp))
+                Text(
+                    text = createDate,
+                    style = OneDayTypography.bodyMedium.copy(
+                        color = subColor
+                    )
+                )
+            }
         }
     }
 }

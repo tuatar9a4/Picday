@@ -1,7 +1,7 @@
 package com.devd.commonsystem.ui.cropImageDialog
 
 import androidx.compose.foundation.Canvas
-import androidx.compose.foundation.gestures.detectDragGestures
+import androidx.compose.foundation.gestures.detectTransformGestures
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
@@ -35,24 +35,35 @@ fun CropOverlay(
         modifier = Modifier
             .fillMaxSize()
             .pointerInput(Unit) {
-                detectDragGestures(
-                    onDragStart = { offset ->
-                        mode = detectMode(offset, cropRect.value)
-                    },
-                    onDragEnd = { mode = DragMode.None }
-                ) { change, dragAmount ->
-
-                    change.consume()
-
+                detectTransformGestures { centroid, pan, zoom, rotation ->
                     val rect = cropRect.value
 
-                    cropRect.value = when (mode) {
-                        DragMode.Move -> rect.translateSafe(dragAmount, containerSize,imageOffset)
-                        DragMode.TopLeft,
-                        DragMode.TopRight,
-                        DragMode.BottomLeft,
-                        DragMode.BottomRight ->
-                            resizeKeepRatioSafe(rect, dragAmount, mode, containerSize,imageOffset)
+                    // 1. 모드 결정 (터치 시작 시점이 따로 없으므로 중심점(centroid) 기준으로 판단)
+                    // 핀치 줌 중이 아닐 때(zoom == 1f) 드래그 모드를 체크하거나,
+                    // 항상 드래그 모드를 갱신하도록 구성할 수 있습니다.
+                    if (mode == DragMode.None || zoom == 1f) {
+                        mode = detectMode(centroid, rect)
+                    }
+
+                    // 2. 변화 적용
+                    cropRect.value = when {
+                        // 핀치 줌이 발생한 경우 (zoom이 1.0이 아님)
+                        zoom != 1f -> {
+                            val newSize = rect.size * zoom
+                            // 중심을 기준으로 확장/축소 하거나 필요에 따라 로직 수정
+                            // 여기서는 단순 크기 조절 예시를 위해 resize 함수 재사용 권장
+                            rect.scaleSafe(zoom, containerSize, imageOffset)
+                        }
+
+                        // 단순 이동 (드래그)
+                        mode == DragMode.Move -> {
+                            rect.translateSafe(pan, containerSize, imageOffset)
+                        }
+
+                        // 모서리 핸들 드래그
+                        mode != DragMode.None -> {
+                            resizeKeepRatioSafe(rect, pan, mode, containerSize, imageOffset)
+                        }
 
                         else -> rect
                     }
