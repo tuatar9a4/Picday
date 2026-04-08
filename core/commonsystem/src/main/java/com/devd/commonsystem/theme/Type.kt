@@ -1,7 +1,7 @@
 package com.devd.commonsystem.theme
 
 import androidx.compose.material3.Typography
-import androidx.compose.runtime.staticCompositionLocalOf
+import androidx.compose.runtime.compositionLocalOf
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
@@ -9,51 +9,73 @@ import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.sp
 import com.devd.commonsystem.R
+import com.devd.commonsystem.utils.FontList
 
-// Set of Material typography styles to start with
-val OneDayTypography = Typography(
-    titleLarge = TextStyle(
-        fontFamily = FontFamily(Font(R.font.suit_extra_bold)),
-        fontWeight = FontWeight(700),
-        fontSize = 22.sp
-    ),
-    titleMedium = TextStyle(
-        fontFamily = FontFamily(Font(R.font.suit_semi_bold)),
-        fontWeight = FontWeight(600),
-        fontSize = 20.sp
-    ),
-    bodyLarge = TextStyle(
-        fontFamily = FontFamily(Font(R.font.suit_semi_bold)),
-        fontWeight = FontWeight(600),
-        fontSize = 16.sp,
-    ),
-    bodyMedium = TextStyle(
-        fontFamily = FontFamily(Font(R.font.suit_medium)),
-        fontWeight = FontWeight(500),
-        fontSize = 14.sp,
-    ),
-    bodySmall = TextStyle(
-        fontFamily = FontFamily(Font(R.font.suit_medium)),
-        fontWeight = FontWeight(500),
-        fontSize = 12.sp,
-    ),
-    labelLarge = TextStyle(
-        fontFamily = FontFamily(Font(R.font.suit_semi_bold)),
-        fontWeight = FontWeight(600),
-        fontSize = 11.sp,
-    ),
-    labelMedium = TextStyle(
-        fontFamily = FontFamily(Font(R.font.suit_light)),
-        fontWeight = FontWeight(400),
-        fontSize = 11.sp,
-    ),
-    labelSmall = TextStyle(
-        fontFamily = FontFamily(Font(R.font.suit_semi_bold)),
-        fontWeight = FontWeight(400),
-        fontSize = 9.sp,
-    ),
+fun getCustomTypography(fontFamily: FontFamily): Typography {
+    return Typography(
+        titleLarge = TextStyle(
+            fontFamily = fontFamily,
+            fontWeight = FontWeight(700),
+            fontSize = 22.sp
+        ),
+        titleMedium = TextStyle(
+            fontFamily = fontFamily,
+            fontWeight = FontWeight(600),
+            fontSize = 22.sp
+        ),
+        titleSmall = TextStyle(
+            fontFamily = fontFamily,
+            fontWeight = FontWeight(500),
+            fontSize = 22.sp
+        ),
+        bodyLarge = TextStyle(
+            fontFamily = fontFamily,
+            fontWeight = FontWeight(600),
+            fontSize = 16.sp,
+        ),
+        bodyMedium = TextStyle(
+            fontFamily = fontFamily,
+            fontWeight = FontWeight(500),
+            fontSize = 16.sp
+        ),
+        bodySmall = TextStyle(
+            fontFamily = fontFamily,
+            fontWeight = FontWeight(400),
+            fontSize = 16.sp
+        ),
+        displayLarge = TextStyle(
+            fontFamily = fontFamily,
+            fontWeight = FontWeight(700),
+            fontSize = 14.sp
+        ),
+        displayMedium = TextStyle(
+            fontFamily = fontFamily,
+            fontWeight = FontWeight(600),
+            fontSize = 14.sp
+        ),
+        displaySmall = TextStyle(
+            fontFamily = fontFamily,
+            fontWeight = FontWeight(500),
+            fontSize = 14.sp
+        ),
+        labelLarge = TextStyle(
+            fontFamily = fontFamily,
+            fontWeight = FontWeight(600),
+            fontSize = 11.sp,
+        ),
+        labelMedium = TextStyle(
+            fontFamily = fontFamily,
+            fontWeight = FontWeight(400),
+            fontSize = 11.sp,
+        ),
+        labelSmall = TextStyle(
+            fontFamily = fontFamily,
+            fontWeight = FontWeight(400),
+            fontSize = 9.sp,
+        )
+    )
 
-)
+}
 
 val textHashTagStyle = TextStyle(
     fontFamily = FontFamily(Font(R.font.suit_semi_bold)),
@@ -68,6 +90,6 @@ val textHashTagSmallStyle = TextStyle(
     fontSize = 9.sp,
 )
 
-val LocalCustomTypography = staticCompositionLocalOf {
-    OneDayTypography
+val LocalCustomTypography = compositionLocalOf {
+    getCustomTypography(FontList.SUIT.fontFamily)
 }

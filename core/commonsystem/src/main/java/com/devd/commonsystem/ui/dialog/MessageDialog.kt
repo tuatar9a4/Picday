@@ -25,7 +25,6 @@ import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import com.devd.commonsystem.R
 import com.devd.commonsystem.theme.GreyColor
-import com.devd.commonsystem.theme.OneDayTypography
 import com.devd.commonsystem.ui.TextButton
 
 @Preview
@@ -58,7 +57,7 @@ fun MessageDialog(
             Spacer(Modifier.height(20.dp))
             Text(
                 text = message ?: "",
-                style = OneDayTypography.titleMedium
+                style = MaterialTheme.typography.titleMedium
             )
             Spacer(Modifier.height(30.dp))
             Row() {

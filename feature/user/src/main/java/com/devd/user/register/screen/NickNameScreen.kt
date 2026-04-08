@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
@@ -22,7 +23,6 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.devd.commonsystem.R
-import com.devd.commonsystem.theme.OneDayTypography
 import com.devd.commonsystem.theme.RedColor
 import com.devd.commonsystem.theme.TextDefaultColor
 import com.devd.commonsystem.theme.TextOpacity80Color
@@ -50,7 +50,7 @@ fun NickNameScreen(
         Text(
             modifier = Modifier.padding(horizontal = 20.dp),
             text = "사용하실 ID를 알려주세요!",
-            style = OneDayTypography.titleMedium.copy(
+            style = MaterialTheme.typography.titleMedium.copy(
                 color = TextDefaultColor
             )
         )
@@ -58,7 +58,7 @@ fun NickNameScreen(
         Text(
             modifier = Modifier.padding(horizontal = 20.dp),
             text = "한글,영문,숫자 최대 2~10자/ 공백,특수기호 불가",
-            style = OneDayTypography.labelLarge.copy(
+            style = MaterialTheme.typography.labelLarge.copy(
                 color = TextOpacity80Color
             )
         )
@@ -90,7 +90,7 @@ fun NickNameScreen(
                         .align(Alignment.CenterEnd)
                         .padding(horizontal = 20.dp),
                     text = "(${editText.value.length}/10)",
-                    style = OneDayTypography.labelLarge.copy(
+                    style = MaterialTheme.typography.labelLarge.copy(
                         color = TextDefaultColor
                     )
                 )
@@ -116,7 +116,7 @@ fun NickNameScreen(
             Text(
                 modifier = Modifier.padding(horizontal = 20.dp),
                 text = "한글,영문,숫자 최대 2~10자/ 공백,특수기호 불가",
-                style = OneDayTypography.labelLarge.copy(
+                style = MaterialTheme.typography.labelLarge.copy(
                     color = RedColor
                 )
             )

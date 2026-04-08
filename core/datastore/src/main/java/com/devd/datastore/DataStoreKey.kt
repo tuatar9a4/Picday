@@ -1,6 +1,7 @@
 package com.devd.datastore
 
 import androidx.datastore.preferences.core.Preferences
+import androidx.datastore.preferences.core.intPreferencesKey
 import androidx.datastore.preferences.core.stringPreferencesKey
 
 sealed class DataStoreKey<T>(
@@ -22,6 +23,10 @@ sealed class DataStoreKey<T>(
 
     object LocalSettingKey : DataStoreKey<String>("local_setting_Data") {
         override fun preferencesKey() = stringPreferencesKey(key)
+    }
+
+    object FontIndex : DataStoreKey<Int>("font_index") {
+        override fun preferencesKey() = intPreferencesKey(key)
     }
 
 }

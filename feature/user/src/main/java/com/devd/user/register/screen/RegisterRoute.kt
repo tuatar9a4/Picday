@@ -13,6 +13,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -26,7 +27,6 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.devd.commonsystem.R
-import com.devd.commonsystem.theme.OneDayTypography
 import com.devd.commonsystem.theme.PrimaryColor
 import com.devd.commonsystem.theme.TextDefaultColor
 import com.devd.commonsystem.ui.TextButton
@@ -89,7 +89,7 @@ fun RegisterRoute(
             titleBox = {
                 Text(
                     "Register",
-                    style = OneDayTypography.titleMedium.copy(color = TextDefaultColor)
+                    style = MaterialTheme.typography.titleMedium.copy(color = TextDefaultColor)
                 )
             },
             leftButtons = {

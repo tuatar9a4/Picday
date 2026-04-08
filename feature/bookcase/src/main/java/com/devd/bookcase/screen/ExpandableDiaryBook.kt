@@ -26,6 +26,7 @@ import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.PagerState
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.VerticalDivider
 import androidx.compose.runtime.Composable
@@ -48,16 +49,17 @@ import androidx.compose.ui.platform.LocalWindowInfo
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import coil3.compose.AsyncImage
 import com.devd.bookcase.BookcaseInterface
 import com.devd.commonsystem.R
 import com.devd.commonsystem.theme.BlackColor
 import com.devd.commonsystem.theme.BlackOpacity90Color
 import com.devd.commonsystem.theme.GreyOpacity40Color
-import com.devd.commonsystem.theme.OneDayTypography
 import com.devd.commonsystem.theme.WhiteColor
 import com.devd.commonsystem.theme.YellowColor
 import com.devd.commonsystem.theme.bookColorList
 import com.devd.commonsystem.utils.noRippleClickable
+import com.devd.commonsystem.utils.rememberImageUrl
 import com.devd.model.local.DiaryBookInfo
 import com.devd.model.local.DiaryInfo
 import com.devd.model.local.DiaryPhaseType
@@ -165,7 +167,7 @@ fun ExpandableDiaryBook(
             Spacer(Modifier.width(5.dp))
             Text(
                 text = bookList.getOrNull(pagerState.currentPage)?.title ?: "",
-                style = OneDayTypography.titleLarge
+                style = MaterialTheme.typography.titleLarge
             )
         }
         Spacer(Modifier.height(10.dp))
@@ -343,30 +345,30 @@ fun BookCover(
                         .atZone(ZoneId.systemDefault())
                         .format(DateTimeFormatter.ofPattern("yyyy.MM.dd"))
                 }
-//                AsyncImage(
-                Image(
+                AsyncImage(
+//                Image(
                     modifier = Modifier
                         .padding(horizontal = 30.dp)
                         .fillMaxWidth()
                         .aspectRatio(1 / 1f)
                         .clip(RoundedCornerShape(5.dp))
                         .background(BlackColor),
-//                    model = bookInfo.bookImage?.rememberImageUrl(),
-                    painter = painterResource(R.drawable.icon_plus),
+                    model = bookInfo.bookImage?.rememberImageUrl(),
+//                    painter = painterResource(R.drawable.icon_plus),
                     contentScale = ContentScale.Crop,
                     contentDescription = null
                 )
                 Spacer(Modifier.height(20.dp))
                 Text(
                     text = "생성일",
-                    style = OneDayTypography.labelLarge.copy(
+                    style = MaterialTheme.typography.labelLarge.copy(
                         color = subColor
                     )
                 )
                 Spacer(Modifier.height(5.dp))
                 Text(
                     text = createDate,
-                    style = OneDayTypography.bodyMedium.copy(
+                    style = MaterialTheme.typography.bodyMedium.copy(
                         color = subColor
                     )
                 )

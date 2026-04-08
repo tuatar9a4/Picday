@@ -14,6 +14,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -30,7 +31,6 @@ import androidx.compose.ui.unit.dp
 import com.devd.commonsystem.R
 import com.devd.commonsystem.theme.AccentColor
 import com.devd.commonsystem.theme.GreyColor
-import com.devd.commonsystem.theme.OneDayTypography
 import com.devd.commonsystem.ui.dialog.book.DiaryBookDialogType
 import com.devd.commonsystem.utils.noRippleClickable
 import com.devd.model.local.DiaryPhaseType
@@ -53,14 +53,14 @@ fun BookOptionScreen(
     ) {
         Column() {
             Row() {
-                Text(text = "생성일 : ", style = OneDayTypography.labelLarge)
-                Text(text = createDate, style = OneDayTypography.labelMedium)
+                Text(text = "생성일 : ", style = MaterialTheme.typography.labelLarge)
+                Text(text = createDate, style = MaterialTheme.typography.labelMedium)
             }
         }
         Column(
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Text(text = "MonthType", style = OneDayTypography.labelLarge)
+            Text(text = "MonthType", style = MaterialTheme.typography.labelLarge)
             Spacer(Modifier.height(5.dp))
             Image(
                 modifier = Modifier

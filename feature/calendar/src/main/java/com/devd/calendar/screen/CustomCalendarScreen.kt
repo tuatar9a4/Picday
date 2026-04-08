@@ -45,7 +45,6 @@ import com.devd.calendar.data.CalendarImageInfo
 import com.devd.commonsystem.R
 import com.devd.commonsystem.theme.AccentColor
 import com.devd.commonsystem.theme.BlackOpacity40Color
-import com.devd.commonsystem.theme.OneDayTypography
 import com.devd.commonsystem.theme.RedColor
 import com.devd.commonsystem.theme.WhiteColor
 import com.devd.commonsystem.utils.getFirstDayMillis
@@ -256,7 +255,7 @@ fun CalendarGrid(
                                 .alpha(if (isToday || isCurrentMonth) 1f else 0.4f)
                                 .padding(vertical = 3.dp, horizontal = 5.dp),
                             text = dayInfo?.day?.toString() ?: "${date.dayOfMonth}",
-                            style = OneDayTypography.labelLarge.copy(
+                            style = MaterialTheme.typography.labelLarge.copy(
                                 color = if (isToday) AccentColor else if (isSunDay) RedColor else WhiteColor
                             )
                         )

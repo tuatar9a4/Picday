@@ -14,6 +14,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -33,7 +34,6 @@ import com.devd.commonsystem.R
 import com.devd.commonsystem.theme.AccentColor
 import com.devd.commonsystem.theme.BlackColor
 import com.devd.commonsystem.theme.GreyColor
-import com.devd.commonsystem.theme.OneDayTypography
 import com.devd.commonsystem.theme.PrimaryColor
 import com.devd.commonsystem.theme.WhiteColor
 import com.devd.commonsystem.ui.SingleLineTextField
@@ -113,7 +113,7 @@ fun LoginScreen(
                 modifier = Modifier.fillMaxWidth(),
                 textAlign = TextAlign.Center,
                 text = "OneDay OneShot",
-                style = OneDayTypography.bodyLarge.copy(
+                style = MaterialTheme.typography.bodyLarge.copy(
                     color = BlackColor
                 )
             )
@@ -161,7 +161,7 @@ fun LoginScreen(
                         .fillMaxWidth()
                         .padding(vertical = 10.dp),
                     text = stringResource(R.string.login_text),
-                    style = OneDayTypography.bodyLarge.copy(
+                    style = MaterialTheme.typography.bodyLarge.copy(
                         color = WhiteColor,
                     ),
                     textAlign = TextAlign.Center

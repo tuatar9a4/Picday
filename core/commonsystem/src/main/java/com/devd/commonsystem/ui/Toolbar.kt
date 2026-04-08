@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -15,7 +16,6 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.devd.commonsystem.R
-import com.devd.commonsystem.theme.OneDayTypography
 import com.devd.commonsystem.theme.TextDefaultColor
 
 @Composable
@@ -49,7 +49,7 @@ fun ToolbarPreview() {
     Toolbar(
         titleBox = {
             Text(
-                "Title", style = OneDayTypography.titleMedium.copy(
+                "Title", style = MaterialTheme.typography.titleMedium.copy(
                     color = TextDefaultColor
                 )
             )
@@ -63,7 +63,7 @@ fun ToolbarUseLeftPreview() {
     Toolbar(
         titleBox = {
             Text(
-                "Title", style = OneDayTypography.titleMedium.copy(
+                "Title", style = MaterialTheme.typography.titleMedium.copy(
                     color = TextDefaultColor
                 )
             )
@@ -82,7 +82,7 @@ fun ToolbarUseLeftPreview() {
 fun ToolbarUseRightPreview() {
     Toolbar(titleBox = {
         Text(
-            "Title", style = OneDayTypography.titleMedium.copy(
+            "Title", style = MaterialTheme.typography.titleMedium.copy(
                 color = TextDefaultColor
             )
         )
@@ -99,7 +99,7 @@ fun ToolbarUseRightPreview() {
 fun ToolbarUseBothPreview() {
     Toolbar(titleBox = {
         Text(
-            "Title", style = OneDayTypography.titleMedium.copy(
+            "Title", style = MaterialTheme.typography.titleMedium.copy(
                 color = TextDefaultColor
             )
         )

@@ -13,6 +13,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -35,7 +36,6 @@ import androidx.compose.ui.unit.dp
 import com.devd.commonsystem.theme.AccentColor
 import com.devd.commonsystem.theme.BlackColor
 import com.devd.commonsystem.theme.GreyColor
-import com.devd.commonsystem.theme.OneDayTypography
 import com.devd.commonsystem.theme.WhiteColor
 import com.devd.model.local.DiaryPhaseType
 import java.util.Locale
@@ -75,14 +75,14 @@ fun MonthWritePercentScreen(
             ) {
             Text(
                 text = "완성률",
-                style = OneDayTypography.bodyMedium.copy(
+                style = MaterialTheme.typography.bodyMedium.copy(
                     color = WhiteColor
                 )
             )
             Spacer(Modifier.height(3.dp))
             Text(
                 text = "${String.format(Locale.US, "%.1f", percent * 100)} %",
-                style = OneDayTypography.labelMedium.copy(
+                style = MaterialTheme.typography.labelMedium.copy(
                     color = WhiteColor
                 )
             )

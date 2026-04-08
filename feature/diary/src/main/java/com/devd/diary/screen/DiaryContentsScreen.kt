@@ -13,13 +13,13 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.devd.commonsystem.theme.BlackOpacity40Color
-import com.devd.commonsystem.theme.OneDayTypography
 import com.devd.commonsystem.theme.WhiteColor
 
 @Composable
@@ -51,7 +51,7 @@ fun DiaryContentsScreen(
         Text(
             modifier = Modifier.fillMaxWidth(),
             text = diaryDate,
-            style = OneDayTypography.labelLarge.copy(
+            style = MaterialTheme.typography.labelLarge.copy(
                 color = WhiteColor
             )
         )
@@ -61,7 +61,7 @@ fun DiaryContentsScreen(
                 .fillMaxWidth()
                 .heightIn(min = 50.dp),
             text = diaryContents,
-            style = OneDayTypography.bodyLarge.copy(
+            style = MaterialTheme.typography.bodyLarge.copy(
                 color = WhiteColor
             )
         )
@@ -79,7 +79,7 @@ fun DiaryContentsScreen(
                         .border(1.dp, WhiteColor, RoundedCornerShape(20.dp))
                         .padding(horizontal = 6.dp, vertical = 3.dp),
                     text = "# $it",
-                    style = OneDayTypography.bodyMedium.copy(
+                    style = MaterialTheme.typography.bodyMedium.copy(
                         color = WhiteColor
                     )
                 )

@@ -1,5 +1,7 @@
 package com.devd.datastore
 
+import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.mutableStateOf
 import androidx.datastore.core.DataStore
 import androidx.datastore.core.IOException
 import androidx.datastore.preferences.core.Preferences
@@ -8,9 +10,12 @@ import androidx.datastore.preferences.core.emptyPreferences
 import com.devd.model.local.LocalSettingData
 import com.devd.model.local.UserInfo
 import com.google.gson.Gson
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -19,6 +24,13 @@ class DataStoreRepository @Inject constructor(
     val sharedPreferences: DataStore<Preferences>
 ) : DatastoreRepositoryImpl {
 
+    val userInfo: MutableState<Int> = mutableStateOf(0)
+
+    init {
+        CoroutineScope(Dispatchers.IO).launch {
+            userInfo.value = getLocalSettingData().fontIndexInt
+        }
+    }
 
     override suspend fun <T> setPreferData(data: DataStoreKey<T>, value: T): Boolean {
         val result = Result.runCatching {
@@ -61,6 +73,7 @@ class DataStoreRepository @Inject constructor(
 
     suspend fun setLocalSettingData(settingData: LocalSettingData): LocalSettingData {
         val jsonSting = Gson().toJson(settingData).toString()
+        userInfo.value = settingData.fontIndexInt
         setPreferData(DataStoreKey.LocalSettingKey, jsonSting)
         return settingData
     }

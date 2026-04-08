@@ -15,6 +15,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Card
 import androidx.compose.material3.LinearProgressIndicator
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
@@ -26,7 +27,6 @@ import androidx.compose.ui.unit.sp
 import com.devd.commonsystem.theme.BlackColor
 import com.devd.commonsystem.theme.GreyColor
 import com.devd.commonsystem.theme.OneDayOneShotTheme
-import com.devd.commonsystem.theme.OneDayTypography
 import com.devd.commonsystem.theme.SecondaryColor
 import com.devd.commonsystem.theme.WhiteColor
 import com.devd.commonsystem.utils.diaryPhaseIcon
@@ -77,7 +77,7 @@ fun BookCardScreen(
                             text = bookInfo.title.ifEmpty { "---" },
                             maxLines = 1,
                             overflow = TextOverflow.Ellipsis,
-                            style = OneDayTypography.bodyLarge.copy(
+                            style = MaterialTheme.typography.bodyLarge.copy(
                                 color = BlackColor
                             )
                         )
@@ -87,7 +87,7 @@ fun BookCardScreen(
                             text = bookInfo.description ?: "",
                             maxLines = 2,
                             overflow = TextOverflow.Ellipsis,
-                            style = OneDayTypography.bodySmall.copy(
+                            style = MaterialTheme.typography.bodySmall.copy(
                                 fontSize = 13.sp,
                                 color = BlackColor
                             )

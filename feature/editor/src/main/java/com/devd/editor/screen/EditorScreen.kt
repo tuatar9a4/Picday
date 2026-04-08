@@ -19,6 +19,7 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.input.rememberTextFieldState
 import androidx.compose.foundation.text.input.setTextAndPlaceCursorAtEnd
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -40,7 +41,6 @@ import androidx.core.net.toUri
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.devd.commonsystem.R
-import com.devd.commonsystem.theme.OneDayTypography
 import com.devd.commonsystem.ui.calendar.CustomDatePickerDialog
 import com.devd.commonsystem.ui.calendar.RangeType
 import com.devd.commonsystem.ui.cropImageDialog.ShowCropDialog
@@ -257,7 +257,7 @@ fun EditorScreen(
             ) {
                 Text(
                     text = selectDiary?.title ?: "",
-                    style = OneDayTypography.titleMedium
+                    style = MaterialTheme.typography.titleMedium
                 )
                 Spacer(Modifier.width(5.dp))
                 Image(

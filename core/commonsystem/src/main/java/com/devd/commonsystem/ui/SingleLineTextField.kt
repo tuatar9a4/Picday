@@ -15,6 +15,7 @@ import androidx.compose.foundation.text.selection.LocalTextSelectionColors
 import androidx.compose.foundation.text.selection.TextSelectionColors
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
@@ -37,7 +38,6 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.devd.commonsystem.R
 import com.devd.commonsystem.theme.BlackColor
-import com.devd.commonsystem.theme.OneDayTypography
 import com.devd.commonsystem.theme.RedColor
 import com.devd.commonsystem.theme.TextDefaultColor
 import com.devd.commonsystem.theme.TextOpacity80Color
@@ -72,7 +72,7 @@ fun SingleLineTextField(
             modifier = modifier,
             value = editText.value,
             singleLine = true,
-            textStyle = OneDayTypography.bodyMedium.copy(color = if (isError) RedColor else textColor),
+            textStyle = MaterialTheme.typography.bodyMedium.copy(color = if (isError) RedColor else textColor),
             onValueChange = onTextChange,
             visualTransformation = if (usePasswordVisible) VisualTransformation.None else PasswordVisualTransformation(),
             keyboardOptions = KeyboardOptions(imeAction = imeAction),
@@ -95,7 +95,7 @@ fun SingleLineTextField(
                             Text(
                                 modifier = Modifier,
                                 text = stringResource(it),
-                                style = OneDayTypography.bodyMedium.copy(color = hintColor)
+                                style = MaterialTheme.typography.bodyMedium.copy(color = hintColor)
                             )
                         }
                     },

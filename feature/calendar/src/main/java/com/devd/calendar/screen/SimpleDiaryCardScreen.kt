@@ -15,6 +15,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Card
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -27,7 +28,6 @@ import coil3.compose.AsyncImage
 import com.devd.calendar.data.CalendarImageInfo
 import com.devd.commonsystem.theme.BlackColor
 import com.devd.commonsystem.theme.BlackOpacity40Color
-import com.devd.commonsystem.theme.OneDayTypography
 import com.devd.commonsystem.theme.WhiteColor
 import com.devd.commonsystem.theme.textHashTagStyle
 
@@ -79,7 +79,7 @@ fun SimpleDiaryCardScreen(
                         .background(color = BlackOpacity40Color, shape = CircleShape)
                         .padding(vertical = 5.dp, horizontal = 15.dp),
                     text = calendarImageInfo.day.toString(),
-                    style = OneDayTypography.bodyLarge.copy(
+                    style = MaterialTheme.typography.bodyLarge.copy(
                         color = WhiteColor
                     )
                 )
@@ -100,7 +100,7 @@ fun SimpleDiaryCardScreen(
                             minLines = 2,
                             overflow = TextOverflow.Ellipsis,
                             text = calendarImageInfo.contents ?: "",
-                            style = OneDayTypography.bodySmall.copy(
+                            style = MaterialTheme.typography.bodySmall.copy(
                                 color = WhiteColor
                             )
                         )

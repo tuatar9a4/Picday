@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
@@ -27,7 +28,6 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.devd.commonsystem.R
 import com.devd.commonsystem.theme.OneDayOneShotTheme
-import com.devd.commonsystem.theme.OneDayTypography
 import com.devd.commonsystem.theme.PrimaryColor
 import com.devd.commonsystem.theme.TextDefaultColor
 import com.devd.commonsystem.theme.WhiteColor
@@ -109,14 +109,14 @@ fun IntroScreen(
             Spacer(modifier = Modifier.height(8.dp))
             Text(
                 text = stringResource(R.string.intro_title),
-                style = OneDayTypography.titleMedium.copy(
+                style = MaterialTheme.typography.titleMedium.copy(
                     color = TextDefaultColor
                 )
             )
             Spacer(modifier = Modifier.height(5.dp))
             Text(
                 text = stringResource(R.string.intro_description),
-                style = OneDayTypography.bodyLarge.copy(
+                style = MaterialTheme.typography.bodyLarge.copy(
                     color = TextDefaultColor
                 )
             )
@@ -137,7 +137,7 @@ fun IntroScreen(
                 Text(
                     modifier = Modifier.padding(vertical = 10.dp),
                     text = stringResource(R.string.make_diary_text),
-                    style = OneDayTypography.bodyLarge.copy(
+                    style = MaterialTheme.typography.bodyLarge.copy(
                         color = WhiteColor
                     )
                 )
@@ -151,14 +151,14 @@ fun IntroScreen(
 //            ) {
 //                Text(
 //                    text = stringResource(R.string.already_diary_text),
-//                    style = OneDayTypography.labelMedium.copy(
+//                    style = MaterialTheme.typography.labelMedium.copy(
 //                        color = TextDefaultColor
 //                    )
 //
 //                )
 //                Text(
 //                    text = stringResource(R.string.login_text),
-//                    style = OneDayTypography.labelLarge.copy(
+//                    style = MaterialTheme.typography.labelLarge.copy(
 //                        color = AccentColor
 //                    )
 //                )

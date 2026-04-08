@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -30,7 +31,6 @@ import com.devd.calendar.screen.MonthWritePercentScreen
 import com.devd.calendar.screen.SimpleDiaryCardScreen
 import com.devd.commonsystem.R
 import com.devd.commonsystem.theme.BlackColor
-import com.devd.commonsystem.theme.OneDayTypography
 import com.devd.commonsystem.ui.Toolbar
 import com.devd.commonsystem.ui.dialog.OptionBottomSheet
 import com.devd.commonsystem.ui.loading.LoadingDialog
@@ -114,7 +114,7 @@ fun CalendarScreen(
                 ) {
                     Text(
                         text = bookName,
-                        style = OneDayTypography.titleMedium.copy(color = BlackColor)
+                        style = MaterialTheme.typography.titleMedium.copy(color = BlackColor)
                     )
                     Spacer(Modifier.width(5.dp))
                     Image(

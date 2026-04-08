@@ -24,6 +24,7 @@ import androidx.compose.foundation.text.input.TextFieldState
 import androidx.compose.foundation.text.input.clearText
 import androidx.compose.foundation.text.input.delete
 import androidx.compose.foundation.text.input.rememberTextFieldState
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
@@ -44,7 +45,6 @@ import com.devd.commonsystem.theme.AccentOpacity40Color
 import com.devd.commonsystem.theme.BlackColor
 import com.devd.commonsystem.theme.GreyOpacity40Color
 import com.devd.commonsystem.theme.OneDayTextFieldColors
-import com.devd.commonsystem.theme.OneDayTypography
 import com.devd.commonsystem.theme.WhiteColor
 import com.devd.commonsystem.theme.textHashTagStyle
 
@@ -92,7 +92,7 @@ fun EditorItem(
             placeholder = {
                 Text(
                     text = "일기의 내용은 되도록 짧게해주세요\n너무 길면 안 보일 수 있습니다.(최대 100자)",
-                    style = OneDayTypography.labelMedium.copy(
+                    style = MaterialTheme.typography.labelMedium.copy(
                         color = GreyOpacity40Color
                     )
                 )
@@ -102,7 +102,7 @@ fun EditorItem(
                 onChangeDiaryText.invoke(asCharSequence().toString())
             },
             shape = RoundedCornerShape(0.dp),
-            textStyle = OneDayTypography.bodyMedium.copy(
+            textStyle = MaterialTheme.typography.bodyMedium.copy(
                 color = BlackColor
             ),
             contentPadding = PaddingValues(10.dp),
@@ -114,7 +114,7 @@ fun EditorItem(
         ) {
             Text(
                 modifier = Modifier.alignBy(FirstBaseline),
-                text = "해시 태그", style = OneDayTypography.bodyMedium,
+                text = "해시 태그", style = MaterialTheme.typography.bodyMedium,
             )
             Spacer(Modifier.width(10.dp))
             Column(
@@ -130,7 +130,7 @@ fun EditorItem(
                     placeholder = {
                         Text(
                             text = "띄어쓰기를 사용하면 HashTag가 적용 됩니다",
-                            style = OneDayTypography.labelMedium.copy(
+                            style = MaterialTheme.typography.labelMedium.copy(
                                 color = GreyOpacity40Color
                             )
                         )
@@ -152,7 +152,7 @@ fun EditorItem(
                         hashTextField.clearText()
                     },
                     shape = RoundedCornerShape(5.dp),
-                    textStyle = OneDayTypography.labelLarge.copy(
+                    textStyle = MaterialTheme.typography.labelLarge.copy(
                         color = BlackColor
                     ),
                     colors = OneDayTextFieldColors,

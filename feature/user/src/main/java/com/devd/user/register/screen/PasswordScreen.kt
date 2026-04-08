@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
@@ -19,7 +20,6 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.devd.commonsystem.R
-import com.devd.commonsystem.theme.OneDayTypography
 import com.devd.commonsystem.theme.TextDefaultColor
 import com.devd.commonsystem.theme.TextOpacity80Color
 import com.devd.commonsystem.ui.SingleLineTextField
@@ -50,7 +50,7 @@ fun PasswordScreen(
         Text(
             modifier = Modifier.padding(horizontal = 20.dp),
             text = "사용하실 비밀번호를 입력해주세요!",
-            style = OneDayTypography.titleMedium.copy(
+            style = MaterialTheme.typography.titleMedium.copy(
                 color = TextDefaultColor
             )
         )
@@ -58,7 +58,7 @@ fun PasswordScreen(
         Text(
             modifier = Modifier.padding(horizontal = 20.dp),
             text = "영문 및 숫자 1자리 포함 8자 이상 20자 미만",
-            style = OneDayTypography.labelLarge.copy(
+            style = MaterialTheme.typography.labelLarge.copy(
                 color = TextOpacity80Color
             )
         )

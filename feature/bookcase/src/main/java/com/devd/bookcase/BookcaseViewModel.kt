@@ -176,6 +176,8 @@ class BookcaseViewModel @Inject constructor(
                 bookImage = bookInfo.bookImage!!,
                 bookTitle = bookInfo.title.trim(),
                 bookDescription = bookInfo.description!!,
+                bookPhaseType = bookInfo.bookPhaseType.ordinal,
+                bookColor = bookInfo.bookColor
             ).run {
                 when (this) {
                     is CallResult.NetworkError -> {

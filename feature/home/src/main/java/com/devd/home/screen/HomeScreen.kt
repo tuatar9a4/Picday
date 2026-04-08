@@ -17,6 +17,7 @@ import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.FloatingActionButtonDefaults
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -33,7 +34,6 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.devd.commonsystem.R
 import com.devd.commonsystem.theme.AccentOpacity40Color
-import com.devd.commonsystem.theme.OneDayTypography
 import com.devd.commonsystem.theme.PrimaryColor
 import com.devd.commonsystem.theme.WhiteColor
 import com.devd.commonsystem.ui.Toolbar
@@ -213,7 +213,7 @@ fun HomeScreen(
             Toolbar(
                 modifier = Modifier.background(color = PrimaryColor),
                 titleBox = {
-                    Text("", style = OneDayTypography.titleMedium.copy(color = WhiteColor))
+                    Text("", style = MaterialTheme.typography.titleMedium.copy(color = WhiteColor))
                 },
                 leftButtons = {
                     Image(

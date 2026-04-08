@@ -13,6 +13,7 @@ import androidx.compose.material3.DatePicker
 import androidx.compose.material3.DatePickerDefaults
 import androidx.compose.material3.DatePickerDialog
 import androidx.compose.material3.DisplayMode
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.SelectableDates
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberDatePickerState
@@ -27,7 +28,6 @@ import com.devd.commonsystem.theme.AccentOpacity40Color
 import com.devd.commonsystem.theme.BlackColor
 import com.devd.commonsystem.theme.GreyColor
 import com.devd.commonsystem.theme.GreyOpacity40Color
-import com.devd.commonsystem.theme.OneDayTypography
 import com.devd.commonsystem.ui.TextButton
 import com.devd.commonsystem.ui.calendar.RangeType.ALL
 import com.devd.commonsystem.ui.calendar.RangeType.CURRENT_MONTH
@@ -82,7 +82,7 @@ fun CustomDatePickerDialog(
                     Text(
                         modifier = Modifier.padding(start = 20.dp, top = 10.dp),
                         text = title,
-                        style = OneDayTypography.bodyLarge.copy(
+                        style = MaterialTheme.typography.bodyLarge.copy(
                             color = BlackColor
                         )
                     )

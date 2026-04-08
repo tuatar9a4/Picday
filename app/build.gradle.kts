@@ -43,6 +43,7 @@ dependencies {
 
 
     implementation(projects.core.commonsystem)
+    implementation(projects.core.datastore)
     implementation(projects.core.model)
     implementation(projects.feature.intro)
     implementation(projects.feature.user)

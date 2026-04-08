@@ -16,6 +16,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.pager.PagerState
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -47,7 +48,6 @@ import com.devd.bookcase.data.SUCCESS_SAVE_BOOK
 import com.devd.bookcase.data.SUCCESS_UPDATE_BOOK
 import com.devd.bookcase.screen.ExpandableDiaryBook
 import com.devd.commonsystem.R
-import com.devd.commonsystem.theme.OneDayTypography
 import com.devd.commonsystem.theme.PrimaryColor
 import com.devd.commonsystem.theme.WhiteColor
 import com.devd.commonsystem.ui.Toolbar
@@ -315,7 +315,7 @@ fun BookcaseScreen(
     ) {
         Toolbar(
             titleBox = {
-                Text("", style = OneDayTypography.titleMedium.copy(color = WhiteColor))
+                Text("", style = MaterialTheme.typography.titleMedium.copy(color = WhiteColor))
             },
             leftButtons = {
                 if (!isOpenBook.value) {

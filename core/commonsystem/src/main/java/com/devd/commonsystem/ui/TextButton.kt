@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -18,7 +19,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.devd.commonsystem.theme.AccentColor
 import com.devd.commonsystem.theme.AccentOpacity40Color
-import com.devd.commonsystem.theme.OneDayTypography
 import com.devd.commonsystem.theme.WhiteColor
 
 
@@ -47,7 +47,7 @@ fun TextButton(
         ),
         textAlign = TextAlign.Center,
         text = text,
-        style = OneDayTypography.bodyMedium.copy(
+        style = MaterialTheme.typography.bodyMedium.copy(
             fontSize = textSize,
             color = if (enable) textColor else textColor.copy(0.4f),
             textAlign = TextAlign.Center

@@ -2,9 +2,11 @@ package com.devd.setting
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.devd.commonsystem.utils.FontList
 import com.devd.commonsystem.utils.getDateStr
 import com.devd.data.repository.DiaryBookRepository
 import com.devd.datastore.DataStoreRepository
+import com.devd.model.local.LocalSettingData
 import com.devd.setting.data.ItemType
 import com.devd.setting.data.SettingItem
 import com.devd.setting.data.SettingType
@@ -31,16 +33,35 @@ class SettingViewModel @Inject constructor(
     private val _settingUiState = MutableStateFlow(SettingUiState())
     val settingUiState = _settingUiState.asStateFlow()
 
+    var savedSettingData = LocalSettingData()
+
     init {
-        viewModelScope.launch { fetchSavedData() }
+        viewModelScope.launch { initSettingData() }
     }
 
-    private suspend fun fetchSavedData() {
-        val settingData = dataStoreRepository.getLocalSettingData()
-        val newList = setValueWithType(
-            SettingType.CLOUD_SYNC,
-            if (settingData.syncTime == 0L) "-" else settingData.syncTime.getDateStr(),
-        )
+    private suspend fun initSettingData() {
+        savedSettingData = dataStoreRepository.getLocalSettingData()
+        val newList = settingList.toMutableList().mapNotNull {
+            when (it.type) {
+                SettingType.FONT_TYPE -> {
+                    val selectItem = FontList.entries[savedSettingData.fontIndexInt]
+                    it.copy(
+                        settingType = ItemType.ActionValue(isArrow = true, value = selectItem.name)
+                    )
+                }
+
+                SettingType.ALERT_TIME -> {
+                    it.copy(settingType = ItemType.ActionValue(isArrow = true, value = "시간"))
+                }
+
+                SettingType.APP_VERSION -> {
+                    it.copy(settingType = ItemType.Value(""))
+                }
+
+                SettingType.CLOUD_SYNC -> null
+                SettingType.MONTH_TYPE -> null
+            }
+        }
         _settingUiState.update {
             it.copy(settingData = newList)
         }
@@ -60,6 +81,22 @@ class SettingViewModel @Inject constructor(
                     isLoading = false,
                     settingData = newList
                 )
+            }
+        }
+    }
+
+    fun changeSettingData(type: SettingType, value: Int) {
+        viewModelScope.launch {
+            when (type) {
+                SettingType.FONT_TYPE -> {
+                    savedSettingData = savedSettingData.copy(fontIndex = value.toString())
+                    dataStoreRepository.setLocalSettingData(savedSettingData)
+                }
+
+                SettingType.CLOUD_SYNC -> Unit
+                SettingType.ALERT_TIME -> TODO()
+                SettingType.MONTH_TYPE -> Unit
+                SettingType.APP_VERSION -> TODO()
             }
         }
     }

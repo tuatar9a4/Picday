@@ -10,8 +10,10 @@ import androidx.compose.material3.dynamicDarkColorScheme
 import androidx.compose.material3.dynamicLightColorScheme
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.platform.LocalContext
+import com.devd.commonsystem.utils.FontList
 
 private val DarkColorScheme = darkColorScheme(
     primary = PrimaryColor,
@@ -43,9 +45,15 @@ val LocalCustomColor = staticCompositionLocalOf {
 fun OneDayOneShotTheme(
     darkTheme: Boolean = isSystemInDarkTheme(),
     // Dynamic color is available on Android 12+
+    changeFontInt :Int =0,
     dynamicColor: Boolean = true,
+    dynamicTypography: Typography = getCustomTypography(FontList.PINK_PONG.fontFamily),
     content: @Composable () -> Unit
 ) {
+    val typography = remember(changeFontInt) {
+        getCustomTypography(FontList.entries[changeFontInt].fontFamily)
+    }
+
     val colorScheme = when {
         dynamicColor && Build.VERSION.SDK_INT >= Build.VERSION_CODES.S -> {
             val context = LocalContext.current
@@ -58,7 +66,7 @@ fun OneDayOneShotTheme(
 
     MaterialTheme(
         colorScheme = colorScheme,
-        typography = OneDayTypography,
+        typography = typography,
         content = content
     )
 }

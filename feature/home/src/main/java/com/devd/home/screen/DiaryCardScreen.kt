@@ -25,6 +25,7 @@ import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Card
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -41,7 +42,6 @@ import androidx.compose.ui.unit.dp
 import com.devd.commonsystem.R
 import com.devd.commonsystem.theme.BlackColor
 import com.devd.commonsystem.theme.BlackOpacity40Color
-import com.devd.commonsystem.theme.OneDayTypography
 import com.devd.commonsystem.theme.WhiteColor
 import com.devd.commonsystem.theme.textHashTagStyle
 import com.devd.commonsystem.utils.AnimateAsyncImage
@@ -142,7 +142,7 @@ fun DiaryCardScreen(
                     .background(color = BlackOpacity40Color, shape = CircleShape)
                     .padding(vertical = 5.dp, horizontal = 15.dp),
                 text = diaryDate,
-                style = OneDayTypography.bodyLarge.copy(
+                style = MaterialTheme.typography.bodyLarge.copy(
                     color = WhiteColor
                 )
             )
@@ -163,7 +163,7 @@ fun DiaryCardScreen(
                         minLines = 2,
                         overflow = TextOverflow.Ellipsis,
                         text = diaryTitle,
-                        style = OneDayTypography.bodySmall.copy(
+                        style = MaterialTheme.typography.bodySmall.copy(
                             color = WhiteColor
                         )
                     )
@@ -235,7 +235,7 @@ fun AddDiaryCardScreen(
                 Spacer(modifier = Modifier.size(20.dp))
                 Text(
                     text = "오늘의 한 컷을 남겨주세요",
-                    style = OneDayTypography.bodyLarge
+                    style = MaterialTheme.typography.bodyLarge
                 )
 
             }
@@ -274,7 +274,7 @@ fun EmptyDiaryCardScreen(
                 Spacer(modifier = Modifier.size(20.dp))
                 Text(
                     text = "해당 달에는 일기를 하나도 쓰지 않았아요...",
-                    style = OneDayTypography.bodyLarge
+                    style = MaterialTheme.typography.bodyLarge
                 )
 
             }

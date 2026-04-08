@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.input.TextFieldState
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
@@ -16,7 +17,6 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.devd.commonsystem.R
 import com.devd.commonsystem.theme.BlackOpacity40Color
-import com.devd.commonsystem.theme.OneDayTypography
 import com.devd.commonsystem.theme.RedColor
 import com.devd.commonsystem.theme.TextDefaultColor
 import com.devd.commonsystem.ui.dialog.book.DiaryBookDialogType
@@ -41,7 +41,7 @@ fun BookTitleInput(
                     else Modifier.bottomBorder(1.dp, BlackOpacity40Color)
                 ),
             state = titleTextFieldState,
-            textStyle = OneDayTypography.titleMedium.copy(
+            textStyle = MaterialTheme.typography.titleMedium.copy(
                 color = TextDefaultColor
             ),
             readOnly = type == DiaryBookDialogType.VIEW,
@@ -54,7 +54,7 @@ fun BookTitleInput(
                     if (titleTextFieldState.text.isEmpty()) {
                         Text(
                             text = "제목을 입력하세요", // 원하는 힌트 문구
-                            style = OneDayTypography.titleMedium,
+                            style = MaterialTheme.typography.titleMedium,
                             color = BlackOpacity40Color // 힌트 컬러
                         )
                     }
@@ -65,7 +65,7 @@ fun BookTitleInput(
         Spacer(Modifier.height(5.dp))
         Text(
             text = if (isErrorTitle.value) stringResource(R.string.error_title_message) else "",
-            style = OneDayTypography.labelLarge.copy(
+            style = MaterialTheme.typography.labelLarge.copy(
                 color = RedColor
             )
         )

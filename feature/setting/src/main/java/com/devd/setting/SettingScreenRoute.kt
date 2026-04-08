@@ -10,10 +10,14 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
@@ -24,8 +28,10 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import com.devd.commonsystem.R
 import com.devd.commonsystem.theme.AccentColor
 import com.devd.commonsystem.theme.BlackColor
-import com.devd.commonsystem.theme.OneDayTypography
 import com.devd.commonsystem.ui.Toolbar
+import com.devd.commonsystem.ui.dialog.OptionBottomSheet
+import com.devd.commonsystem.utils.FontList
+import com.devd.model.local.SheetItem
 import com.devd.setting.data.ItemType
 import com.devd.setting.data.SettingType
 
@@ -35,14 +41,18 @@ fun SettingScreenRoute(
     viewModel: SettingViewModel = hiltViewModel()
 ) {
     val uiState by viewModel.settingUiState.collectAsState()
+    var isFontListSheet by remember { mutableStateOf(false) }
 
     SettingScreen(
         modifier = modifier,
         uiState = uiState,
         onItemClick = {
-            when(it){
+            when (it) {
                 SettingType.CLOUD_SYNC -> viewModel.syncDiaryData()
-                SettingType.FONT_TYPE -> TODO()
+                SettingType.FONT_TYPE -> {
+                    isFontListSheet = true
+                }
+
                 SettingType.ALERT_TIME -> TODO()
                 SettingType.MONTH_TYPE -> TODO()
                 SettingType.APP_VERSION -> TODO()
@@ -50,13 +60,34 @@ fun SettingScreenRoute(
         }
     )
 
+    if (isFontListSheet) {
+        OptionBottomSheet(
+            title = "앱 폰트 선택",
+            items = FontList.entries
+                .mapIndexed { index, item ->
+                    SheetItem(
+                        id = index.toString(),
+                        text = item.name,
+                        isSelected = index == viewModel.savedSettingData.fontIndexInt
+                    )
+                },
+            onItemSelected = {
+                isFontListSheet = false
+                viewModel.changeSettingData(SettingType.FONT_TYPE, it.id.toInt())
+            },
+            onDismissRequest = {
+                isFontListSheet = false
+
+            }
+        )
+    }
 }
 
 @Preview
 @Composable
 fun SettingScreen(
     modifier: Modifier = Modifier,
-    uiState : SettingUiState = SettingUiState(),
+    uiState: SettingUiState = SettingUiState(),
     onItemClick: (type: SettingType) -> Unit = {}
 ) {
     Column(
@@ -104,7 +135,7 @@ fun ActionItem(
     ) {
         Text(
             text = stringResource(key.strId),
-            style = OneDayTypography.bodyMedium.copy(
+            style = MaterialTheme.typography.bodyMedium.copy(
                 color = BlackColor
             )
         )
@@ -133,7 +164,7 @@ fun ActionValueItem(
     ) {
         Text(
             text = stringResource(key.strId),
-            style = OneDayTypography.bodyMedium.copy(
+            style = MaterialTheme.typography.bodyMedium.copy(
                 color = BlackColor
             )
         )
@@ -143,7 +174,7 @@ fun ActionValueItem(
             type.valueId?.let { stringResource(it) } ?: type.value?.let {
                 Text(
                     text = it,
-                    style = OneDayTypography.labelLarge.copy(
+                    style = MaterialTheme.typography.labelLarge.copy(
                         color = AccentColor
                     )
                 )
@@ -173,14 +204,14 @@ fun ValueItem(
     ) {
         Text(
             text = stringResource(key.strId),
-            style = OneDayTypography.bodyMedium.copy(
+            style = MaterialTheme.typography.bodyMedium.copy(
                 color = BlackColor
             )
         )
         type.valueId?.let { stringResource(it) } ?: type.value?.let {
             Text(
                 text = it,
-                style = OneDayTypography.labelLarge.copy(
+                style = MaterialTheme.typography.labelLarge.copy(
                     color = AccentColor
                 )
             )
