@@ -1,6 +1,5 @@
 package com.devd.home.screen
 
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
@@ -19,17 +18,19 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import coil3.compose.AsyncImage
 import com.devd.commonsystem.theme.BlackColor
 import com.devd.commonsystem.theme.GreyColor
 import com.devd.commonsystem.theme.OneDayOneShotTheme
 import com.devd.commonsystem.theme.SecondaryColor
 import com.devd.commonsystem.theme.WhiteColor
-import com.devd.commonsystem.utils.diaryPhaseIcon
+import com.devd.commonsystem.utils.rememberImageUrl
 import com.devd.model.local.DiaryBookInfo
 import com.devd.model.local.DiaryPhaseType
 
@@ -63,12 +64,12 @@ fun BookCardScreen(
                         .fillMaxWidth()
                         .padding(top = 5.dp)
                 ) {
-                    Image(
+                    AsyncImage(
+                        model = bookInfo.bookImage?.rememberImageUrl(),
+                        contentDescription = null,
                         modifier = Modifier
                             .size(50.dp)
-                            .background(color = WhiteColor, shape = RoundedCornerShape(5.dp)),
-                        painter = bookInfo.bookPhaseType.diaryPhaseIcon(bookInfo.monthWritePercent),
-                        contentDescription = null
+                            .clip(RoundedCornerShape(5.dp))
                     )
                     Spacer(Modifier.width(15.dp))
                     Column() {
