@@ -101,12 +101,14 @@ fun DiaryBookDialog(
                 .fillMaxWidth()
                 .background(WhiteColor, shape = RoundedCornerShape(10.dp)),
         ) {
-            ColorPalletIcon(
-                modifier = Modifier
-                    .padding(top = 10.dp, end = 15.dp)
-                    .align(Alignment.TopEnd),
-                bookColor = bookColor
-            )
+            if (dialogType == DiaryBookDialogType.EDIT) {
+                ColorPalletIcon(
+                    modifier = Modifier
+                        .padding(top = 10.dp, end = 15.dp)
+                        .align(Alignment.TopEnd),
+                    bookColor = bookColor
+                )
+            }
             Column(
                 modifier = Modifier.padding(top = 34.dp)
             ) {
