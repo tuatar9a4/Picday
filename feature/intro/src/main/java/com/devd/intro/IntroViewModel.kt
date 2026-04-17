@@ -5,7 +5,9 @@ import androidx.lifecycle.viewModelScope
 import com.devd.data.repository.DiaryBookRepository
 import com.devd.data.repository.OracleRepository
 import com.devd.data.utils.CallResult
+import com.devd.datastore.DataStoreKey
 import com.devd.datastore.DataStoreRepository
+import com.devd.firebase.fcm.FcmExtension
 import com.devd.model.local.DiaryBookInfo
 import com.devd.model.local.DiaryPhaseType
 import com.devd.model.local.FailUpload
@@ -139,6 +141,8 @@ class IntroViewModel @Inject constructor(
                 }
 
                 is CallResult.Success -> {
+                    FcmExtension.getFcmToken()
+                        ?.let { dataStoreRepository.setPreferData(DataStoreKey.FcmToken, it) }
                     _introUiState.update { it.copy(isLoading = false) }
                     _naviToHome.emit(userUUID)
                 }

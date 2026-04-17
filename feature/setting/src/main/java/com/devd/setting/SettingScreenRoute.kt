@@ -30,10 +30,13 @@ import com.devd.commonsystem.theme.AccentColor
 import com.devd.commonsystem.theme.BlackColor
 import com.devd.commonsystem.ui.Toolbar
 import com.devd.commonsystem.ui.dialog.OptionBottomSheet
+import com.devd.commonsystem.ui.dialog.ShowMessageDialog
+import com.devd.commonsystem.ui.loading.LoadingDialog
 import com.devd.commonsystem.utils.FontList
 import com.devd.model.local.SheetItem
 import com.devd.setting.data.ItemType
 import com.devd.setting.data.SettingType
+import com.devd.setting.dialog.AlarmTimSelectDialog
 
 @Composable
 fun SettingScreenRoute(
@@ -46,14 +49,14 @@ fun SettingScreenRoute(
     SettingScreen(
         modifier = modifier,
         uiState = uiState,
-        onItemClick = {
-            when (it) {
+        onItemClick = { type, value ->
+            when (type) {
                 SettingType.CLOUD_SYNC -> viewModel.syncDiaryData()
                 SettingType.FONT_TYPE -> {
                     isFontListSheet = true
                 }
 
-                SettingType.ALERT_TIME -> TODO()
+                SettingType.ALERT_TIME -> viewModel.checkFcmToken()
                 SettingType.MONTH_TYPE -> TODO()
                 SettingType.APP_VERSION -> TODO()
             }
@@ -81,6 +84,27 @@ fun SettingScreenRoute(
             }
         )
     }
+
+    if (uiState.alarmDialogInfo.isShow) {
+        AlarmTimSelectDialog(
+            uiState.alarmDialogInfo.selectHour ?: 0,
+            uiState.alarmDialogInfo.selectMin ?: 0,
+            {
+                viewModel.dismissAlarmDialog()
+            },
+            { hour, min ->
+                viewModel.registerScheduleUserPush("$hour$min")
+            }
+        )
+    }
+
+    uiState.messageDialog?.getMessage()?.ShowMessageDialog(
+        onRightButtonClick = {
+            viewModel.dismissMessageDialog()
+        }
+    )
+
+    uiState.isLoading.LoadingDialog()
 }
 
 @Preview
@@ -88,7 +112,7 @@ fun SettingScreenRoute(
 fun SettingScreen(
     modifier: Modifier = Modifier,
     uiState: SettingUiState = SettingUiState(),
-    onItemClick: (type: SettingType) -> Unit = {}
+    onItemClick: (type: SettingType, itemValue: String?) -> Unit = { _, _ -> }
 ) {
     Column(
         modifier = modifier.then(Modifier.fillMaxSize())
@@ -112,7 +136,7 @@ fun SettingScreen(
                 is ItemType.ActionValue -> ActionValueItem(
                     item.type,
                     item.settingType,
-                    onItemClick = { onItemClick(item.type) })
+                    onItemClick = { onItemClick(item.type, item.settingType.value) })
 
                 is ItemType.Value -> ValueItem(item.type, item.settingType)
             }

@@ -3,12 +3,9 @@ package com.devd.commonsystem.theme
 import androidx.compose.material3.Typography
 import androidx.compose.runtime.compositionLocalOf
 import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
-import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.sp
-import com.devd.commonsystem.R
 import com.devd.commonsystem.utils.FontList
 
 fun getCustomTypography(fontFamily: FontFamily): Typography {
@@ -76,19 +73,6 @@ fun getCustomTypography(fontFamily: FontFamily): Typography {
     )
 
 }
-
-val textHashTagStyle = TextStyle(
-    fontFamily = FontFamily(Font(R.font.suit_semi_bold)),
-    fontWeight = FontWeight(600),
-    fontStyle = FontStyle.Italic,
-    fontSize = 11.sp,
-)
-val textHashTagSmallStyle = TextStyle(
-    fontFamily = FontFamily(Font(R.font.suit_semi_bold)),
-    fontWeight = FontWeight(600),
-    fontStyle = FontStyle.Italic,
-    fontSize = 9.sp,
-)
 
 val LocalCustomTypography = compositionLocalOf {
     getCustomTypography(FontList.SUIT.fontFamily)

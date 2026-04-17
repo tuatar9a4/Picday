@@ -8,6 +8,7 @@ plugins {
     alias(libs.plugins.dagger.hilt.android) apply false
     alias(libs.plugins.jetbrains.kotlin.jvm) apply false
     alias(libs.plugins.kotlin.serialization) apply false
+    alias(libs.plugins.google.services) apply false
 }
 
 // Hilt Android Gradle Plugin 적용

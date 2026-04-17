@@ -23,7 +23,7 @@ class MainActivity : ComponentActivity() {
 
         setContent {
             OneDayOneShotTheme(
-                changeFontInt = viewModel.dataChangeFlow.value
+                changeFontInt = viewModel.appFontCurrent.value
             ) {
                 Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
                     MyNavHost(

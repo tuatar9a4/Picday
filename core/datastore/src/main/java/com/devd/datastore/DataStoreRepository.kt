@@ -1,7 +1,7 @@
 package com.devd.datastore
 
 import androidx.compose.runtime.MutableState
-import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.datastore.core.DataStore
 import androidx.datastore.core.IOException
 import androidx.datastore.preferences.core.Preferences
@@ -24,11 +24,11 @@ class DataStoreRepository @Inject constructor(
     val sharedPreferences: DataStore<Preferences>
 ) : DatastoreRepositoryImpl {
 
-    val userInfo: MutableState<Int> = mutableStateOf(0)
+    val currentFontInfo: MutableState<Int> = mutableIntStateOf(0)
 
     init {
         CoroutineScope(Dispatchers.IO).launch {
-            userInfo.value = getLocalSettingData().fontIndexInt
+            currentFontInfo.value = getLocalSettingData().fontIndexInt
         }
     }
 
@@ -73,7 +73,7 @@ class DataStoreRepository @Inject constructor(
 
     suspend fun setLocalSettingData(settingData: LocalSettingData): LocalSettingData {
         val jsonSting = Gson().toJson(settingData).toString()
-        userInfo.value = settingData.fontIndexInt
+        currentFontInfo.value = settingData.fontIndexInt
         setPreferData(DataStoreKey.LocalSettingKey, jsonSting)
         return settingData
     }

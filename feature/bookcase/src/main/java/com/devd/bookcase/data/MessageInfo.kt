@@ -21,7 +21,7 @@ const val NEED_CAMERA_PERMISSION = "needCameraPermission"
 data class MessageInfo @SuppressLint("SupportAnnotationUsage") constructor(
     val type: String,
     @param:StringRes val messageId: Int? = null,
-    @param:StringRes val messageStr: String? = null
+    val messageStr: String? = null
 ) {
     @Composable
     fun getMessage() =

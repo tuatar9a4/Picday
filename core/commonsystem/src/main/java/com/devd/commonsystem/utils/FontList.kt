@@ -22,4 +22,20 @@ enum class FontList(val fontFamily: FontFamily) {
             Font(R.font.pinkfong_font_light, weight = FontWeight(400)),
         )
     ),
+    NANUM_SQUARE(
+        fontFamily = FontFamily(
+            Font(R.font.nanumsquare_extra_bold, weight = FontWeight(700)),
+            Font(R.font.nanumsquare_bold, weight = FontWeight(600)),
+            Font(R.font.nanumsquare_regular, weight = FontWeight(500)),
+            Font(R.font.nanumsquare_light, weight = FontWeight(400)),
+        )
+    ),
+    INTERROP(
+        fontFamily = FontFamily(
+            Font(R.font.interop_extra_bold, weight = FontWeight(700)),
+            Font(R.font.interop_bold, weight = FontWeight(600)),
+            Font(R.font.interop_regular, weight = FontWeight(500)),
+            Font(R.font.interop_light, weight = FontWeight(400)),
+        )
+    ),
 }

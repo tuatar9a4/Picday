@@ -46,7 +46,6 @@ import com.devd.commonsystem.theme.BlackColor
 import com.devd.commonsystem.theme.GreyOpacity40Color
 import com.devd.commonsystem.theme.OneDayTextFieldColors
 import com.devd.commonsystem.theme.WhiteColor
-import com.devd.commonsystem.theme.textHashTagStyle
 
 @Preview
 @Composable
@@ -201,16 +200,17 @@ fun HashTagList(
             ) {
                 Text(
                     text = "#",
-                    style = textHashTagStyle.copy(
-                        color = WhiteColor,
-                        fontStyle = FontStyle.Italic
+                    style =MaterialTheme.typography.labelLarge.copy(
+                        fontStyle = FontStyle.Italic,
+                        color = WhiteColor
                     )
                 )
                 Spacer(Modifier.width(2.dp))
                 Text(
                     text = it,
-                    style = textHashTagStyle.copy(
-                        color = WhiteColor,
+                    style = MaterialTheme.typography.labelLarge.copy(
+                        fontStyle = FontStyle.Italic,
+                        color = WhiteColor
                     )
                 )
                 Spacer(Modifier.width(6.dp))

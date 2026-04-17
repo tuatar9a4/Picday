@@ -20,6 +20,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -29,7 +30,6 @@ import com.devd.calendar.data.CalendarImageInfo
 import com.devd.commonsystem.theme.BlackColor
 import com.devd.commonsystem.theme.BlackOpacity40Color
 import com.devd.commonsystem.theme.WhiteColor
-import com.devd.commonsystem.theme.textHashTagStyle
 
 
 @Preview
@@ -112,7 +112,8 @@ fun SimpleDiaryCardScreen(
                         calendarImageInfo.tagList?.forEach {
                             Text(
                                 text = "# $it",
-                                style = textHashTagStyle.copy(
+                                style = MaterialTheme.typography.labelLarge.copy(
+                                    fontStyle = FontStyle.Italic,
                                     color = WhiteColor
                                 )
                             )

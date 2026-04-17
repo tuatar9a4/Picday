@@ -1,5 +1,8 @@
+import com.devd.build_logic.app.configureFirebaseConsole
+
 plugins {
     id("devd.android.application")
+    id("com.google.gms.google-services")
 }
 
 android {
@@ -31,6 +34,8 @@ android {
     }
 }
 
+configureFirebaseConsole()
+
 dependencies {
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
@@ -45,6 +50,7 @@ dependencies {
     implementation(projects.core.commonsystem)
     implementation(projects.core.datastore)
     implementation(projects.core.model)
+    implementation(projects.core.firebase)
     implementation(projects.feature.intro)
     implementation(projects.feature.user)
     implementation(projects.feature.home)

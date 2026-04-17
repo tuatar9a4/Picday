@@ -28,6 +28,7 @@ import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -37,7 +38,6 @@ import com.devd.commonsystem.theme.BlackOpacity40Color
 import com.devd.commonsystem.theme.SecondaryColor
 import com.devd.commonsystem.theme.WhiteColor
 import com.devd.commonsystem.theme.WhiteOpacity40Color
-import com.devd.commonsystem.theme.textHashTagStyle
 import com.devd.commonsystem.utils.noRippleClickable
 import com.devd.commonsystem.utils.rememberImageUrl
 import com.devd.editor.data.ImageType
@@ -123,9 +123,10 @@ fun CardPreviewItem(
                 items(diaryTag) {
                     Text(
                         text = "# $it",
-                        style = textHashTagStyle.copy(
-                            color = WhiteColor,
-                        ),
+                        style = MaterialTheme.typography.labelLarge.copy(
+                            fontStyle = FontStyle.Italic,
+                            color = WhiteColor
+                        )
                     )
                 }
             }

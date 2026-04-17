@@ -29,5 +29,13 @@ sealed class DataStoreKey<T>(
         override fun preferencesKey() = intPreferencesKey(key)
     }
 
+    object FcmToken : DataStoreKey<String>("fcm_token") {
+        override fun preferencesKey() = stringPreferencesKey(key)
+    }
+
+    object SavedAlarmTime : DataStoreKey<String>("saved_alarm_time") {
+        override fun preferencesKey() = stringPreferencesKey(key)
+    }
+
 }
 

@@ -16,4 +16,6 @@ dependencies {
     implementation(libs.material)
     implementation(libs.androidx.lifecycle.runtime.ktx)
 
+    implementation(projects.core.firebase)
+
 }

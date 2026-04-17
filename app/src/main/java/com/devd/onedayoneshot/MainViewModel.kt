@@ -10,6 +10,6 @@ class MainViewModel @Inject constructor(
     private val dataStoreRepository: DataStoreRepository
 ) : ViewModel() {
 
-    val dataChangeFlow = dataStoreRepository.userInfo
+    val appFontCurrent = dataStoreRepository.currentFontInfo
 
 }

@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "878643231397",
+    "project_id": "onecutdiary",
+    "storage_bucket": "onecutdiary.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:878643231397:android:d8060e483d616b8191ab4c",
+        "android_client_info": {
+          "package_name": "com.devd.onedayoneshot"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyA5JtLGM692OOdF3wodVXQCPe9RVc8Klms"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

@@ -36,6 +36,7 @@ import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -43,7 +44,6 @@ import com.devd.commonsystem.R
 import com.devd.commonsystem.theme.BlackColor
 import com.devd.commonsystem.theme.BlackOpacity40Color
 import com.devd.commonsystem.theme.WhiteColor
-import com.devd.commonsystem.theme.textHashTagStyle
 import com.devd.commonsystem.utils.AnimateAsyncImage
 import com.devd.commonsystem.utils.LocalAnimatedVisibilityScope
 import com.devd.commonsystem.utils.LocalSharedTransitionScope
@@ -184,7 +184,8 @@ fun DiaryCardScreen(
                     diaryTag.forEach {
                         Text(
                             text = "# $it",
-                            style = textHashTagStyle.copy(
+                            style = MaterialTheme.typography.labelLarge.copy(
+                                fontStyle = FontStyle.Italic,
                                 color = WhiteColor
                             )
                         )

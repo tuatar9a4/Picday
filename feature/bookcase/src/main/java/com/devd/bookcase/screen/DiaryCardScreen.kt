@@ -18,6 +18,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -25,7 +26,6 @@ import coil3.compose.AsyncImage
 import com.devd.commonsystem.theme.BlackColor
 import com.devd.commonsystem.theme.BlackOpacity40Color
 import com.devd.commonsystem.theme.WhiteColor
-import com.devd.commonsystem.theme.textHashTagSmallStyle
 import com.devd.commonsystem.utils.rememberImageUrl
 import com.devd.model.local.DiaryInfo
 
@@ -103,7 +103,8 @@ fun DiaryCardScreen(
                 diaryInfo.tagList.forEach {
                     Text(
                         text = "# $it",
-                        style = textHashTagSmallStyle.copy(
+                        style = MaterialTheme.typography.labelSmall.copy(
+                            fontStyle = FontStyle.Italic,
                             color = WhiteColor
                         )
                     )
