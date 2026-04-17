@@ -151,50 +151,62 @@ fun Rect.scaleSafe(
     containerSize: IntSize,
     imageOffset: Offset
 ): Rect {
-    // 1. 현재 중심점 계산
-    val centerX = this.left + this.width / 2f
-    val centerY = this.top + this.height / 2f
-
-    // 2. 새로운 크기 계산
+    // 1. 새로운 크기 계산
     val newWidth = this.width * zoom
     val newHeight = this.height * zoom
 
-    // 3. 중심을 유지하며 새로운 Rect 생성
-    var newRect = Rect(
-        left = centerX - newWidth / 2f,
-        top = centerY - newHeight / 2f,
-        right = centerX + newWidth / 2f,
-        bottom = centerY + newHeight / 2f
-    )
+    // 2. 가용 가능한 최대 영역 정의 (이미지가 그려지는 실제 범위)
+    // 여기서는 컨테이너 전체를 기준으로 잡거나, 실제 이미지의 끝 좌표를 넣어야 합니다.
+    val limitLeft = imageOffset.x
+    val limitTop = imageOffset.y
+    val limitRight = containerSize.width.toFloat() // 혹은 imageOffset.x + imageActualWidth
+    val limitBottom =
+        limitTop + containerSize.height.toFloat() // 혹은 imageOffset.y + imageActualHeight
 
-    // 4. 경계 제한 (Container 및 ImageOffset 기준)
-    // 왼쪽/위 제한
-    if (newRect.left < imageOffset.x) {
-        newRect = newRect.translate(imageOffset.x - newRect.left, 0f)
-    }
-    if (newRect.top < imageOffset.y) {
-        newRect = newRect.translate(0f, imageOffset.y - newRect.top)
+    // 크기가 가용 영역보다 커지는 경우 미리 방지
+    if (newWidth > (limitRight - limitLeft) || newHeight > (limitBottom - limitTop)) {
+        return this
     }
 
-    // 오른쪽/아래 제한 (이미지 크기를 벗어나지 않게 하려면 추가 로직 필요)
-    val maxRight = containerSize.width.toFloat() - imageOffset.x
-    val maxBottom = containerSize.height.toFloat() - imageOffset.y
+    // 3. 중심점 유지하며 새로운 Rect 생성
+    val centerX = this.left + this.width / 2f
+    val centerY = this.top + this.height / 2f
 
-    if (newRect.right > maxRight) {
-        newRect = newRect.translate(maxRight - newRect.right, 0f)
-    }
-    if (newRect.bottom > maxBottom) {
-        newRect = newRect.translate(0f, maxBottom - newRect.bottom)
-    }
+    var left = centerX - newWidth / 2f
+    var top = centerY - newHeight / 2f
+    var right = left + newWidth
+    var bottom = top + newHeight
+    val duringCenterX = left + newWidth / 2f
+    val duringCenterY = top + newHeight / 2f
 
-    // 최종 크기가 컨테이너보다 커지는 것을 방지
-    return if (newRect.width <= (maxRight - imageOffset.x) &&
-        newRect.height <= (maxBottom - imageOffset.y)
-    ) {
-        newRect
-    } else {
-        this // 너무 커지면 변화 무시
+    // 4. 경계 보정 (Clamp)
+    // 왼쪽으로 벗어나면 오른쪽으로 밀기
+    if (left < limitLeft) {
+        val diff = limitLeft - left
+        left += diff
+        right += diff
     }
+    // 오른쪽으로 벗어나면 왼쪽으로 밀기
+    if (right > limitRight) {
+        val diff = right - limitRight
+        left -= diff
+        right -= diff
+    }
+    // 위로 벗어나면 아래로 밀기
+    if (top < limitTop) {
+        val diff = limitTop - top
+        top += diff
+        bottom += diff
+    }
+    // 아래로 벗어나면 위로 밀기
+    if (bottom > limitBottom) {
+        val diff = bottom - limitBottom
+        top -= diff
+        bottom -= diff
+    }
+    val newCenterX = left + newWidth / 2f
+    val newCenterY = top + newHeight / 2f
+    return Rect(left, top, right, bottom)
 }
 
 /* Uri 를 Bitmap으로 전환 */
