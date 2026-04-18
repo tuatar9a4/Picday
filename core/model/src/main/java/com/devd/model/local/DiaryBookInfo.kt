@@ -7,6 +7,7 @@ data class DiaryBookInfo(
     val title: String,
     val description: String? = null,
     val bookPhaseType: DiaryPhaseType = DiaryPhaseType.MOON,
+    val continueWriteCount: Long = 0,
     val createDate: Long = System.currentTimeMillis(),
     var monthWritePercent: Float = 0f,
     var isMajor: Boolean = false

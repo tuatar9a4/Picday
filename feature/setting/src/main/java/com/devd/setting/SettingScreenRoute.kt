@@ -1,5 +1,6 @@
 package com.devd.setting
 
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -41,10 +42,15 @@ import com.devd.setting.dialog.AlarmTimSelectDialog
 @Composable
 fun SettingScreenRoute(
     modifier: Modifier = Modifier,
-    viewModel: SettingViewModel = hiltViewModel()
+    viewModel: SettingViewModel = hiltViewModel(),
+    onBackClick: () -> Unit,
 ) {
     val uiState by viewModel.settingUiState.collectAsState()
     var isFontListSheet by remember { mutableStateOf(false) }
+
+    BackHandler() {
+        onBackClick()
+    }
 
     SettingScreen(
         modifier = modifier,

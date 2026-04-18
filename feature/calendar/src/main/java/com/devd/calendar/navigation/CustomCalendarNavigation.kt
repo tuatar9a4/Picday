@@ -4,14 +4,15 @@ import androidx.compose.ui.Modifier
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
 import com.devd.calendar.CalendarScreenRoute
+import com.devd.model.local.NavRoute
 import kotlinx.serialization.Serializable
 
 
 @Serializable
-data class CustomCalendarRoute(
+data object CustomCalendarRoute/*(
     val selectBookID: Long,
     val selectMillis: Long
-)
+)*/ : NavRoute
 
 fun NavGraphBuilder.customCalendarScreen(
     modifier: Modifier = Modifier,
@@ -21,7 +22,6 @@ fun NavGraphBuilder.customCalendarScreen(
         CalendarScreenRoute(
             modifier = modifier,
             onBackClick = onBackClick
-
         )
     }
 }

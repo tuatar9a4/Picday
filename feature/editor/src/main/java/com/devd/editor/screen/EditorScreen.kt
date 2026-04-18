@@ -1,6 +1,7 @@
 package com.devd.editor.screen
 
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.scrollBy
 import androidx.compose.foundation.layout.Arrangement
@@ -16,6 +17,7 @@ import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.input.rememberTextFieldState
 import androidx.compose.foundation.text.input.setTextAndPlaceCursorAtEnd
 import androidx.compose.foundation.verticalScroll
@@ -41,6 +43,7 @@ import androidx.core.net.toUri
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.devd.commonsystem.R
+import com.devd.commonsystem.theme.BlackColor
 import com.devd.commonsystem.ui.calendar.CustomDatePickerDialog
 import com.devd.commonsystem.ui.calendar.RangeType
 import com.devd.commonsystem.ui.cropImageDialog.ShowCropDialog
@@ -275,13 +278,37 @@ fun EditorScreen(
             )
         }
         Spacer(Modifier.height(15.dp))
-        EditorDateItem(
-            writeDate = writeDate,
-            isCanChangeDate = isCanChangeDate,
-            onShowCalendar = {
-                onChangeCalendar()
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.SpaceBetween
+        ) {
+            EditorDateItem(
+                writeDate = writeDate,
+                isCanChangeDate = isCanChangeDate,
+                onShowCalendar = {
+                    onChangeCalendar()
+                }
+            )   // 날짜 View
+            Column(
+                modifier = Modifier.padding(end = 15.dp),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                Text(
+                    text = "Feel",
+                    style = MaterialTheme.typography.labelLarge.copy(
+                        color = BlackColor
+                    )
+                )
+                Image(
+                    modifier = Modifier
+                        .border(width = 1.dp, color = BlackColor, shape = RoundedCornerShape(5.dp))
+                        .padding(5.dp),
+                    painter = painterResource(R.drawable.icon_pencil),
+                    contentDescription = null
+                )
             }
-        )   // 날짜 View
+        }
         Spacer(Modifier.height(20.dp))
         CardPreviewItem(
             imageUrl = diaryState?.imageUrl,

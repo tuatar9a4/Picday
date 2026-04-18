@@ -11,11 +11,12 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.devd.commonsystem.R
-import com.devd.commonsystem.theme.BlackColor
+import com.devd.commonsystem.theme.Black33Color
 import java.time.ZonedDateTime
 
 @Composable
@@ -32,16 +33,17 @@ fun YearCategory(
         verticalAlignment = Alignment.CenterVertically,
     ) {
         Text(
-            text = "${searchDate.year}/${searchDate.monthValue}",
+            text = "${searchDate.year} . ${searchDate.monthValue} . ${searchDate.dayOfMonth} , ${searchDate.dayOfWeek.name}",
             style = MaterialTheme.typography.bodyMedium.copy(
-                color = BlackColor
+                color = Black33Color
             )
         )
         Spacer(Modifier.width(5.dp))
         Image(
-            modifier = Modifier.size(14.dp),
+            modifier = Modifier.size(36.dp),
             painter = painterResource(R.drawable.icon_drop_down),
-            contentDescription = null
+            contentDescription = null,
+            colorFilter = ColorFilter.tint(color = Black33Color)
         )
     }
 }

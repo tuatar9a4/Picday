@@ -1,20 +1,20 @@
 package com.devd.home.screen
 
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.FloatingActionButtonDefaults
 import androidx.compose.material3.MaterialTheme
@@ -34,7 +34,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.devd.commonsystem.R
 import com.devd.commonsystem.theme.AccentOpacity40Color
-import com.devd.commonsystem.theme.PrimaryColor
+import com.devd.commonsystem.theme.BlackD9Color
 import com.devd.commonsystem.theme.WhiteColor
 import com.devd.commonsystem.ui.Toolbar
 import com.devd.commonsystem.ui.calendar.CustomDatePickerDialog
@@ -61,8 +61,6 @@ import java.io.File
 fun HomeScreenRoute(
     modifier: Modifier = Modifier,
     onEditorMove: (imageUrl: String?, bookId: Long, diaryId: Long?) -> Unit = { _, _, _ -> },
-    onCalendarMove: (bookId: Long, selectMillis: Long) -> Unit = { _, _ -> },
-    onBookcaseMove: (userId: String) -> Unit = {},
     onSettingClick: (userId: String) -> Unit = {},
     onMoveDiaryList: (List<DiaryInfo>, Int) -> Unit = { _, _ -> },
     viewModel: HomeViewModel = hiltViewModel()
@@ -136,18 +134,7 @@ fun HomeScreenRoute(
         uiState = uiState,
         diaryState = diaryState,
         onShowCalendar = viewModel::showCalendarDialog,
-        onBookcaseClick = {
-            viewModel.storedUUID ?: return@HomeScreen
-            onBookcaseMove(viewModel.storedUUID!!)
-        },
         onEditorClick = { checkDiaryInfoBeforeMove() },
-        onCalendarClick = {
-            uiState.bookInfo?.bookId ?: return@HomeScreen
-            onCalendarMove(
-                uiState.bookInfo?.bookId!!,
-                uiState.searchDate.toInstant().toEpochMilli()
-            )
-        },
         onSettingClick = {
             onSettingClick(viewModel.storedUUID!!)
         },
@@ -193,50 +180,39 @@ fun HomeScreen(
     uiState: HomeUiState = HomeUiState(),
     diaryState: LazyListState = rememberLazyListState(),
     onShowCalendar: () -> Unit = {},
-    onBookcaseClick: () -> Unit = {},
     onEditorClick: () -> Unit = {},
-    onCalendarClick: () -> Unit = {},
     onDiaryCardClick: (Int) -> Unit = {},
     onSettingClick: () -> Unit = {},
     onBookClick: () -> Unit = {}
 ) {
     Box(
         modifier = modifier.then(
-            Modifier
-                .fillMaxSize()
-                .background(color = PrimaryColor)
+            Modifier.fillMaxWidth()
         )
     ) {
         Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .verticalScroll(rememberScrollState()),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Toolbar(
-                modifier = Modifier.background(color = PrimaryColor),
                 titleBox = {
                     Text("", style = MaterialTheme.typography.titleMedium.copy(color = WhiteColor))
-                },
-                leftButtons = {
-                    Image(
-                        modifier = Modifier
-                            .size(32.dp)
-                            .padding(4.dp)
-                            .clickable(onClick = onBookcaseClick),
-                        painter = painterResource(R.drawable.icon_library),
-                        contentDescription = null
-                    )
                 },
                 rightButtons = {
                     Image(
                         modifier = Modifier
-                            .size(32.dp)
+                            .size(36.dp)
                             .padding(4.dp)
                             .clickable(onClick = onSettingClick),
                         painter = painterResource(R.drawable.icon_setting),
-                        contentDescription = null
+                        contentDescription = null,
+                        colorFilter = ColorFilter.tint(color = BlackD9Color)
                     )
                 }
             )
-            Spacer(Modifier.height(20.dp))
+            Spacer(Modifier.height(4.dp))
             BookCardScreen(
                 modifier = Modifier.align(Alignment.CenterHorizontally),
                 bookInfo = uiState.bookInfo,
@@ -257,6 +233,7 @@ fun HomeScreen(
                 onDiaryCardClick = onDiaryCardClick,
                 onAddCardClick = onEditorClick
             )   // DiaryList 스크린
+            Spacer(Modifier.height(20.dp))
         }
         Row(
             modifier = Modifier
@@ -277,21 +254,6 @@ fun HomeScreen(
                     colorFilter = ColorFilter.tint(WhiteColor)
                 )
             }   // 일기장 작성 이동 버튼
-            Spacer(Modifier.width(20.dp))
-            FloatingActionButton(
-                modifier = Modifier.size(42.dp),
-                shape = CircleShape,
-                containerColor = AccentOpacity40Color,
-                elevation = FloatingActionButtonDefaults.elevation(defaultElevation = 0.dp),
-                onClick = onCalendarClick,
-            ) {
-                Image(
-                    painter = painterResource(R.drawable.icon_calendar),
-                    contentDescription = null,
-                    colorFilter = ColorFilter.tint(WhiteColor)
-                )
-            }   // 달력 이동 번튼
-            Spacer(Modifier.width(20.dp))
         }
     }
 }

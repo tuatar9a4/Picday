@@ -4,9 +4,7 @@ import androidx.annotation.FloatRange
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import androidx.navigation.toRoute
 import com.devd.calendar.data.CalendarImageInfo
-import com.devd.calendar.navigation.CustomCalendarRoute
 import com.devd.commonsystem.utils.getCurrentMonthRangeMillis
 import com.devd.commonsystem.utils.getFirstDayMillis
 import com.devd.data.repository.DiaryBookRepository
@@ -45,10 +43,14 @@ class CalendarViewModel @Inject constructor(
     savedStateHandle: SavedStateHandle
 ) : ViewModel() {
 
-    private val route = savedStateHandle.toRoute<CustomCalendarRoute>()
-    var bookId = route.selectBookID
+    //    private val route = savedStateHandle.toRoute<CustomCalendarRoute>()
+//    var bookId = route.selectBookID
+//    private val _calendarUiState =
+//        MutableStateFlow(CalendarUiState(selectDate = route.selectMillis))
+
+    var bookId: Long = -1L
     private val _calendarUiState =
-        MutableStateFlow(CalendarUiState(selectDate = route.selectMillis))
+        MutableStateFlow(CalendarUiState(selectDate = System.currentTimeMillis()))
     val calendarUiState = _calendarUiState.asStateFlow()
 
     private val _optionBookList = MutableStateFlow<List<DiaryBookInfo>?>(null)
@@ -57,6 +59,8 @@ class CalendarViewModel @Inject constructor(
 
     init {
         viewModelScope.launch {
+            val uuid = dataStoreRepository.getUserInfo()?.uuid!!
+            bookId = diaryRepository.fetchMajorDiaryBook(uuid)?.bookId!!
             val bookInfo = diaryRepository.fetchBookInfo(bookId)
             bookInfo?.let { bookInfo ->
                 _calendarUiState.update {

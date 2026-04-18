@@ -23,7 +23,7 @@ fun getCustomTypography(fontFamily: FontFamily): Typography {
         titleSmall = TextStyle(
             fontFamily = fontFamily,
             fontWeight = FontWeight(500),
-            fontSize = 22.sp
+            fontSize = 20.sp
         ),
         bodyLarge = TextStyle(
             fontFamily = fontFamily,
@@ -43,17 +43,17 @@ fun getCustomTypography(fontFamily: FontFamily): Typography {
         displayLarge = TextStyle(
             fontFamily = fontFamily,
             fontWeight = FontWeight(700),
-            fontSize = 14.sp
+            fontSize = 12.sp
         ),
         displayMedium = TextStyle(
             fontFamily = fontFamily,
             fontWeight = FontWeight(600),
-            fontSize = 14.sp
+            fontSize = 12.sp
         ),
         displaySmall = TextStyle(
             fontFamily = fontFamily,
             fontWeight = FontWeight(500),
-            fontSize = 14.sp
+            fontSize = 12.sp
         ),
         labelLarge = TextStyle(
             fontFamily = fontFamily,

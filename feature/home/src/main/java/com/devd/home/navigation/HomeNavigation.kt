@@ -7,19 +7,18 @@ import androidx.navigation.compose.composable
 import com.devd.commonsystem.utils.LocalAnimatedVisibilityScope
 import com.devd.home.screen.HomeScreenRoute
 import com.devd.model.local.DiaryInfo
+import com.devd.model.local.NavRoute
 import kotlinx.serialization.Serializable
 
 
 @Serializable
-data object HomeRoute
+data object HomeRoute : NavRoute
 
 fun NavGraphBuilder.homeScreen(
     modifier: Modifier = Modifier,
     onNavigateToList: (list: List<DiaryInfo>, pos: Int) -> Unit,
     onNavigateToEditor: (String?, Long, Long?) -> Unit,
-    onBookcaseMove: (userId: String) -> Unit,
     onSettingClick :(userId: String) -> Unit,
-    onNavigateToCalendar: (bookId: Long, selectMillis: Long) -> Unit
 ) {
     composable<HomeRoute> {
         CompositionLocalProvider(
@@ -28,8 +27,6 @@ fun NavGraphBuilder.homeScreen(
             HomeScreenRoute(
                 modifier = modifier,
                 onEditorMove = onNavigateToEditor,
-                onCalendarMove = onNavigateToCalendar,
-                onBookcaseMove = onBookcaseMove,
                 onSettingClick = onSettingClick,
                 onMoveDiaryList = onNavigateToList
             )

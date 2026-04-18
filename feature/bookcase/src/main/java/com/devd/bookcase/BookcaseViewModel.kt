@@ -3,7 +3,6 @@ package com.devd.bookcase
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import androidx.navigation.toRoute
 import com.devd.bookcase.data.ASK_DELETE_BOOK
 import com.devd.bookcase.data.CAN_NOT_DELETE_MAJOR
 import com.devd.bookcase.data.FAIL_DELETE_BOOK
@@ -14,7 +13,6 @@ import com.devd.bookcase.data.NONE
 import com.devd.bookcase.data.SUCCESS_DELETE_BOOK
 import com.devd.bookcase.data.SUCCESS_SAVE_BOOK
 import com.devd.bookcase.data.SUCCESS_UPDATE_BOOK
-import com.devd.bookcase.navigation.BookcaseNaviRoute
 import com.devd.commonsystem.R
 import com.devd.data.repository.DiaryBookRepository
 import com.devd.data.repository.OracleRepository
@@ -51,7 +49,7 @@ class BookcaseViewModel @Inject constructor(
     private val oracleRepository: OracleRepository,
     savedStateHandle: SavedStateHandle
 ) : ViewModel() {
-    private val route = savedStateHandle.toRoute<BookcaseNaviRoute>()
+//    private val route = savedStateHandle.toRoute<BookcaseNaviRoute>()
 
     val newBookInfo = DiaryBookInfo(bookId = -1L, title = "")
 
@@ -72,7 +70,8 @@ class BookcaseViewModel @Inject constructor(
     }
 
     suspend fun collectDiaryBook() {
-        diaryBookRepository.fetchAllDairyBooksFlow(route.userUUID)
+        val uuid = dataStoreRepository.getUserInfo()!!.uuid
+        diaryBookRepository.fetchAllDairyBooksFlow(uuid)
             .stateIn(
                 scope = viewModelScope,
                 started = SharingStarted.WhileSubscribed(2000L),
@@ -126,7 +125,8 @@ class BookcaseViewModel @Inject constructor(
     fun updateMajorBook(bookId: Long) {
         viewModelScope.launch {
             _bookcaseUiState.update { it.copy(isLoading = true) }
-            diaryBookRepository.changeMajorBook(bookId, route.userUUID)
+            val uuid = dataStoreRepository.getUserInfo()!!.uuid
+            diaryBookRepository.changeMajorBook(bookId, uuid)
             _bookcaseUiState.update { it.copy(isLoading = false) }
         }
     }

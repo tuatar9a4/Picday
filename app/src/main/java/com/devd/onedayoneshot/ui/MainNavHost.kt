@@ -7,9 +7,7 @@ import androidx.compose.ui.Modifier
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.rememberNavController
-import com.devd.bookcase.navigation.BookcaseNaviRoute
 import com.devd.bookcase.navigation.bookcaseScreen
-import com.devd.calendar.navigation.CustomCalendarRoute
 import com.devd.calendar.navigation.customCalendarScreen
 import com.devd.commonsystem.utils.LocalSharedTransitionScope
 import com.devd.diary.navigation.DiaryListRoute
@@ -25,7 +23,8 @@ import com.devd.setting.navigation.settingScreen
 @Composable
 fun MyNavHost(
     modifier: Modifier = Modifier,
-    navController: NavHostController = rememberNavController()
+    navController: NavHostController = rememberNavController(),
+    changeShowBottomBar: (Boolean) -> Unit
 ) {
 
     //HomeRoute, EditorRoute, DiaryListRoute, CustomCalendarRoute
@@ -58,23 +57,8 @@ fun MyNavHost(
                             )
                         )
                     },
-                    onBookcaseMove = { userId ->
-                        navController.navigate(
-                            BookcaseNaviRoute(
-                                userUUID = userId
-                            )
-                        )
-
-                    },
-                    onNavigateToCalendar = { bookId, selectMillis ->
-                        navController.navigate(
-                            CustomCalendarRoute(
-                                selectBookID = bookId,
-                                selectMillis = selectMillis
-                            )
-                        )
-                    },
                     onSettingClick = { uuid ->
+                        changeShowBottomBar(false)
                         navController.navigate(
                             SettingNaviRoute(uuid)
                         )
@@ -132,6 +116,7 @@ fun MyNavHost(
                 settingScreen(
                     modifier = modifier,
                     onBackClick = {
+                        changeShowBottomBar(true)
                         navController.popBackStack()
                     }
                 )

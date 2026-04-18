@@ -7,9 +7,7 @@ import com.devd.bookcase.BookcaseRoute
 import kotlinx.serialization.Serializable
 
 @Serializable
-data class BookcaseNaviRoute(
-    val userUUID: String
-)
+data object BookcaseNaviRoute
 
 fun NavGraphBuilder.bookcaseScreen(
     modifier: Modifier = Modifier,

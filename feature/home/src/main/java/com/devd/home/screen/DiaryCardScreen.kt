@@ -30,7 +30,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.rotate
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.platform.LocalConfiguration
@@ -41,8 +41,12 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.devd.commonsystem.R
+import com.devd.commonsystem.theme.AccentDimColor
 import com.devd.commonsystem.theme.BlackColor
+import com.devd.commonsystem.theme.BlackF9Color
 import com.devd.commonsystem.theme.BlackOpacity40Color
+import com.devd.commonsystem.theme.SubAccentDimColor
+import com.devd.commonsystem.theme.TransParents
 import com.devd.commonsystem.theme.WhiteColor
 import com.devd.commonsystem.utils.AnimateAsyncImage
 import com.devd.commonsystem.utils.LocalAnimatedVisibilityScope
@@ -131,27 +135,23 @@ fun DiaryCardScreen(
                         .fillMaxSize()
                         .background(color = BlackColor, shape = RoundedCornerShape(20.dp)),
                     model = it,
-                    key =  "image-$index",
+                    key = "image-$index",
                     animatedVisibilityScope = animatedScope
                 )
             }
-            Text(
-                modifier = Modifier
-                    .align(Alignment.TopStart)
-                    .padding(10.dp)
-                    .background(color = BlackOpacity40Color, shape = CircleShape)
-                    .padding(vertical = 5.dp, horizontal = 15.dp),
-                text = diaryDate,
-                style = MaterialTheme.typography.bodyLarge.copy(
-                    color = WhiteColor
-                )
-            )
             Column(
                 modifier = Modifier
                     .align(Alignment.BottomCenter)
                     .fillMaxWidth()
-                    .background(BlackOpacity40Color)
-                    .padding(start = 5.dp, end = 5.dp, top = 5.dp, bottom = 10.dp),
+                    .background(
+                        brush = Brush.verticalGradient(
+                            colors = listOf(
+                                TransParents,
+                                BlackOpacity40Color
+                            )
+                        )
+                    )
+                    .padding(start = 5.dp, end = 5.dp, top = 30.dp, bottom = 10.dp),
 
                 ) {
                 Row(
@@ -170,9 +170,8 @@ fun DiaryCardScreen(
                     Spacer(Modifier.width(10.dp))
                     Image(
                         modifier = Modifier
-                            .size(16.dp)
-                            .rotate(180f),
-                        painter = painterResource(R.drawable.icon_back_arrow),
+                            .size(16.dp),
+                        painter = painterResource(R.drawable.icon_angle_right),
                         colorFilter = ColorFilter.tint(WhiteColor),
                         contentDescription = null
                     )
@@ -205,10 +204,11 @@ fun DiaryCardScreen(
     }
 }
 
+@Preview
 @Composable
 fun AddDiaryCardScreen(
     modifier: Modifier = Modifier,
-    onClick: () -> Unit
+    onClick: () -> Unit = {}
 ) {
     Card(
         modifier = modifier.then(
@@ -221,7 +221,7 @@ fun AddDiaryCardScreen(
     ) {
         Box(
             modifier = Modifier
-                .background(color = WhiteColor)
+                .background(color = BlackF9Color)
                 .fillMaxSize()
         ) {
             Column(
@@ -229,14 +229,20 @@ fun AddDiaryCardScreen(
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 Image(
-                    modifier = Modifier.size(40.dp),
-                    painter = painterResource(R.drawable.icon_pencil),
-                    contentDescription = null
+                    modifier = Modifier
+                        .background(color = SubAccentDimColor, shape = CircleShape)
+                        .size(74.dp)
+                        .padding(18.dp),
+                    painter = painterResource(R.drawable.icon_plus),
+                    contentDescription = null,
+                    colorFilter = ColorFilter.tint(color = AccentDimColor)
                 )
                 Spacer(modifier = Modifier.size(20.dp))
                 Text(
-                    text = "오늘의 한 컷을 남겨주세요",
-                    style = MaterialTheme.typography.bodyLarge
+                    text = "오늘의 한컷 기록",
+                    style = MaterialTheme.typography.bodyLarge.copy(
+                        color = AccentDimColor
+                    )
                 )
 
             }
@@ -259,7 +265,7 @@ fun EmptyDiaryCardScreen(
     ) {
         Box(
             modifier = Modifier
-                .background(color = WhiteColor)
+                .background(color = BlackF9Color)
                 .padding(horizontal = 20.dp)
                 .fillMaxSize()
         ) {
@@ -274,7 +280,7 @@ fun EmptyDiaryCardScreen(
                 )
                 Spacer(modifier = Modifier.size(20.dp))
                 Text(
-                    text = "해당 달에는 일기를 하나도 쓰지 않았아요...",
+                    text = "이 달에는 일기를 하나도 쓰지 않았아요...",
                     style = MaterialTheme.typography.bodyLarge
                 )
 

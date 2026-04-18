@@ -25,6 +25,8 @@ data class DiaryBookEntity(
 
     val isMajor: Boolean = false,
 
+    val conWriteCount: Long = 0,
+
     val createdAt: Long,
     val updatedAt: Long?,
 
@@ -36,6 +38,7 @@ data class DiaryBookEntity(
         title = title,
         description = description,
         createDate = createdAt,
+        continueWriteCount = conWriteCount,
         bookPhaseType = DiaryPhaseType.entries[bookPhaseType],
         bookColor = bookColor,
         isMajor = isMajor,

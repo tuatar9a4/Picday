@@ -17,7 +17,8 @@ fun NavGraphBuilder.settingScreen(
 ) {
     composable<SettingNaviRoute> {
         SettingScreenRoute(
-            modifier = modifier
+            modifier = modifier,
+            onBackClick = onBackClick
         )
     }
 }
