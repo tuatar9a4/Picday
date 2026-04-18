@@ -12,6 +12,6 @@ enum class DiaryPhaseType(@param:DrawableRes vararg val ids: Int) {
         R.drawable.moon_phase_02,
         R.drawable.moon_phase_01,
         R.drawable.moon_phase_00
-    ),
+    )
 
 }

@@ -82,8 +82,8 @@ fun BookImage(
                         scope.launch { checkPermission() }
                     }
                 })
-                .clip(RoundedCornerShape(5.dp))
-                .size(56.dp),
+                .clip(RoundedCornerShape(10.dp))
+                .size(88.dp),
             model = it,
             contentScale = ContentScale.Crop,
             contentDescription = null
@@ -95,8 +95,8 @@ fun BookImage(
                     if (type == DiaryBookDialogType.VIEW) return@clickable
                     scope.launch { checkPermission() }
                 })
-                .border(1.dp, BlackColor, RoundedCornerShape(5.dp))
-                .size(56.dp)
+                .border(1.dp, BlackColor, RoundedCornerShape(10.dp))
+                .size(88.dp)
                 .padding(10.dp),
             painter = painterResource(R.drawable.icon_photo),
             contentDescription = null

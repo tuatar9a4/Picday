@@ -11,6 +11,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
@@ -37,11 +38,12 @@ fun TextButton(
     Text(
         modifier = modifier.then(
             Modifier
-                .clickable(onClick = onClick)
                 .background(
                     color = if (enable) enableButtonColor else disableButtonColor,
-                    shape = RoundedCornerShape(10.dp)
+                    shape = RoundedCornerShape(20.dp)
                 )
+                .clip(RoundedCornerShape(20.dp))
+                .clickable(onClick = onClick)
                 .wrapContentHeight(Alignment.CenterVertically)
                 .padding(contentsPadding)
         ),

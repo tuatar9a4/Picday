@@ -14,6 +14,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import com.devd.commonsystem.theme.BlackD9Color
 import com.devd.commonsystem.theme.BlackOpacity40Color
 import com.devd.commonsystem.ui.dialog.book.DiaryBookDialogType
 
@@ -23,19 +24,14 @@ fun BookDescriptionInput(
     type: DiaryBookDialogType,
     descriptionTextFieldState: TextFieldState
 ) {
-    val contentsEditorBg = if (type == DiaryBookDialogType.VIEW) {
-        Modifier
-    } else {
-        Modifier.border(1.dp, BlackOpacity40Color, RoundedCornerShape(5.dp))
-    }
     BasicTextField(
         modifier = modifier.then(
-            contentsEditorBg.then(
-                Modifier
-                    .fillMaxWidth()
-                    .height(70.dp)
-                    .padding(5.dp)
-            )
+            Modifier
+                .border(1.dp, BlackD9Color, RoundedCornerShape(20.dp))
+                .fillMaxWidth()
+                .height(100.dp)
+                .padding(vertical = 5.dp, horizontal = 10.dp)
+
         ),
         state = descriptionTextFieldState,
         readOnly = type == DiaryBookDialogType.VIEW,

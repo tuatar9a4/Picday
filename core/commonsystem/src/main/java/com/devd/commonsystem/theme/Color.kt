@@ -41,6 +41,7 @@ val Black33Color = Color(0xFF333333)
 val Black33Opacity90Color = Color(0x1a333333)
 val BlackF2Color = Color(0xFFF2F2F2)
 val BlackD9Color = Color(0xFFD9D9D9)
+val BlackDDColor = Color(0xFFDDDDDD)
 val BlackF4Color = Color(0xFFF4F4F4)
 val BlackF9Color = Color(0xFFF9F9F9)
 

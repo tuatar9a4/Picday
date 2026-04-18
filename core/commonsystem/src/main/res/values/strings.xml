@@ -49,4 +49,5 @@
     <string name="setting_alert_time">"작성 알림 시간"</string>
     <string name="setting_month_type">"한달 표시 타입"</string>
     <string name="setting_app_version">"App Version"</string>
+    <string name="close">"닫기"</string>
 </resources>

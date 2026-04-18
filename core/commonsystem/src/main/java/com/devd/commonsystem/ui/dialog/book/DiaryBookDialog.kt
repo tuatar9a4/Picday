@@ -16,6 +16,8 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.input.rememberTextFieldState
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
 import androidx.compose.material3.VerticalDivider
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
@@ -29,7 +31,8 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import com.devd.commonsystem.R
-import com.devd.commonsystem.theme.AccentColor
+import com.devd.commonsystem.theme.BlackColor
+import com.devd.commonsystem.theme.BlackD9Color
 import com.devd.commonsystem.theme.GreyColor
 import com.devd.commonsystem.theme.WhiteColor
 import com.devd.commonsystem.ui.TextButton
@@ -37,7 +40,6 @@ import com.devd.commonsystem.ui.dialog.book.screen.BookDescriptionInput
 import com.devd.commonsystem.ui.dialog.book.screen.BookImage
 import com.devd.commonsystem.ui.dialog.book.screen.BookOptionScreen
 import com.devd.commonsystem.ui.dialog.book.screen.BookTitleInput
-import com.devd.commonsystem.ui.dialog.book.screen.ColorPalletIcon
 import com.devd.model.local.DiaryBookInfo
 import com.devd.model.local.DiaryPhaseType
 import java.time.Instant
@@ -99,36 +101,46 @@ fun DiaryBookDialog(
         Box(
             modifier = Modifier
                 .fillMaxWidth()
-                .background(WhiteColor, shape = RoundedCornerShape(10.dp)),
+                .background(WhiteColor, shape = RoundedCornerShape(20.dp)),
         ) {
-            if (dialogType == DiaryBookDialogType.EDIT) {
-                ColorPalletIcon(
-                    modifier = Modifier
-                        .padding(top = 10.dp, end = 15.dp)
-                        .align(Alignment.TopEnd),
-                    bookColor = bookColor
-                )
-            }
             Column(
                 modifier = Modifier.padding(top = 34.dp)
             ) {
-                Row(
-                    modifier = Modifier.padding(horizontal = 15.dp),
-                    verticalAlignment = Alignment.CenterVertically
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 15.dp),
                 ) {
-                    BookImage(
-                        type = dialogType,
-                        imageUrl = imageUrl
-                    )
-                    Spacer(Modifier.width(10.dp))
-                    BookTitleInput(
-                        modifier = Modifier
-                            .weight(1f)
-                            .align(Alignment.Bottom),
-                        type = dialogType,
-                        titleTextFieldState = titleTextFieldState,
-                        isErrorTitle = isErrorTitle,
-                    )
+                    Row {
+                        BookImage(
+                            type = dialogType,
+                            imageUrl = imageUrl
+                        )
+                        Spacer(Modifier.width(10.dp))
+                        BookTitleInput(
+                            modifier = Modifier
+                                .weight(1f)
+                                .align(Alignment.Bottom),
+                            type = dialogType,
+                            titleTextFieldState = titleTextFieldState,
+                            isErrorTitle = isErrorTitle,
+                        )
+                    }
+                    Row(
+                        modifier = Modifier.align(Alignment.TopEnd),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Text(
+                            text = "생성일 : ", style = MaterialTheme.typography.labelLarge.copy(
+                                color = BlackD9Color
+                            )
+                        )
+                        Text(
+                            text = createDate, style = MaterialTheme.typography.labelMedium.copy(
+                                color = BlackD9Color
+                            )
+                        )
+                    }
                 }
                 Spacer(Modifier.height(15.dp))
                 BookDescriptionInput(
@@ -139,8 +151,8 @@ fun DiaryBookDialog(
                 Spacer(Modifier.height(10.dp))
                 BookOptionScreen(
                     modifier = Modifier.padding(horizontal = 15.dp),
-                    createDate = createDate,
                     monthTypeState = monthTypeState,
+                    bookColor = bookColor,
                     dialogType = dialogType
                 )
                 Spacer(Modifier.height(15.dp))
@@ -173,7 +185,7 @@ fun DiaryBookDialog(
                             .weight(1f)
                             .padding(vertical = 10.dp),
                         text = stringResource(if (dialogType == DiaryBookDialogType.EDIT) R.string.save else R.string.confirm),
-                        textColor = AccentColor,
+                        textColor = BlackColor,
                         enableButtonColor = WhiteColor,
                         onClick = {
                             if (titleTextFieldState.text.length < 2) {
