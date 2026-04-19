@@ -17,6 +17,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.devd.commonsystem.theme.Black33Color
@@ -77,7 +78,16 @@ fun MainNavigationBar(
                 selected = currentScreen.value == it,
                 onClick = {
                     currentScreen.value = it
-                    navController.navigate(it.mainRoute)
+                    navController.navigate(it.mainRoute){
+                        // 기존 탭의 상태(스크롤 등)를 저장
+                        popUpTo(navController.graph.findStartDestination().id) { saveState = true }
+                        // 2. 중복 방지:
+                        // 현재 화면이 이미 선택된 탭이라면 다시 생성하지 않습니다.
+                        launchSingleTop = true
+                        // 3. 상태 복원:
+                        // 이전에 저장된 상태가 있다면(예: Home의 스크롤 위치) 복구합니다.
+                        restoreState = true
+                    }
                 }
             )
         }
