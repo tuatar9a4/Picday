@@ -298,29 +298,30 @@ fun BookcaseScreen(
 ) {
 
     var isShowBookOptionSheet by remember { mutableStateOf<DiaryBookInfo?>(null) }
+    var isShowDiaryOptionSheet by remember { mutableStateOf<Boolean>(false) }
+
+    val diaryState = rememberPagerState(0) { diaryList.size }
     var selectBook by remember { mutableStateOf<DiaryBookInfo?>(null) }
 
-    SharedTransitionLayout(modifier = Modifier.fillMaxWidth()) {
+    SharedTransitionLayout(modifier = modifier.then(Modifier.fillMaxWidth())) {
         Box() {
             Column(
-                modifier = modifier.then(
-                    Modifier
-                        .fillMaxSize()
-                        .animateContentSize(
-                            animationSpec = spring(stiffness = Spring.StiffnessLow)
-                        )
-                        .verticalScroll(rememberScrollState())
-                        .background(WhiteColor)
-                ),
+                modifier = Modifier
+                    .fillMaxSize()
+                    .animateContentSize(
+                        animationSpec = spring(stiffness = Spring.StiffnessLow)
+                    )
+                    .verticalScroll(rememberScrollState())
+                    .background(WhiteColor),
                 verticalArrangement = Arrangement.SpaceBetween
             ) {
                 Toolbar(
                     titleBox = {
                         Text(
                             text = "",
-                            style = MaterialTheme.typography.titleMedium.copy(color = WhiteColor)
+                            style = MaterialTheme.typography.titleMedium.copy(color = BlackColor)
                         )
-                    }
+                    },
                 )
                 HorizontalPager(
                     state = pagerState,
@@ -385,12 +386,18 @@ fun BookcaseScreen(
                     Spacer(Modifier.height(80.dp))
                 }
             }
+
             OpenedBook(
                 selectBook = selectBook,
                 diaryList = diaryList,
+                state = diaryState,
+                isOpened = isOpenBook,
                 bookClickAction = {
                     selectBook = null
                     bookcaseInterface(it)
+                },
+                onBookMoreClick = {
+                    isShowBookOptionSheet = selectBook
                 },
                 onBackClick = onBackPress
             )

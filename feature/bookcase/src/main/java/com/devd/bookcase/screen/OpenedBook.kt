@@ -6,23 +6,31 @@ import androidx.compose.animation.SharedTransitionScope
 import androidx.compose.animation.core.FastOutSlowInEasing
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.pager.PagerState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalWindowInfo
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
 import com.devd.bookcase.BookcaseInterface
+import com.devd.commonsystem.R
+import com.devd.commonsystem.theme.Black33Color
 import com.devd.commonsystem.theme.BlackColor
 import com.devd.commonsystem.theme.BlackOpacity40Color
 import com.devd.commonsystem.theme.TransParents
@@ -50,16 +58,36 @@ fun OpendBOokPreview() {
         isMajor = false
 
     )
-    val bookWidth = LocalWindowInfo.current.containerDpSize.width - 75.dp
-    val isOpened = true
+    val bookWidth = LocalWindowInfo.current.containerDpSize.width - 60.dp
+    val isOpened = false
     Box(
         modifier = Modifier.fillMaxSize(),
-        contentAlignment = Alignment.CenterStart
+        contentAlignment = Alignment.TopStart
     ) {
         Box(
             modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 35.dp, vertical = 20.dp)
+        ) {
+            Text(
+                modifier = Modifier.align(Alignment.Center),
+                text = targetItem.title,
+                style = MaterialTheme.typography.titleMedium.copy(
+                    color = Black33Color
+                )
+            )
+            Image(
+                modifier = Modifier
+                    .size(36.dp)
+                    .align(Alignment.CenterEnd),
+                painter = painterResource(R.drawable.icon_more),
+                contentDescription = null
+            )
+        }
+        Box(
+            modifier = Modifier
                 .noRippleClickable(onClick = { })
-                .padding(end = 21.dp)
+                .padding(end = 21.dp, top = 76.dp)
                 .background(
                     color = BlackOpacity40Color,
                     shape = RoundedCornerShape(topEnd = 20.dp, bottomEnd = 20.dp)
@@ -69,7 +97,7 @@ fun OpendBOokPreview() {
                     color = BlackColor,
                     blur = 4.dp, offsetX = 1.dp, offsetY = 2.dp
                 )
-                .padding(all = 13.dp),
+                .padding(start = 13.dp),
         ) {
             OpenableBook(
                 modifier = Modifier
@@ -93,11 +121,13 @@ fun OpendBOokPreview() {
 fun SharedTransitionScope.OpenedBook(
     selectBook: DiaryBookInfo?,
     diaryList: List<DiaryInfo> = emptyList(),
+    state: PagerState,
+    isOpened: MutableState<Boolean>,
     bookClickAction: (BookcaseInterface) -> Unit = {},
+    onBookMoreClick: () -> Unit,
     onBackClick: () -> Unit,
 ) {
-    val bookWidth = LocalWindowInfo.current.containerDpSize.width - 100.dp
-    val isOpened = remember { mutableStateOf(false) }
+    val bookWidth = LocalWindowInfo.current.containerDpSize.width - 75.dp
 
     val rotation by animateFloatAsState(
         targetValue = if (isOpened.value) -180f else 0f,
@@ -130,15 +160,22 @@ fun SharedTransitionScope.OpenedBook(
     ) { targetItem ->
         Box(
             modifier = Modifier.fillMaxSize(),
-            contentAlignment = Alignment.Center
+            contentAlignment = Alignment.TopStart
         ) {
             if (targetItem != null) {
                 Box(
                     modifier = Modifier
                         .noRippleClickable(onClick = { isOpened.value = false })
-                        .fillMaxSize()
-                        .background(color = BlackOpacity40Color),
-                    contentAlignment = Alignment.Center
+                        .padding(end = 10.dp, top = 76.dp)
+                        .background(
+                            color = BlackOpacity40Color,
+                            shape = RoundedCornerShape(topEnd = 20.dp, bottomEnd = 20.dp)
+                        )
+                        .dropShadow(
+                            shape = RoundedCornerShape(topEnd = 20.dp, bottomEnd = 20.dp),
+                            color = BlackColor,
+                            blur = 4.dp, offsetX = 1.dp, offsetY = 2.dp
+                        ),
                 ) {
                     OpenableBook(
                         modifier = Modifier
@@ -154,9 +191,31 @@ fun SharedTransitionScope.OpenedBook(
                             bookWidth.value.toInt(),
                             (bookWidth.value * 16 / 9f).toInt()
                         ),
+                        state = state,
                         diaryList = diaryList,
                         rotation = rotation,
                         bookImage = targetItem.bookImage?.rememberImageUrl(),
+                    )
+                }
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 45.dp, vertical = 20.dp)
+                ) {
+                    Text(
+                        modifier = Modifier.align(Alignment.Center),
+                        text = targetItem.title,
+                        style = MaterialTheme.typography.titleMedium.copy(
+                            color = Black33Color
+                        )
+                    )
+                    Image(
+                        modifier = Modifier
+                            .size(36.dp)
+                            .noRippleClickable(onClick = onBookMoreClick)
+                            .align(Alignment.CenterEnd),
+                        painter = painterResource(R.drawable.icon_more),
+                        contentDescription = null
                     )
                 }
             }

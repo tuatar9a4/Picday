@@ -47,6 +47,10 @@ val BlackDDColor = Color(0xFFDDDDDD)
 val BlackBCColor = Color(0xFFBCBCBC)
 val BlackF4Color = Color(0xFFF4F4F4)
 val BlackF9Color = Color(0xFFF9F9F9)
+val Black88Color = Color(0xFF888888)
+
+val VioletColor = Color(0xFF7B6FAD)
+val SemiVioletColor = Color(0xFFEAE6F4)
 
 
 /* Book Color Combination */
