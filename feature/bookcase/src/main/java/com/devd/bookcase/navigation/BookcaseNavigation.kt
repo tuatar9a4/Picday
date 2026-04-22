@@ -4,10 +4,12 @@ import androidx.compose.ui.Modifier
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
 import com.devd.bookcase.BookcaseRoute
+import com.devd.model.local.NavRoute
 import kotlinx.serialization.Serializable
 
 @Serializable
-data object BookcaseNaviRoute
+data object BookcaseNaviRoute : NavRoute
+
 
 fun NavGraphBuilder.bookcaseScreen(
     modifier: Modifier = Modifier,

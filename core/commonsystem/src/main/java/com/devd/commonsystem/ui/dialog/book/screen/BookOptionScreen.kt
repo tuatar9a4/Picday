@@ -76,7 +76,7 @@ fun BookOptionScreen(
             Spacer(Modifier.width(20.dp))
             Image(
                 modifier = Modifier
-                    .size(36.dp)
+                    .size(37.dp)
                     .then(
                         if (dialogType == DiaryBookDialogType.VIEW) Modifier
                         else Modifier
@@ -100,7 +100,7 @@ fun BookOptionScreen(
             Spacer(Modifier.width(20.dp))
             Box(
                 modifier = Modifier
-                    .size(36.dp)
+                    .size(37.dp)
                     .then(
                         if (dialogType == DiaryBookDialogType.VIEW) Modifier
                         else Modifier

@@ -2,20 +2,26 @@ package com.devd.bookcase
 
 import android.net.Uri
 import androidx.activity.compose.BackHandler
-import androidx.compose.foundation.Image
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.SharedTransitionLayout
+import androidx.compose.animation.animateContentSize
+import androidx.compose.animation.core.Spring
+import androidx.compose.animation.core.spring
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.PagerState
 import androidx.compose.foundation.pager.rememberPagerState
-import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -30,10 +36,9 @@ import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
 import androidx.core.net.toUri
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -46,22 +51,31 @@ import com.devd.bookcase.data.NEED_BOOK_IMAGE
 import com.devd.bookcase.data.NEED_CAMERA_PERMISSION
 import com.devd.bookcase.data.SUCCESS_SAVE_BOOK
 import com.devd.bookcase.data.SUCCESS_UPDATE_BOOK
-import com.devd.bookcase.screen.ExpandableDiaryBook
+import com.devd.bookcase.screen.BookCoverItem
+import com.devd.bookcase.screen.OpenedBook
 import com.devd.commonsystem.R
-import com.devd.commonsystem.theme.PrimaryColor
+import com.devd.commonsystem.theme.BlackBCColor
+import com.devd.commonsystem.theme.BlackColor
+import com.devd.commonsystem.theme.BlackD9Color
+import com.devd.commonsystem.theme.RedColor
 import com.devd.commonsystem.theme.WhiteColor
+import com.devd.commonsystem.ui.TextButton
 import com.devd.commonsystem.ui.Toolbar
 import com.devd.commonsystem.ui.cropImageDialog.ShowCropDialog
+import com.devd.commonsystem.ui.dialog.OptionBottomSheet
 import com.devd.commonsystem.ui.dialog.ShowImagePicker
 import com.devd.commonsystem.ui.dialog.ShowMessageDialog
 import com.devd.commonsystem.ui.dialog.book.DiaryBookDialog
 import com.devd.commonsystem.ui.dialog.book.DiaryBookDialogType
 import com.devd.commonsystem.ui.loading.LoadingDialog
+import com.devd.commonsystem.utils.noRippleClickable
 import com.devd.commonsystem.utils.rememberImagePicker
+import com.devd.commonsystem.utils.rememberImageUrl
 import com.devd.commonsystem.utils.uriToFile
 import com.devd.model.local.DiaryBookInfo
 import com.devd.model.local.DiaryInfo
 import com.devd.model.local.DiaryPhaseType
+import com.devd.model.local.SheetItem
 import com.devd.permission.Consts
 import com.devd.permission.IPermissionHandler
 import com.devd.permission.rememberPermissionHandler
@@ -137,7 +151,7 @@ fun BookcaseRoute(
     }
 
     BackHandler(enabled = true) {
-        if(isOpenBook.value) isOpenBook.value = false
+        if (isOpenBook.value) isOpenBook.value = false
         else onBackPress()
     }
 
@@ -232,7 +246,7 @@ fun BookcaseRoute(
         DiaryBookDialog(
             dialogType = DiaryBookDialogType.EDIT,
             bookInfo = bookInfo!!,
-            onSaveClick = { uri, title, description, monthType,color ->
+            onSaveClick = { uri, title, description, monthType, color ->
                 bookInfo = bookInfo!!.copy(
                     title = title,
                     description = description,
@@ -271,6 +285,162 @@ fun BookcaseRoute(
     }
 }
 
+@Composable
+fun BookcaseScreen(
+    modifier: Modifier = Modifier,
+    pagerState: PagerState = rememberPagerState(0) { 5 },
+    bookList: List<DiaryBookInfo>,
+    isOpenBook: MutableState<Boolean>,
+    diaryList: List<DiaryInfo>,
+    bookcaseInterface: (BookcaseInterface) -> Unit,
+    onAddDiaryPress: () -> Unit,
+    onBackPress: () -> Unit = {}
+) {
+
+    var isShowBookOptionSheet by remember { mutableStateOf<DiaryBookInfo?>(null) }
+    var selectBook by remember { mutableStateOf<DiaryBookInfo?>(null) }
+
+    SharedTransitionLayout(modifier = Modifier.fillMaxWidth()) {
+        Box(){
+            Column(
+                modifier = modifier.then(
+                    Modifier
+                        .fillMaxSize()
+                        .animateContentSize(
+                            animationSpec = spring(stiffness = Spring.StiffnessLow)
+                        )
+                        .verticalScroll(rememberScrollState())
+                        .background(WhiteColor)
+                ),
+                verticalArrangement = Arrangement.SpaceBetween
+            ) {
+                Toolbar(
+                    titleBox = {
+                        Text(
+                            "",
+                            style = MaterialTheme.typography.titleMedium.copy(color = WhiteColor)
+                        )
+                    }
+                )
+                HorizontalPager(
+                    state = pagerState,
+                    contentPadding = PaddingValues(start = 100.dp, end = 50.dp),
+                    modifier = Modifier.fillMaxWidth(),
+                    pageSpacing = 20.dp,
+                    verticalAlignment = Alignment.CenterVertically
+                ) { page ->
+                    val bookInfo = bookList[page]
+                    AnimatedVisibility(
+                        visible = bookInfo != selectBook
+                    ) {
+                        bookInfo.bookImage?.rememberImageUrl()?.let {
+                            BookCoverItem(
+                                modifier = Modifier.sharedBounds(
+                                    sharedContentState = rememberSharedContentState(key = "book_${bookInfo.bookId}"),
+                                    animatedVisibilityScope = this@AnimatedVisibility
+                                ).noRippleClickable(
+                                    onClick = {
+                                        bookcaseInterface(
+                                            BookcaseInterface.OnOpenDiaryBook(bookInfo.bookId)
+                                        )
+                                        selectBook = bookInfo
+                                    }
+                                ),
+                                coverImage = it,
+                                bookSize = IntSize(200, 300),
+                                isOpen = false,
+                                bookInfo = bookInfo,
+                                onMoreClick = {
+                                    bookcaseInterface(
+                                        BookcaseInterface.OnUpdateDiaryBook(
+                                            bookInfo
+                                        )
+                                    )
+                                },
+                                onChangeMajor = {
+                                    val bookId = bookInfo.bookId
+                                    bookcaseInterface(
+                                        BookcaseInterface.OnUpdateMajorBook(
+                                            bookId
+                                        )
+                                    )
+                                }
+                            )
+                        }
+                    }
+                }
+                if (!isOpenBook.value) {
+                    Spacer(Modifier.height(30.dp))
+                    TextButton(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(horizontal = 50.dp),
+                        contentsPadding = PaddingValues(vertical = 20.dp),
+                        frontIcon = R.drawable.icon_plus,
+                        text = "새 일기장",
+                        textColor = BlackBCColor,
+                        borerColor = BlackD9Color,
+                        enableButtonColor = WhiteColor,
+                        cornerRound = 34.dp,
+                        onClick = onAddDiaryPress
+                    )
+                    Spacer(Modifier.height(20.dp))
+                } else {
+                    Spacer(Modifier.height(80.dp))
+                }
+            }
+            OpenedBook(
+                selectBook = selectBook,
+                diaryList = diaryList,
+                bookClickAction = {
+                    selectBook = null
+                    bookcaseInterface(it)
+                }
+            )
+        }
+
+    }
+    isShowBookOptionSheet?.let { sheet ->
+        OptionBottomSheet(
+            "",
+            items = listOf(
+                SheetItem(
+                    itemIcon = R.drawable.icon_pencil_stroke,
+                    id = "0",
+                    text = "일기장 수정",
+                    itemColor = BlackColor
+                ),
+                SheetItem(
+                    itemIcon = R.drawable.icon_delete_trash,
+                    id = "1",
+                    text = "삭제",
+                    itemColor = RedColor
+                )
+            ),
+            onItemSelected = {
+                when (it.id) {
+                    "0" -> {
+                        bookcaseInterface(BookcaseInterface.OnUpdateDiaryBook(sheet))
+                    }
+
+                    "1" -> {
+                        bookcaseInterface(
+                            BookcaseInterface.OnDeleteDiaryBook(
+                                sheet.bookId,
+                                sheet.isMajor
+                            )
+                        )
+                    }
+                }
+                isShowBookOptionSheet = null
+            }
+        ) {
+            isShowBookOptionSheet = null
+        }
+    }
+}
+
+
 @Preview
 @Composable
 fun BookcaseScreenPreview() {
@@ -292,96 +462,4 @@ fun BookcaseScreenPreview() {
         onAddDiaryPress = {},
         bookcaseInterface = {}
     )
-}
-
-@Composable
-fun BookcaseScreen(
-    modifier: Modifier = Modifier,
-    pagerState: PagerState = rememberPagerState(0) { 5 },
-    bookList: List<DiaryBookInfo>,
-    isOpenBook: MutableState<Boolean>,
-    diaryList: List<DiaryInfo>,
-    bookcaseInterface: (BookcaseInterface) -> Unit,
-    onAddDiaryPress: () -> Unit,
-    onBackPress: () -> Unit = {}
-) {
-
-    Column(
-        modifier = modifier.then(
-            Modifier
-                .fillMaxSize()
-                .background(PrimaryColor)
-        )
-    ) {
-        Toolbar(
-            titleBox = {
-                Text("", style = MaterialTheme.typography.titleMedium.copy(color = WhiteColor))
-            },
-            leftButtons = {
-                if (!isOpenBook.value) {
-                    Image(
-                        modifier = Modifier
-                            .size(32.dp)
-                            .padding(4.dp)
-                            .clickable(onClick = onBackPress),
-                        painter = painterResource(R.drawable.icon_back_arrow),
-                        contentDescription = null
-                    )
-                }
-
-            },
-            rightButtons = {
-                if (!isOpenBook.value) {
-                    Row() {
-                        Image(
-                            modifier = Modifier
-                                .size(32.dp)
-                                .padding(4.dp)
-                                .clickable(onClick = { bookcaseInterface(BookcaseInterface.OnAddDiaryBook) }),
-                            painter = painterResource(R.drawable.icon_plus),
-                            contentDescription = null
-                        )
-                        Spacer(Modifier.width(15.dp))
-                        Image(
-                            modifier = Modifier
-                                .size(32.dp)
-                                .padding(4.dp)
-                                .clickable(onClick = {
-                                    bookcaseInterface(
-                                        BookcaseInterface.OnDeleteDiaryBook(
-                                            bookList[pagerState.currentPage].bookId,
-                                            bookList[pagerState.currentPage].isMajor
-                                        )
-                                    )
-                                }),
-                            painter = painterResource(R.drawable.icon_delete_trash),
-                            contentDescription = null
-                        )
-                    }
-                }
-            }
-        )
-        Spacer(Modifier.height(40.dp))
-        ExpandableDiaryBook(
-            pagerState = pagerState,
-            isOpened = isOpenBook,
-            bookList = bookList,
-            diaryList = diaryList,
-            bookClickAction = bookcaseInterface,
-        )
-        Spacer(Modifier.height(20.dp))
-        if (!isOpenBook.value) {
-            Image(
-                modifier = Modifier
-                    .shadow(elevation = 1.dp, shape = CircleShape)
-                    .align(Alignment.CenterHorizontally)
-                    .background(WhiteColor, CircleShape)
-                    .size(52.dp)
-                    .clickable(onClick = onAddDiaryPress)
-                    .padding(14.dp),
-                painter = painterResource(R.drawable.icon_pencil),
-                contentDescription = null
-            )
-        }
-    }
 }

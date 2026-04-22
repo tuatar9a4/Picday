@@ -9,12 +9,18 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
+import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import com.devd.bookcase.navigation.BookcaseNaviRoute
+import com.devd.calendar.navigation.CustomCalendarRoute
 import com.devd.commonsystem.theme.OneDayOneShotTheme
 import com.devd.commonsystem.theme.WhiteColor
+import com.devd.home.navigation.HomeRoute
 import com.devd.onedayoneshot.navigation.NaviBarItem
 import com.devd.onedayoneshot.ui.MainNavigationBar
 import com.devd.onedayoneshot.ui.MyNavHost
@@ -36,7 +42,30 @@ class MainActivity : ComponentActivity() {
                 val currentScreen = remember { mutableStateOf<NaviBarItem>(NaviBarItem.Home) }
                 val isShowBottomNav = remember { mutableStateOf(true) }
                 val navController = rememberNavController()
+                val navBackStackEntry by navController.currentBackStackEntryAsState()
+                LaunchedEffect(navBackStackEntry?.destination?.route) {
+                    val currentRoute = navBackStackEntry?.destination?.route
+                    when (currentRoute) {
+                        HomeRoute.javaClass.name -> {
+                            isShowBottomNav.value = true
+                            currentScreen.value = NaviBarItem.Home
+                        }
 
+                        BookcaseNaviRoute.javaClass.name -> {
+                            isShowBottomNav.value = true
+                            currentScreen.value = NaviBarItem.Library
+                        }
+
+                        CustomCalendarRoute.javaClass.name -> {
+                            isShowBottomNav.value = true
+                            currentScreen.value = NaviBarItem.Calendar
+                        }
+
+                        else -> {
+                            isShowBottomNav.value = false
+                        }
+                    }
+                }
                 Scaffold(
                     modifier = Modifier.fillMaxSize(),
                     bottomBar = {
@@ -54,8 +83,7 @@ class MainActivity : ComponentActivity() {
                             .background(WhiteColor)
                             .padding(innerPadding),
                         navController = navController
-                    ){ isShow ->
-                        isShowBottomNav.value = isShow
+                    ) { isShow ->
                     }
                 }
             }

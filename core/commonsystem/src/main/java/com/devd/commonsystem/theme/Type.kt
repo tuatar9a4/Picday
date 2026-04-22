@@ -28,17 +28,17 @@ fun getCustomTypography(fontFamily: FontFamily): Typography {
         bodyLarge = TextStyle(
             fontFamily = fontFamily,
             fontWeight = FontWeight(600),
-            fontSize = 16.sp,
+            fontSize = 14.sp,
         ),
         bodyMedium = TextStyle(
             fontFamily = fontFamily,
             fontWeight = FontWeight(500),
-            fontSize = 16.sp
+            fontSize = 14.sp
         ),
         bodySmall = TextStyle(
             fontFamily = fontFamily,
             fontWeight = FontWeight(400),
-            fontSize = 16.sp
+            fontSize = 14.sp
         ),
         displayLarge = TextStyle(
             fontFamily = fontFamily,
