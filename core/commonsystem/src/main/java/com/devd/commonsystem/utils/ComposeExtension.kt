@@ -14,13 +14,18 @@ import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.composed
 import androidx.compose.ui.draw.drawBehind
+import androidx.compose.ui.draw.dropShadow
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.graphics.painter.Painter
+import androidx.compose.ui.graphics.shadow.Shadow
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.DpOffset
+import androidx.compose.ui.unit.dp
 import androidx.core.content.FileProvider
 import coil3.compose.AsyncImage
 import com.devd.commonsystem.R
@@ -118,3 +123,22 @@ fun SharedTransitionScope?.AnimateAsyncImage(
         contentDescription = null
     )
 }
+
+fun Modifier.dropShadow(
+    shape: Shape,
+    color: Color = Color.Black,
+    alpha: Float = 0.25f,
+    blur: Dp = 1.dp,
+    offsetY: Dp = 1.dp,
+    offsetX: Dp = 1.dp,
+    spread: Dp = 1.dp
+) = this.dropShadow(
+    shape = shape,
+    shadow = Shadow(
+        alpha = alpha,
+        radius = blur,
+        color = color,
+        spread = spread,
+        offset = DpOffset(x = offsetX, y = offsetY)
+    )
+)

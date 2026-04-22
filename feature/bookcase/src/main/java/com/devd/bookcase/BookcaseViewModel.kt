@@ -89,10 +89,8 @@ class BookcaseViewModel @Inject constructor(
 
     fun fetchDiaryListWithBook(bookId: Long) {
         viewModelScope.launch {
-            _bookcaseUiState.update { it.copy(isLoading = true) }
             val diaryList = diaryBookRepository.fetchAllDairiesByDiaryBook(bookId)
-            Timber.d("CheckDiary List => $diaryList")
-            _bookcaseUiState.update { it.copy(isLoading = false, diaryList = diaryList) }
+            _bookcaseUiState.update { it.copy(diaryList = diaryList) }
         }
     }
 

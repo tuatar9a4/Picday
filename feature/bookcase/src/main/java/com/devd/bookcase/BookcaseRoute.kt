@@ -301,7 +301,7 @@ fun BookcaseScreen(
     var selectBook by remember { mutableStateOf<DiaryBookInfo?>(null) }
 
     SharedTransitionLayout(modifier = Modifier.fillMaxWidth()) {
-        Box(){
+        Box() {
             Column(
                 modifier = modifier.then(
                     Modifier
@@ -317,7 +317,7 @@ fun BookcaseScreen(
                 Toolbar(
                     titleBox = {
                         Text(
-                            "",
+                            text = "",
                             style = MaterialTheme.typography.titleMedium.copy(color = WhiteColor)
                         )
                     }
@@ -335,28 +335,24 @@ fun BookcaseScreen(
                     ) {
                         bookInfo.bookImage?.rememberImageUrl()?.let {
                             BookCoverItem(
-                                modifier = Modifier.sharedBounds(
-                                    sharedContentState = rememberSharedContentState(key = "book_${bookInfo.bookId}"),
-                                    animatedVisibilityScope = this@AnimatedVisibility
-                                ).noRippleClickable(
-                                    onClick = {
-                                        bookcaseInterface(
-                                            BookcaseInterface.OnOpenDiaryBook(bookInfo.bookId)
-                                        )
-                                        selectBook = bookInfo
-                                    }
-                                ),
+                                modifier = Modifier
+                                    .sharedBounds(
+                                        sharedContentState = rememberSharedContentState(key = "book_${bookInfo.bookId}"),
+                                        animatedVisibilityScope = this@AnimatedVisibility
+                                    )
+                                    .noRippleClickable(
+                                        onClick = {
+                                            bookcaseInterface(
+                                                BookcaseInterface.OnOpenDiaryBook(bookInfo.bookId)
+                                            )
+                                            selectBook = bookInfo
+                                        }
+                                    ),
                                 coverImage = it,
                                 bookSize = IntSize(200, 300),
                                 isOpen = false,
                                 bookInfo = bookInfo,
-                                onMoreClick = {
-                                    bookcaseInterface(
-                                        BookcaseInterface.OnUpdateDiaryBook(
-                                            bookInfo
-                                        )
-                                    )
-                                },
+                                onMoreClick = { isShowBookOptionSheet = bookInfo },
                                 onChangeMajor = {
                                     val bookId = bookInfo.bookId
                                     bookcaseInterface(
@@ -395,7 +391,8 @@ fun BookcaseScreen(
                 bookClickAction = {
                     selectBook = null
                     bookcaseInterface(it)
-                }
+                },
+                onBackClick = onBackPress
             )
         }
 
@@ -425,10 +422,7 @@ fun BookcaseScreen(
 
                     "1" -> {
                         bookcaseInterface(
-                            BookcaseInterface.OnDeleteDiaryBook(
-                                sheet.bookId,
-                                sheet.isMajor
-                            )
+                            BookcaseInterface.OnDeleteDiaryBook(sheet.bookId, sheet.isMajor)
                         )
                     }
                 }

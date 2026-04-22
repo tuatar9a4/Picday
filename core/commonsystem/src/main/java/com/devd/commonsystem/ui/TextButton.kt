@@ -27,7 +27,6 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.devd.commonsystem.R
 import com.devd.commonsystem.theme.AccentColor
 import com.devd.commonsystem.theme.AccentOpacity40Color
 import com.devd.commonsystem.theme.WhiteColor
@@ -37,7 +36,7 @@ import com.devd.commonsystem.theme.WhiteColor
 fun TextButton(
     modifier: Modifier = Modifier,
     enable: Boolean = true,
-    @DrawableRes frontIcon: Int? = R.drawable.icon_plus,
+    @DrawableRes frontIcon: Int? = null,
     text: String,
     textColor: Color = WhiteColor,
     enableButtonColor: Color = AccentColor,

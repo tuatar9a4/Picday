@@ -78,7 +78,6 @@ fun BookCoverItem(
             modifier = modifier,
             bookSize = bookSize,
             bookImage = coverImage,
-            onCloseBook = {}
         )
         if (!isOpen) {
             Column(

@@ -9,9 +9,11 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.TransformOrigin
@@ -37,12 +39,10 @@ fun OpenableBookPreview() {
     ) {
         OpenableBook(
             modifier = Modifier,
-            rotation = -0f,
+            rotation = -20f,
             bookSize = IntSize(200, 300),
             bookImage = "@3"
-        ) {
-
-        }
+        )
 
     }
 }
@@ -53,10 +53,8 @@ fun OpenableBook(
     bookSize: IntSize,
     diaryList: List<DiaryInfo> = emptyList(),
     rotation: Float = 0f,
-    bookImage: String?,
-    onCloseBook: () -> Unit
+    bookImage: String?
 ) {
-//    val bookWidth = LocalWindowInfo.current.containerDpSize.width - 150.dp
     val bookWidth = bookSize.width.dp
     val height = bookSize.height.dp
     val state = rememberPagerState(0) { diaryList.size }
@@ -64,7 +62,6 @@ fun OpenableBook(
     Box(
         modifier = modifier.then(
             Modifier
-                .graphicsLayer(clip = false)
                 .width(bookWidth)
                 .height(height)
         )
@@ -73,6 +70,7 @@ fun OpenableBook(
         HorizontalPager(
             modifier = Modifier
                 .fillMaxSize()
+                .clip(RoundedCornerShape(topEnd = 20.dp, bottomEnd = 20.dp))
                 .background(Color.White)
                 .padding(20.dp),
             state = state
@@ -104,8 +102,6 @@ fun OpenableBook(
             bookSize = bookSize,
             coverImage = if (rotation < -90f) null else bookImage,
             isOpen = rotation < -90f
-//            coverImage = if (rotation < -90f) null else bookImage,
-//            isOpen = rotation < -90f
         )
     }
 }
