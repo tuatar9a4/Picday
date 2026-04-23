@@ -19,10 +19,13 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.layer.GraphicsLayer
 import androidx.compose.ui.platform.LocalWindowInfo
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
@@ -59,7 +62,7 @@ fun OpendBOokPreview() {
 
     )
     val bookWidth = LocalWindowInfo.current.containerDpSize.width - 60.dp
-    val isOpened = false
+    val isOpened = true
     Box(
         modifier = Modifier.fillMaxSize(),
         contentAlignment = Alignment.TopStart
@@ -107,9 +110,21 @@ fun OpendBOokPreview() {
                     ),
                 bookSize = IntSize(
                     bookWidth.value.toInt(),
-                    (bookWidth.value * 16 / 9f).toInt()
+                    (bookWidth.value * 17 / 9f).toInt()
                 ),
-                diaryList = emptyList(),
+                diaryList = listOf(
+                    DiaryInfo(
+                        diaryId = 3709,
+                        diaryBookId = 6393,
+                        content = "turpis",
+                        mood = 3412,
+                        weather = 4676,
+                        createdAt = 8076,
+                        updatedAt = 7061,
+                        imageUrlList = listOf(),
+                        tagList = listOf("231", "124", "24")
+                    )
+                ),
                 rotation = if (isOpened) -180f else 0f,
                 bookImage = targetItem.bookImage?.rememberImageUrl(),
             )
@@ -122,15 +137,16 @@ fun SharedTransitionScope.OpenedBook(
     selectBook: DiaryBookInfo?,
     diaryList: List<DiaryInfo> = emptyList(),
     state: PagerState,
-    isOpened: MutableState<Boolean>,
+    layerMap : MutableMap<Int, GraphicsLayer>,
     bookClickAction: (BookcaseInterface) -> Unit = {},
-    onBookMoreClick: () -> Unit,
+    onDiaryMoreClick: (GraphicsLayer?) -> Unit,
     onBackClick: () -> Unit,
 ) {
-    val bookWidth = LocalWindowInfo.current.containerDpSize.width - 75.dp
+    val bookWidth = LocalWindowInfo.current.containerDpSize.width - 60.dp
+    var isOpened by remember() { mutableStateOf(false) }
 
     val rotation by animateFloatAsState(
-        targetValue = if (isOpened.value) -180f else 0f,
+        targetValue = if (isOpened) -180f else 0f,
         animationSpec = tween(800, easing = FastOutSlowInEasing),
         label = "FlipAnimation"
     )
@@ -138,18 +154,18 @@ fun SharedTransitionScope.OpenedBook(
     LaunchedEffect(selectBook) {
         if (selectBook != null) {
             delay(200)
-            isOpened.value = true
+            isOpened = true
         }
     }
 
     BackHandler() {
-        if (!isOpened.value) onBackClick()
-        else isOpened.value = false
+        if (!isOpened) onBackClick()
+        else isOpened = false
 
     }
 
     LaunchedEffect(rotation) {
-        if (!isOpened.value && rotation > -60f && rotation != 0f) {
+        if (!isOpened && rotation > -60f && rotation != 0f) {
             bookClickAction(BookcaseInterface.OnColesDiaryBook)
         }
     }
@@ -165,7 +181,7 @@ fun SharedTransitionScope.OpenedBook(
             if (targetItem != null) {
                 Box(
                     modifier = Modifier
-                        .noRippleClickable(onClick = { isOpened.value = false })
+                        .noRippleClickable(onClick = { isOpened = false })
                         .padding(end = 10.dp, top = 76.dp)
                         .background(
                             color = BlackOpacity40Color,
@@ -175,7 +191,8 @@ fun SharedTransitionScope.OpenedBook(
                             shape = RoundedCornerShape(topEnd = 20.dp, bottomEnd = 20.dp),
                             color = BlackColor,
                             blur = 4.dp, offsetX = 1.dp, offsetY = 2.dp
-                        ),
+                        )
+                        .padding(start = 13.dp),
                 ) {
                     OpenableBook(
                         modifier = Modifier
@@ -189,10 +206,11 @@ fun SharedTransitionScope.OpenedBook(
                             ),
                         bookSize = IntSize(
                             bookWidth.value.toInt(),
-                            (bookWidth.value * 16 / 9f).toInt()
+                            (bookWidth.value * 17 / 9f).toInt()
                         ),
                         state = state,
                         diaryList = diaryList,
+                        layerMap = layerMap,
                         rotation = rotation,
                         bookImage = targetItem.bookImage?.rememberImageUrl(),
                     )
@@ -212,7 +230,10 @@ fun SharedTransitionScope.OpenedBook(
                     Image(
                         modifier = Modifier
                             .size(36.dp)
-                            .noRippleClickable(onClick = onBookMoreClick)
+                            .noRippleClickable(onClick = {
+
+                                onDiaryMoreClick(layerMap[state.currentPage])
+                            })
                             .align(Alignment.CenterEnd),
                         painter = painterResource(R.drawable.icon_more),
                         contentDescription = null

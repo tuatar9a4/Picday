@@ -4,6 +4,7 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.devd.bookcase.data.ASK_DELETE_BOOK
+import com.devd.bookcase.data.ASK_DELETE_DIARY_BOOK
 import com.devd.bookcase.data.CAN_NOT_DELETE_MAJOR
 import com.devd.bookcase.data.FAIL_DELETE_BOOK
 import com.devd.bookcase.data.FAIL_SAVE_BOOK
@@ -39,6 +40,7 @@ data class BookcaseUiState(
     val isLoading: Boolean = false,
     val bookList: List<DiaryBookInfo> = emptyList(),
     val diaryList: List<DiaryInfo> = emptyList(),
+    val selectBook: DiaryBookInfo? = null,
     val messageDialog: MessageInfo = MessageInfo(type = NONE)
 )
 
@@ -53,7 +55,8 @@ class BookcaseViewModel @Inject constructor(
 
     val newBookInfo = DiaryBookInfo(bookId = -1L, title = "")
 
-    var storeDeleteId: Long? = null
+    var storeDeleteBookId: Long? = null
+    var storeDeleteDiaryId: Long? = null
     var isInitScroll = true
 
     private val _bookcaseUiState = MutableStateFlow(BookcaseUiState())
@@ -87,15 +90,22 @@ class BookcaseViewModel @Inject constructor(
             }
     }
 
-    fun fetchDiaryListWithBook(bookId: Long) {
+    fun fetchDiaryListWithBook(bookInfo: DiaryBookInfo) {
         viewModelScope.launch {
-            val diaryList = diaryBookRepository.fetchAllDairiesByDiaryBook(bookId)
-            _bookcaseUiState.update { it.copy(diaryList = diaryList) }
+            _bookcaseUiState.update { it.copy(isLoading = true) }
+            val diaryList = diaryBookRepository.fetchAllDairiesByDiaryBook(bookInfo.bookId)
+            _bookcaseUiState.update {
+                it.copy(
+                    isLoading = false,
+                    diaryList = diaryList,
+                    selectBook = bookInfo
+                )
+            }
         }
     }
 
     fun closeBook() {
-        _bookcaseUiState.update { it.copy(diaryList = emptyList()) }
+        _bookcaseUiState.update { it.copy(diaryList = emptyList(), selectBook = null) }
     }
 
     fun showMessageDialog(messageInfo: MessageInfo) {
@@ -113,11 +123,9 @@ class BookcaseViewModel @Inject constructor(
 
     fun requestDiaryBook(deleteID: Long, isMajor: Boolean) {
         val (type, message) = if (isMajor) CAN_NOT_DELETE_MAJOR to R.string.cannot_delete_major
-        else ASK_DELETE_BOOK to R.string.ask_delete_diary_message
-
-        storeDeleteId = deleteID
+        else ASK_DELETE_BOOK to R.string.ask_delete_diary_book_message
+        storeDeleteBookId = deleteID
         showMessageDialog(MessageInfo(type, message))
-
     }
 
     fun updateMajorBook(bookId: Long) {
@@ -235,10 +243,10 @@ class BookcaseViewModel @Inject constructor(
     }
 
     fun deleteDiaryBook() {
-        storeDeleteId ?: return
+        storeDeleteBookId ?: return
         _bookcaseUiState.update { it.copy(isLoading = true) }
         viewModelScope.launch {
-            val errorMessage = diaryBookRepository.deleteBookInfo(storeDeleteId!!)
+            val errorMessage = diaryBookRepository.deleteBookInfo(storeDeleteBookId!!)
             val (code, message) = if (errorMessage == null) {
                 SUCCESS_DELETE_BOOK to R.string.success_delete_book_message
             } else {
@@ -247,6 +255,40 @@ class BookcaseViewModel @Inject constructor(
             _bookcaseUiState.update {
                 it.copy(
                     isLoading = true,
+                    messageDialog = MessageInfo(code, message)
+                )
+            }
+
+        }
+    }
+
+    fun requestDiary(diaryId: Long) {
+        val (type, message) = ASK_DELETE_DIARY_BOOK to R.string.ask_delete_diary_message
+        storeDeleteDiaryId = diaryId
+        showMessageDialog(MessageInfo(type, message))
+
+    }
+
+    fun deleteDiary() {
+        storeDeleteDiaryId ?: return
+        _bookcaseUiState.update { it.copy(isLoading = true) }
+        viewModelScope.launch {
+            val deleteItem = diaryBookRepository.deleteDiaryWithExtras(storeDeleteDiaryId!!)
+            var newItem = bookcaseUiState.value.diaryList
+            deleteItem?.let { deleteItem ->
+                val temp = bookcaseUiState.value.diaryList.toMutableList()
+                temp.removeIf { it.diaryId == deleteItem.diaryId }
+                newItem = temp
+            }
+            val (code, message) = if (deleteItem != null) {
+                SUCCESS_DELETE_BOOK to R.string.success_delete_diary_message
+            } else {
+                FAIL_DELETE_BOOK to R.string.fail_delete_diary_message
+            }
+            _bookcaseUiState.update {
+                it.copy(
+                    isLoading = false,
+                    diaryList = newItem,
                     messageDialog = MessageInfo(code, message)
                 )
             }

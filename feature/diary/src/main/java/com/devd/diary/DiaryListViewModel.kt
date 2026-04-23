@@ -69,16 +69,13 @@ class DiaryListViewModel @Inject constructor(
             id ?: return@launch _diaryListUiState.update {
                 it.copy(popupCode = PopupCode.NotFoundItem, isLoading = false)
             }
-            Timber.d("CheckDiaryList => ${id}")
             _diaryListUiState.update { it.copy(isLoading = true) }
             diaryBookRepository.deleteDiaryWithExtras(id)?.let { deleteItem ->
                 _diaryListUiState.update {
                     val newList = it.diaryList.toMutableList()
                     newList.removeIf { item ->
-                        Timber.d("CheckDiaryList removeIf => ${item.diaryId} == ${deleteItem.diaryId}")
                         item.diaryId == deleteItem.diaryId
                     }
-                    Timber.d("CheckDiaryList newList => ${newList}")
                     it.copy(diaryList = newList, isLoading = false)
                 }
 

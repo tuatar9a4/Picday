@@ -1,7 +1,6 @@
 package com.devd.bookcase
 
 import android.net.Uri
-import androidx.activity.compose.BackHandler
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.SharedTransitionLayout
 import androidx.compose.animation.animateContentSize
@@ -26,7 +25,6 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -36,6 +34,8 @@ import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.asAndroidBitmap
+import androidx.compose.ui.graphics.layer.GraphicsLayer
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.IntSize
@@ -43,6 +43,7 @@ import androidx.compose.ui.unit.dp
 import androidx.core.net.toUri
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.devd.bookcase.data.ASK_DELETE_BOOK
+import com.devd.bookcase.data.ASK_DELETE_DIARY_BOOK
 import com.devd.bookcase.data.FAIL_SAVE_BOOK
 import com.devd.bookcase.data.FAIL_UPDATE_BOOK
 import com.devd.bookcase.data.LIMIT_BOOK_LIST_COUNT
@@ -71,6 +72,7 @@ import com.devd.commonsystem.ui.loading.LoadingDialog
 import com.devd.commonsystem.utils.noRippleClickable
 import com.devd.commonsystem.utils.rememberImagePicker
 import com.devd.commonsystem.utils.rememberImageUrl
+import com.devd.commonsystem.utils.shareBitmap
 import com.devd.commonsystem.utils.uriToFile
 import com.devd.model.local.DiaryBookInfo
 import com.devd.model.local.DiaryInfo
@@ -85,12 +87,14 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 
 sealed interface BookcaseInterface {
-    data class OnOpenDiaryBook(val bookID: Long) : BookcaseInterface
+    data class OnOpenDiaryBook(val bookInfo: DiaryBookInfo) : BookcaseInterface
     data object OnColesDiaryBook : BookcaseInterface
     data object OnAddDiaryBook : BookcaseInterface
     data class OnDeleteDiaryBook(val bookID: Long, val isMajor: Boolean) : BookcaseInterface
     data class OnUpdateDiaryBook(val bookInfo: DiaryBookInfo) : BookcaseInterface
     data class OnUpdateMajorBook(val bookID: Long) : BookcaseInterface
+
+    data class OnDeleteDiary(val diaryId: Long) : BookcaseInterface
 }
 
 @Composable
@@ -148,11 +152,9 @@ fun BookcaseRoute(
                     viewModel.newBookInfo.copy(createDate = System.currentTimeMillis())
             }
         }
-    }
-
-    BackHandler(enabled = true) {
-        if (isOpenBook.value) isOpenBook.value = false
-        else onBackPress()
+        if (uiState.selectBook != null) {
+            viewModel.fetchDiaryListWithBook(uiState.selectBook!!)
+        }
     }
 
     /* ADD */
@@ -179,7 +181,7 @@ fun BookcaseRoute(
         modifier = modifier,
         bookList = uiState.bookList,
         diaryList = uiState.diaryList,
-        isOpenBook = isOpenBook,
+        selectBook = uiState.selectBook,
         pagerState = pagerState,
         bookcaseInterface = { actionItem ->
             when (actionItem) {
@@ -193,24 +195,24 @@ fun BookcaseRoute(
                     modifyDiaryBook(actionItem.bookInfo)
 
                 is BookcaseInterface.OnOpenDiaryBook ->
-                    viewModel.fetchDiaryListWithBook(actionItem.bookID)
+                    viewModel.fetchDiaryListWithBook(actionItem.bookInfo)
 
                 is BookcaseInterface.OnColesDiaryBook ->
                     viewModel.closeBook()
 
                 is BookcaseInterface.OnUpdateMajorBook ->
                     viewModel.updateMajorBook(actionItem.bookID)
+
+                is BookcaseInterface.OnDeleteDiary -> {
+                    viewModel.requestDiary(actionItem.diaryId)
+                }
             }
         },
-        onAddDiaryPress = {
+        onChangeDiaryClick = { dairyPos ->
             scope.launch {
-                val currentBookId = uiState.bookList[pagerState.currentPage].bookId
-                val todayDiaryId = viewModel.hasWriteToDayDiary(currentBookId)
-                todayDiaryId?.let {
-                    onNaviToEditor(currentBookId, null, it)
-                } ?: run {
-                    checkPermission()
-                }
+                val currentBook = uiState.diaryList.getOrNull(dairyPos)
+                currentBook ?: return@launch checkPermission()
+                onNaviToEditor(currentBook.diaryBookId, null, currentBook.diaryId)
             }
         },
         onBackPress = onBackPress
@@ -230,6 +232,7 @@ fun BookcaseRoute(
 
                 ASK_DELETE_BOOK -> viewModel.deleteDiaryBook()
                 LIMIT_BOOK_LIST_COUNT -> viewModel.showAdVideo()
+                ASK_DELETE_DIARY_BOOK -> viewModel.deleteDiary()
                 else -> Unit
             }
             viewModel.dismissMessageDialog()
@@ -290,18 +293,22 @@ fun BookcaseScreen(
     modifier: Modifier = Modifier,
     pagerState: PagerState = rememberPagerState(0) { 5 },
     bookList: List<DiaryBookInfo>,
-    isOpenBook: MutableState<Boolean>,
+    selectBook: DiaryBookInfo? = null,
     diaryList: List<DiaryInfo>,
     bookcaseInterface: (BookcaseInterface) -> Unit,
-    onAddDiaryPress: () -> Unit,
+    onChangeDiaryClick: (Int) -> Unit,
     onBackPress: () -> Unit = {}
 ) {
 
     var isShowBookOptionSheet by remember { mutableStateOf<DiaryBookInfo?>(null) }
-    var isShowDiaryOptionSheet by remember { mutableStateOf<Boolean>(false) }
+    var isShowDiaryOptionSheet by remember { mutableStateOf(false) }
 
     val diaryState = rememberPagerState(0) { diaryList.size }
-    var selectBook by remember { mutableStateOf<DiaryBookInfo?>(null) }
+
+    val context = LocalContext.current
+    val scope = rememberCoroutineScope()
+    val layerMap = remember { mutableMapOf<Int, GraphicsLayer>() }
+
 
     SharedTransitionLayout(modifier = modifier.then(Modifier.fillMaxWidth())) {
         Box() {
@@ -344,9 +351,8 @@ fun BookcaseScreen(
                                     .noRippleClickable(
                                         onClick = {
                                             bookcaseInterface(
-                                                BookcaseInterface.OnOpenDiaryBook(bookInfo.bookId)
+                                                BookcaseInterface.OnOpenDiaryBook(bookInfo)
                                             )
-                                            selectBook = bookInfo
                                         }
                                     ),
                                 coverImage = it,
@@ -366,7 +372,7 @@ fun BookcaseScreen(
                         }
                     }
                 }
-                if (!isOpenBook.value) {
+                if (selectBook == null) {
                     Spacer(Modifier.height(30.dp))
                     TextButton(
                         modifier = Modifier
@@ -379,7 +385,7 @@ fun BookcaseScreen(
                         borerColor = BlackD9Color,
                         enableButtonColor = WhiteColor,
                         cornerRound = 34.dp,
-                        onClick = onAddDiaryPress
+                        onClick = { bookcaseInterface(BookcaseInterface.OnAddDiaryBook) }
                     )
                     Spacer(Modifier.height(20.dp))
                 } else {
@@ -391,13 +397,12 @@ fun BookcaseScreen(
                 selectBook = selectBook,
                 diaryList = diaryList,
                 state = diaryState,
-                isOpened = isOpenBook,
+                layerMap = layerMap,
                 bookClickAction = {
-                    selectBook = null
                     bookcaseInterface(it)
                 },
-                onBookMoreClick = {
-                    isShowBookOptionSheet = selectBook
+                onDiaryMoreClick = {
+                    isShowDiaryOptionSheet = true
                 },
                 onBackClick = onBackPress
             )
@@ -439,6 +444,60 @@ fun BookcaseScreen(
             isShowBookOptionSheet = null
         }
     }
+    if (isShowDiaryOptionSheet) {
+        OptionBottomSheet(
+            "",
+            items = listOf(
+                SheetItem(
+                    itemIcon = R.drawable.icon_pencil_stroke,
+                    id = "0",
+                    text = "일기장 수정",
+                    itemColor = BlackColor
+                ),
+                SheetItem(
+                    itemIcon = R.drawable.icon_share,
+                    id = "1",
+                    text = "공유하기",
+                    itemColor = BlackColor
+                ),
+                SheetItem(
+                    itemIcon = R.drawable.icon_delete_trash,
+                    id = "2",
+                    text = "삭제",
+                    itemColor = RedColor
+                )
+            ),
+            onItemSelected = {
+                when (it.id) {
+                    "0" -> {
+                        onChangeDiaryClick(diaryState.currentPage)
+                    }
+
+                    "1" -> {
+                        scope.launch {
+                            val image = layerMap[diaryState.currentPage]?.toImageBitmap()
+                            image?.let {
+                                context.shareBitmap(it.asAndroidBitmap())
+                            }
+                        }
+//                        bookcaseInterface(
+//                            BookcaseInterface.OnDeleteDiaryBook(sheet.bookId, sheet.isMajor)
+//                        )
+                    }
+
+                    "2" -> {
+                        val diaryId = diaryList.getOrNull(diaryState.currentPage)?.diaryId
+                            ?: return@OptionBottomSheet
+                        bookcaseInterface(BookcaseInterface.OnDeleteDiary(diaryId))
+                    }
+                }
+                isShowDiaryOptionSheet = false
+            }
+        ) {
+            isShowDiaryOptionSheet = false
+        }
+
+    }
 }
 
 
@@ -458,9 +517,8 @@ fun BookcaseScreenPreview() {
             )
         ),
         pagerState = rememberPagerState(0) { 1 },
-        isOpenBook = remember { mutableStateOf(false) },
         diaryList = emptyList(),
-        onAddDiaryPress = {},
+        onChangeDiaryClick = {},
         bookcaseInterface = {}
     )
 }

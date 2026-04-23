@@ -1,5 +1,9 @@
 package com.devd.commonsystem.utils
 
+import android.content.Context
+import android.content.Intent
+import android.graphics.Bitmap
+import android.net.Uri
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.ime
 import androidx.compose.foundation.lazy.LazyListState
@@ -7,7 +11,12 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.State
 import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.ui.platform.LocalDensity
+import androidx.core.content.FileProvider
 import com.devd.commonsystem.R
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
+import java.io.File
+import java.io.FileOutputStream
 import java.time.DayOfWeek
 import java.time.Instant
 import java.time.LocalDate
@@ -116,4 +125,36 @@ fun Long.getDateStr(pattern: String = "yyyy-MM-dd"): String {
     val formatter = DateTimeFormatter.ofPattern(pattern)
         .withZone(ZoneId.systemDefault())
     return formatter.format(instant)
+}
+
+// --- 비트맵 저장 및 공유 유틸리티 함수 ---
+suspend fun Context.shareBitmap( bitmap: Bitmap) {
+    // a. 임시 파일 생성
+    val cachePath = File(cacheDir, "images")
+    cachePath.mkdirs() // 폴더가 없으면 생성
+    val file = File(cachePath, "captured_image.png")
+
+    // b. 비트맵을 파일로 쓰기
+    withContext(Dispatchers.IO) {
+        FileOutputStream(file).use { stream ->
+            bitmap.compress(Bitmap.CompressFormat.PNG, 100, stream)
+        }
+    }
+
+    // c. FileProvider를 통해 URI 가져오기
+    // *주의: AndroidManifest.xml에 FileProvider 설정이 필요합니다.*
+    val contentUri: Uri = FileProvider.getUriForFile(
+        this,
+        "${packageName}.fileprovider", // Manifest의 authorities와 일치해야 함
+        file
+    )
+
+    // d. 공유 Intent 생성 및 실행
+    val intent = Intent(Intent.ACTION_SEND).apply {
+        type = "image/png"
+        putExtra(Intent.EXTRA_STREAM, contentUri)
+        addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION) // 읽기 권한 부여 필수
+    }
+
+    startActivity(Intent.createChooser(intent, "이미지 공유하기"))
 }

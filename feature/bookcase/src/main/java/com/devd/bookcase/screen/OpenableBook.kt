@@ -18,6 +18,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -30,6 +31,8 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.TransformOrigin
 import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.graphics.layer.GraphicsLayer
+import androidx.compose.ui.graphics.rememberGraphicsLayer
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
@@ -83,6 +86,7 @@ fun OpenableBook(
     bookSize: IntSize,
     diaryList: List<DiaryInfo> = emptyList(),
     state: PagerState = rememberPagerState(0) { diaryList.size },
+    layerMap : MutableMap<Int, GraphicsLayer> = mutableMapOf(),
     rotation: Float = 0f,
     bookImage: String?
 ) {
@@ -138,7 +142,18 @@ fun OpenableBook(
                     ),
                     state = state
                 ) { page ->
-                    DiaryCardScreen(diaryInfo = diaryList[page])
+                    // 2. 각 페이지마다 고유한 레이어 생성
+                    val layer = rememberGraphicsLayer()
+
+                    // 3. 생성된 레이어를 부모의 Map에 등록 (Key는 페이지 번호)
+                    DisposableEffect(layer) {
+                        layerMap[page] = layer
+                        onDispose { layerMap.remove(page) } // 페이지 파괴 시 삭제
+                    }
+                    DiaryCardScreen(
+                        graphicsLayer = layer,
+                        diaryInfo = diaryList[page]
+                    )
                 }
                 feelIcon?.let {
                     Box(

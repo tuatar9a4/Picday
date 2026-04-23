@@ -13,7 +13,11 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.drawWithContent
 import androidx.compose.ui.graphics.RectangleShape
+import androidx.compose.ui.graphics.layer.GraphicsLayer
+import androidx.compose.ui.graphics.layer.drawLayer
+import androidx.compose.ui.graphics.rememberGraphicsLayer
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
@@ -50,10 +54,17 @@ fun DiaryCardScreenPreview() {
 fun DiaryCardScreen(
     modifier: Modifier = Modifier,
     diaryInfo: DiaryInfo,
+    graphicsLayer : GraphicsLayer  = rememberGraphicsLayer(),
 ) {
-
     Column(
         modifier = Modifier.fillMaxWidth()
+            .drawWithContent {
+                graphicsLayer.record {
+                    this@drawWithContent.drawContent()
+                }
+                // 화면에도 보여야 하므로 실제로도 그립니다.
+                drawLayer(graphicsLayer)
+            }
             .padding(2.dp)
             .dropShadow(
                 color = BlackColor,

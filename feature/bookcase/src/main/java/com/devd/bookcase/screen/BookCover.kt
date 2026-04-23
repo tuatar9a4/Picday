@@ -1,9 +1,11 @@
 package com.devd.bookcase.screen
 
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
@@ -17,10 +19,12 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.TransformOrigin
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
 import coil3.compose.AsyncImage
+import com.devd.commonsystem.R
 import com.devd.commonsystem.theme.Black7COp66Color
 import com.devd.commonsystem.theme.BlackF2Color
 import com.devd.commonsystem.theme.TransParents
@@ -73,10 +77,18 @@ fun BookCover(
             Box(
                 modifier = Modifier
                     .clip(RoundedCornerShape(topEnd = 20.dp, bottomEnd = 20.dp))
-                    .background(WhiteColor)
                     .width(leftWidth + rightWidth)
                     .height(totalHeight)
-            )
+            ){
+                Image(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .clip(RoundedCornerShape(topEnd = 20.dp, bottomEnd = 20.dp)),
+                    painter = painterResource(R.drawable.img_diary_bg_01),
+                    contentDescription = null,
+                    contentScale = ContentScale.Crop,
+                )
+            }
         } else {
             Row(
                 modifier = Modifier
