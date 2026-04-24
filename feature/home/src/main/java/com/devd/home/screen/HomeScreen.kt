@@ -4,7 +4,6 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -13,10 +12,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.FloatingActionButton
-import androidx.compose.material3.FloatingActionButtonDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -33,7 +29,6 @@ import androidx.core.net.toUri
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.devd.commonsystem.R
-import com.devd.commonsystem.theme.AccentOpacity40Color
 import com.devd.commonsystem.theme.BlackD9Color
 import com.devd.commonsystem.theme.WhiteColor
 import com.devd.commonsystem.ui.Toolbar
@@ -234,26 +229,6 @@ fun HomeScreen(
                 onAddCardClick = onEditorClick
             )   // DiaryList 스크린
             Spacer(Modifier.height(20.dp))
-        }
-        Row(
-            modifier = Modifier
-                .align(Alignment.BottomEnd)
-                .padding(bottom = 40.dp)
-
-        ) {
-            FloatingActionButton(
-                modifier = Modifier.size(42.dp),
-                shape = CircleShape,
-                containerColor = AccentOpacity40Color,
-                elevation = FloatingActionButtonDefaults.elevation(defaultElevation = 0.dp),
-                onClick = onEditorClick
-            ) {
-                Image(
-                    painter = painterResource(R.drawable.icon_pencil),
-                    contentDescription = null,
-                    colorFilter = ColorFilter.tint(WhiteColor)
-                )
-            }   // 일기장 작성 이동 버튼
         }
     }
 }

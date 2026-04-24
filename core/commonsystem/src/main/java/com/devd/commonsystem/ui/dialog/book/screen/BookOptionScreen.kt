@@ -11,7 +11,6 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -31,9 +30,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.ColorFilter
-import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
@@ -42,9 +39,9 @@ import com.devd.commonsystem.theme.Black33Color
 import com.devd.commonsystem.theme.BlackColor
 import com.devd.commonsystem.theme.BlackD9Color
 import com.devd.commonsystem.theme.BlackF2Color
-import com.devd.commonsystem.theme.BlackF9Color
 import com.devd.commonsystem.theme.WhiteColor
 import com.devd.commonsystem.ui.TextButton
+import com.devd.commonsystem.ui.ThemeIcon
 import com.devd.commonsystem.ui.dialog.book.DiaryBookDialogType
 import com.devd.commonsystem.ui.dialog.book.screen.sheet.ColorThemeSheet
 import com.devd.model.local.DiaryPhaseType
@@ -78,25 +75,10 @@ fun BookOptionScreen(
                 .size(80.dp),
             contentAlignment = Alignment.Center
         ) {
-            Image(
+            ThemeIcon(
                 modifier = Modifier
-                    .fillMaxSize()
-                    .border(color = BlackF9Color, shape = CircleShape, width = 1.dp)
-                    .border(color = monthTypeState.value.color, shape = CircleShape, width = 5.dp)
-                    .padding(5.dp)
-                    .border(color = BlackF9Color, shape = CircleShape, width = 1.dp)
-                    .clip(CircleShape),
-                painter = painterResource(monthTypeState.value.bg),
-                contentDescription = null,
-                contentScale = ContentScale.Crop
-            )
-            Image(
-                modifier = Modifier
-                    .size(50.dp)
-                    .clip(CircleShape),
-                painter = painterResource(monthTypeState.value.ids.first()),
-                contentDescription = null,
-                contentScale = ContentScale.Crop
+                    .size(80.dp),
+                themeType = monthTypeState.value,
             )
             if (dialogType == DiaryBookDialogType.EDIT) Image(
                 modifier = Modifier
@@ -164,33 +146,12 @@ fun MonthThemeSheet(
                 horizontalArrangement = Arrangement.spacedBy(8.dp)
             ) {
                 DiaryPhaseType.entries.forEachIndexed { index, type ->
-                    Box(
+                    ThemeIcon(
                         modifier = Modifier
                             .size(80.dp)
                             .clickable(onClick = { onItemSelect(type) }),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        Image(
-                            modifier = Modifier
-                                .fillMaxSize()
-                                .border(color = BlackF9Color, shape = CircleShape, width = 1.dp)
-                                .border(color = type.color, shape = CircleShape, width = 5.dp)
-                                .padding(5.dp)
-                                .border(color = BlackF9Color, shape = CircleShape, width = 1.dp)
-                                .clip(CircleShape),
-                            painter = painterResource(type.bg),
-                            contentDescription = null,
-                            contentScale = ContentScale.Crop
-                        )
-                        Image(
-                            modifier = Modifier
-                                .size(50.dp)
-                                .clip(CircleShape),
-                            painter = painterResource(type.ids.first()),
-                            contentDescription = null,
-                            contentScale = ContentScale.Crop
-                        )
-                    }
+                        themeType = type,
+                    )
                 }
             }
         }

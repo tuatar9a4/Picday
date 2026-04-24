@@ -1,22 +1,16 @@
 package com.devd.home.screen
 
 import androidx.compose.foundation.Canvas
-import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -25,29 +19,27 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
+import androidx.compose.ui.geometry.CornerRadius
+import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.drawscope.Fill
 import androidx.compose.ui.graphics.drawscope.Stroke
-import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import coil3.compose.AsyncImage
-import com.devd.commonsystem.theme.AccentColor
+import androidx.compose.ui.unit.sp
 import com.devd.commonsystem.theme.Black33Color
+import com.devd.commonsystem.theme.Black88Color
+import com.devd.commonsystem.theme.BlackColor
 import com.devd.commonsystem.theme.BlackD9Color
-import com.devd.commonsystem.theme.BlackF2Color
+import com.devd.commonsystem.theme.BlackF4Color
 import com.devd.commonsystem.theme.BlackF9Color
 import com.devd.commonsystem.theme.OneDayOneShotTheme
-import com.devd.commonsystem.theme.SubAccentColor
-import com.devd.commonsystem.theme.WhiteColor
-import com.devd.commonsystem.utils.diaryPhaseIcon
-import com.devd.commonsystem.utils.rememberImageUrl
+import com.devd.commonsystem.ui.ThemeIcon
 import com.devd.model.local.DiaryBookInfo
 import com.devd.model.local.DiaryPhaseType
 
@@ -58,6 +50,7 @@ fun BookCardScreen(
     onBookClick: () -> Unit = {}
 ) {
     bookInfo ?: return
+    val phaseIndex = ((bookInfo.bookPhaseType.ids.size - 1) * bookInfo.monthWritePercent).toInt()
     Column(
         modifier = modifier.then(
             Modifier
@@ -68,7 +61,9 @@ fun BookCardScreen(
     ) {
         Text(
             modifier = Modifier.fillMaxWidth(),
-            text = bookInfo.description ?: "",
+            maxLines = 1,
+            overflow = TextOverflow.Ellipsis,
+            text = bookInfo.title,
             style = MaterialTheme.typography.titleSmall.copy(
                 color = Black33Color,
             )
@@ -82,133 +77,119 @@ fun BookCardScreen(
                 containerColor = BlackF9Color
             )
         ) {
-            Row(
+            Column(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(vertical = 18.dp, horizontal = 30.dp),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
+                    .padding(vertical = 13.dp, horizontal = 20.dp),
             ) {
                 Row(
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    AsyncImage(
-                        modifier = Modifier
-                            .size(68.dp)
-                            .clip(RoundedCornerShape(15.dp)),
-                        model = bookInfo.bookImage?.rememberImageUrl(),
-                        contentDescription = null,
-                        contentScale = ContentScale.Crop
+                    ThemeIcon(
+                        modifier = Modifier.size(80.dp),
+                        themeType = bookInfo.bookPhaseType,
+                        showIndex = phaseIndex
                     )
                     Spacer(Modifier.width(10.dp))
                     Column() {
                         Text(
-                            modifier = Modifier.padding(end = 15.dp),
-                            text = bookInfo.title.ifEmpty { "---" },
-                            maxLines = 1,
-                            overflow = TextOverflow.Ellipsis,
-                            style = MaterialTheme.typography.titleSmall.copy(
-                                color = Black33Color
+                            modifier = Modifier,
+                            text = "stage $phaseIndex",
+                            style = MaterialTheme.typography.labelMedium.copy(
+                                color = bookInfo.bookPhaseType.mainColor
                             )
                         )
-                        Spacer(Modifier.height(8.dp))
-                        Row(
-                            modifier = Modifier
-                                .background(
-                                    color = SubAccentColor,
-                                    shape = RoundedCornerShape(100.dp)
-                                )
-                                .border(
-                                    width = 1.dp,
-                                    color = BlackD9Color,
-                                    shape = RoundedCornerShape(100.dp)
-                                )
-                                .padding(horizontal = 7.dp, vertical = 5.dp),
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
-                            Box(
-                                modifier = Modifier
-                                    .size(4.dp)
-                                    .background(
-                                        color = AccentColor,
-                                        shape = CircleShape
-                                    )
+                        Spacer(Modifier.height(5.dp))
+                        Text(
+                            modifier = Modifier,
+                            text = bookInfo.bookPhaseType.description.getOrNull(phaseIndex) ?: "-",
+                            style = MaterialTheme.typography.titleSmall.copy(
+                                color = Black33Color,
+                                fontSize = 18.sp
                             )
-                            Spacer(Modifier.width(5.dp))
-                            Text(
-                                modifier = Modifier,
-                                text = "${bookInfo.continueWriteCount} 일 연속 기록 중",
-                                overflow = TextOverflow.Ellipsis,
-                                style = MaterialTheme.typography.displaySmall.copy(
-                                    color = AccentColor
-                                )
+                        )
+                        Text(
+                            modifier = Modifier,
+                            text = "\uD83D\uDD25 ${bookInfo.continueWriteCount}일 연속 기록 중",
+                            style = MaterialTheme.typography.displaySmall.copy(
+                                color = Black88Color,
                             )
-
-                        }
+                        )
                     }
                 }
-                Box(
-                    modifier = Modifier.size(60.dp),
-                    contentAlignment = Alignment.Center
+                GradientCircularProgressIndicatorPreview(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(top = 15.dp),
+                    progress = bookInfo.monthWritePercent,
+                    gradientColors = listOf(
+                        bookInfo.bookPhaseType.subColor,
+                        bookInfo.bookPhaseType.mainColor
+                    ),
+                )
+                Spacer(Modifier.height(5.dp))
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween
                 ) {
-                    GradientCircularProgressIndicatorPreview(
-                        modifier = Modifier
-                            .fillMaxSize()
-                            .align(Alignment.Center),
-                        gradientColors = listOf(WhiteColor, AccentColor),
-                        progress = bookInfo.monthWritePercent
-                    )
-                    Image(
-                        modifier = Modifier.padding(10.dp),
-                        painter = bookInfo.bookPhaseType.diaryPhaseIcon(bookInfo.monthWritePercent),
-                        contentDescription = null,
-                    )
+                    bookInfo.bookPhaseType.names.forEachIndexed { index, string ->
+                        Text(
+                            text = string,
+                            style = MaterialTheme.typography.labelLarge.copy(
+                                color = if (index < phaseIndex) bookInfo.bookPhaseType.mainColor
+                                else if (index > phaseIndex) BlackD9Color
+                                else BlackColor,
+                                fontSize = 9.sp
+
+                            )
+                        )
+                    }
                 }
             }
         }
     }
 }
 
+@Preview
 @Composable
 fun GradientCircularProgressIndicatorPreview(
     modifier: Modifier = Modifier,
     progress: Float = 0.5f, // 0.0 ~ 1.0
     gradientColors: List<Color> = listOf(Color.Cyan, Color.Blue, Color.Magenta),
-    trackColor: Color = Color.White,
+    trackColor: Color = BlackF4Color,
     strokeWidth: Dp = 5.dp
 ) {
     val stroke = with(LocalDensity.current) {
-        Stroke(width = strokeWidth.toPx(), cap = StrokeCap.Round)
+        Stroke(width = 1.dp.toPx(), cap = StrokeCap.Round)
     }
 
     Canvas(
         modifier = modifier
-            .padding(strokeWidth / 2) // 스트로크가 잘리지 않도록 패딩
+            .fillMaxWidth()
+            .height(strokeWidth)
     ) {
-        val startAngle = -90f
-        val sweep = progress * 360f
-
-        drawCircle(
-            color = BlackF2Color,
+        // 1. 전체 배경 (게이지가 차지할 빈 공간)
+        drawRoundRect(
+            cornerRadius = CornerRadius(size.height / 2f),
+            color = trackColor,
             style = Fill
         )
 
-        // 배경 트랙 (연한 회색 등)
-        drawCircle(
-            color = trackColor.copy(alpha = 0.3f),
-            style = stroke
+        // 2. 실제 차오르는 프로그레스 (배경보다 위에 그림)
+        val progressWidth = size.width * progress // 0.0f ~ 1.0f 사이 값
+
+        drawRoundRect(
+            cornerRadius = CornerRadius(size.height / 2f),
+            brush = Brush.linearGradient(colors = gradientColors),
+            size = Size(width = progressWidth, height = size.height),
+            style = Fill
         )
 
-        // 그라데이션 프로그레스
-        drawArc(
-            brush = Brush.linearGradient(
-                colors = gradientColors
-            ),
-            startAngle = startAngle,
-            sweepAngle = sweep,
-            useCenter = false,
-            style = stroke
-        )
+//        // 3. 테두리 (가장 마지막에 그려서 위를 덮음)
+//        drawRect(
+//            color = YellowColor.copy(alpha = 0.3f),
+//            style = stroke
+//        )
     }
 }
 
@@ -224,7 +205,7 @@ fun BookCardScreenPreview() {
                 description = "다이어리 설명",
                 bookPhaseType = DiaryPhaseType.MOON,
                 createDate = 6782,
-                monthWritePercent = 0.2f
+                monthWritePercent = 0.6f
 
             )
         )
