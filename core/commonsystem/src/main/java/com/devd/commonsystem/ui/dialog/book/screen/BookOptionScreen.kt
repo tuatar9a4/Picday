@@ -11,11 +11,11 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -33,16 +33,17 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.ColorFilter
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.devd.commonsystem.R
-import com.devd.commonsystem.theme.AccentColor
+import com.devd.commonsystem.theme.Black33Color
 import com.devd.commonsystem.theme.BlackColor
-import com.devd.commonsystem.theme.BlackDDColor
+import com.devd.commonsystem.theme.BlackD9Color
 import com.devd.commonsystem.theme.BlackF2Color
+import com.devd.commonsystem.theme.BlackF9Color
 import com.devd.commonsystem.theme.WhiteColor
-import com.devd.commonsystem.theme.bookColorList
 import com.devd.commonsystem.ui.TextButton
 import com.devd.commonsystem.ui.dialog.book.DiaryBookDialogType
 import com.devd.commonsystem.ui.dialog.book.screen.sheet.ColorThemeSheet
@@ -60,73 +61,54 @@ fun BookOptionScreen(
     var showMonthTypeSelectSheet by remember { mutableStateOf(false) }
     var showBookColorSelectSheet by remember { mutableStateOf(false) }
 
-    Row(
+    Column(
         modifier = modifier.then(Modifier.fillMaxWidth()),
-        horizontalArrangement = Arrangement.SpaceEvenly,
-        verticalAlignment = Alignment.CenterVertically
     ) {
-        Row(
-            verticalAlignment = Alignment.CenterVertically
+        Text(
+            text = "내 일기장과 함께 할 테마를 선택해주세요",
+            style = MaterialTheme.typography.labelSmall.copy(color = Black33Color)
+        )
+        Spacer(Modifier.height(20.dp))
+        Box(
+            modifier = Modifier
+                .align(Alignment.CenterHorizontally)
+                .clickable(onClick = {
+                    if (dialogType == DiaryBookDialogType.EDIT) showMonthTypeSelectSheet = true
+                })
+                .size(80.dp),
+            contentAlignment = Alignment.Center
         ) {
-            Text(
-                text = "Theme", style = MaterialTheme.typography.labelSmall.copy(
-                    color = BlackColor
-                )
-            )
-            Spacer(Modifier.width(20.dp))
             Image(
                 modifier = Modifier
-                    .size(37.dp)
-                    .then(
-                        if (dialogType == DiaryBookDialogType.VIEW) Modifier
-                        else Modifier
-                            .clip(CircleShape)
-                            .clickable(onClick = {
-                                showMonthTypeSelectSheet = true
-                            })
-                    ),
+                    .fillMaxSize()
+                    .border(color = BlackF9Color, shape = CircleShape, width = 1.dp)
+                    .border(color = monthTypeState.value.color, shape = CircleShape, width = 5.dp)
+                    .padding(5.dp)
+                    .border(color = BlackF9Color, shape = CircleShape, width = 1.dp)
+                    .clip(CircleShape),
+                painter = painterResource(monthTypeState.value.bg),
+                contentDescription = null,
+                contentScale = ContentScale.Crop
+            )
+            Image(
+                modifier = Modifier
+                    .size(50.dp)
+                    .clip(CircleShape),
                 painter = painterResource(monthTypeState.value.ids.first()),
+                contentDescription = null,
+                contentScale = ContentScale.Crop
+            )
+            if (dialogType == DiaryBookDialogType.EDIT) Image(
+                modifier = Modifier
+                    .size(23.dp)
+                    .background(color = WhiteColor, shape = CircleShape)
+                    .border(1.dp, BlackD9Color, CircleShape)
+                    .align(Alignment.BottomEnd)
+                    .padding(5.dp),
+                painter = painterResource(R.drawable.icon_pencil),
+                colorFilter = ColorFilter.tint(color = Black33Color),
                 contentDescription = null
             )
-        }
-        Row(
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Text(
-                text = "Color", style = MaterialTheme.typography.labelSmall.copy(
-                    color = BlackColor
-                )
-            )
-            Spacer(Modifier.width(20.dp))
-            Box(
-                modifier = Modifier
-                    .size(37.dp)
-                    .then(
-                        if (dialogType == DiaryBookDialogType.VIEW) Modifier
-                        else Modifier
-                            .clip(CircleShape)
-                            .clickable(onClick = {
-                                showBookColorSelectSheet = true
-                            })
-                    )
-
-            ) {
-                Box(
-                    modifier = Modifier
-                        .size(30.dp)
-                        .align(Alignment.TopStart)
-                        .border(1.dp, BlackDDColor, CircleShape)
-                        .background(bookColorList[bookColor.value].first, shape = CircleShape)
-                )
-                Box(
-                    modifier = Modifier
-                        .padding(bottom = 3.dp)
-                        .align(Alignment.BottomEnd)
-                        .size(19.dp)
-                        .border(1.dp, BlackDDColor, CircleShape)
-                        .background(bookColorList[bookColor.value].second, shape = CircleShape)
-                )
-            }
         }
     }
 
@@ -179,40 +161,48 @@ fun MonthThemeSheet(
                 modifier = Modifier
                     .fillMaxWidth()
                     .horizontalScroll(rememberScrollState()),
-                horizontalArrangement = Arrangement.spacedBy(20.dp)
+                horizontalArrangement = Arrangement.spacedBy(8.dp)
             ) {
                 DiaryPhaseType.entries.forEachIndexed { index, type ->
                     Box(
-                        modifier = Modifier.clickable(onClick = {
-                            onItemSelect(type)
-                        })
+                        modifier = Modifier
+                            .size(80.dp)
+                            .clickable(onClick = { onItemSelect(type) }),
+                        contentAlignment = Alignment.Center
                     ) {
                         Image(
-                            modifier = Modifier.size(50.dp),
-                            painter = painterResource(type.ids.first()),
-                            contentDescription = null
-                        )
-                        if (selectPos == index) Image(
                             modifier = Modifier
-                                .size(18.dp)
-                                .align(Alignment.TopEnd),
-                            painter = painterResource(R.drawable.icon_check),
-                            colorFilter = ColorFilter.tint(AccentColor),
-                            contentDescription = null
+                                .fillMaxSize()
+                                .border(color = BlackF9Color, shape = CircleShape, width = 1.dp)
+                                .border(color = type.color, shape = CircleShape, width = 5.dp)
+                                .padding(5.dp)
+                                .border(color = BlackF9Color, shape = CircleShape, width = 1.dp)
+                                .clip(CircleShape),
+                            painter = painterResource(type.bg),
+                            contentDescription = null,
+                            contentScale = ContentScale.Crop
+                        )
+                        Image(
+                            modifier = Modifier
+                                .size(50.dp)
+                                .clip(CircleShape),
+                            painter = painterResource(type.ids.first()),
+                            contentDescription = null,
+                            contentScale = ContentScale.Crop
                         )
                     }
                 }
             }
-            Spacer(Modifier.height(30.dp))
-            TextButton(
-                modifier = Modifier.fillMaxWidth(),
-                contentsPadding = PaddingValues(vertical = 20.dp),
-                enableButtonColor = BlackF2Color,
-                text = stringResource(R.string.close),
-                textColor = BlackColor
-            ) {
-                onDismissRequest()
-            }
+        }
+        Spacer(Modifier.height(30.dp))
+        TextButton(
+            modifier = Modifier.fillMaxWidth(),
+            contentsPadding = PaddingValues(vertical = 20.dp),
+            enableButtonColor = BlackF2Color,
+            text = stringResource(R.string.close),
+            textColor = BlackColor
+        ) {
+            onDismissRequest()
         }
     }
 }

@@ -90,12 +90,8 @@ fun String.rememberImageUrl(): String {
 fun DiaryPhaseType.diaryPhaseIcon(
     @FloatRange(0.0, 1.0) percent: Float
 ): Painter {
-    return when (this) {
-        DiaryPhaseType.MOON -> {
-            val index = ((this.ids.size - 1) * percent).toInt()
-            painterResource(this.ids[index])
-        }
-    }
+    val index = ((this.ids.size - 1) * percent).toInt()
+    return painterResource(this.ids[index])
 }
 
 @Composable

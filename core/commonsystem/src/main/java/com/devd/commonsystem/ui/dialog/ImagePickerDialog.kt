@@ -18,10 +18,12 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.devd.commonsystem.R
+import com.devd.commonsystem.theme.BlackColor
 import com.devd.commonsystem.theme.WhiteColor
 import kotlinx.coroutines.launch
 
@@ -59,6 +61,7 @@ fun ImagePickerDialog(
                 Image(
                     modifier = Modifier.size(36.dp),
                     painter = painterResource(R.drawable.icon_camera),
+                    colorFilter = ColorFilter.tint(BlackColor),
                     contentDescription = null
                 )
                 Spacer(Modifier.height(10.dp))

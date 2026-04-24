@@ -24,7 +24,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import coil3.compose.AsyncImage
 import com.devd.commonsystem.R
-import com.devd.commonsystem.theme.BlackColor
+import com.devd.commonsystem.theme.BlackD9Color
 import com.devd.commonsystem.ui.dialog.ShowImagePicker
 import com.devd.commonsystem.ui.dialog.book.DiaryBookDialogType
 import com.devd.commonsystem.utils.rememberImagePicker
@@ -95,10 +95,10 @@ fun BookImage(
                     if (type == DiaryBookDialogType.VIEW) return@clickable
                     scope.launch { checkPermission() }
                 })
-                .border(1.dp, BlackColor, RoundedCornerShape(10.dp))
+                .border(1.dp, BlackD9Color, RoundedCornerShape(10.dp))
                 .size(88.dp)
-                .padding(10.dp),
-            painter = painterResource(R.drawable.icon_photo),
+                .padding(26.dp),
+            painter = painterResource(R.drawable.icon_camera),
             contentDescription = null
         )
     }

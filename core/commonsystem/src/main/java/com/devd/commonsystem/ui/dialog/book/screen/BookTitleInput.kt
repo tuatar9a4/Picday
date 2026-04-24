@@ -17,8 +17,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.devd.commonsystem.R
+import com.devd.commonsystem.theme.Black88Color
 import com.devd.commonsystem.theme.BlackColor
-import com.devd.commonsystem.theme.BlackOpacity40Color
 import com.devd.commonsystem.theme.RedColor
 import com.devd.commonsystem.theme.TextDefaultColor
 import com.devd.commonsystem.ui.dialog.book.DiaryBookDialogType
@@ -59,14 +59,14 @@ fun BookTitleInput(
                         Text(
                             text = "제목을 입력하세요", // 원하는 힌트 문구
                             style = MaterialTheme.typography.titleMedium,
-                            color = BlackOpacity40Color // 힌트 컬러
+                            color = Black88Color // 힌트 컬러
                         )
                     }
                     innerTextField() // 실제 입력창 호출
                 }
             }
         )
-        Spacer(Modifier.height(10.dp))
+        Spacer(Modifier.height(2.dp))
         if (type == DiaryBookDialogType.EDIT) HorizontalDivider(
             modifier = Modifier.fillMaxWidth(),
             thickness = 1.dp,

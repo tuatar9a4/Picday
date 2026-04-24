@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.text.TextAutoSize
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -20,6 +21,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.devd.commonsystem.R
 import com.devd.commonsystem.theme.Black33Color
 import com.devd.commonsystem.theme.BlackColor
@@ -103,6 +105,12 @@ fun BookCoverItem(
                 Spacer(Modifier.height(20.dp))
                 Text(
                     text = bookInfo.description ?: "",
+                    maxLines = 2,
+                    autoSize = TextAutoSize.StepBased(
+                        minFontSize = 6.sp,
+                        maxFontSize = 14.sp,
+                        stepSize = 0.5.sp,
+                    ),
                     style = MaterialTheme.typography.bodySmall.copy(
                         color = Black33Color
                     )
