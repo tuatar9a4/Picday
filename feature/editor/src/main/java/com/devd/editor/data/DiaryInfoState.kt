@@ -12,5 +12,6 @@ data class DiaryInfoState(
     var diaryId: Long? = null,
     var imageUrl: ImageType? = null,
     var diaryContents: String = "",
+    var diaryMood: Int = -1,
     var diaryTag: List<String> = listOf()
 )

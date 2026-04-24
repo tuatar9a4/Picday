@@ -18,6 +18,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
@@ -59,6 +60,7 @@ import com.devd.commonsystem.theme.BlackF4Color
 import com.devd.commonsystem.theme.RedColor
 import com.devd.commonsystem.theme.TransParents
 import com.devd.commonsystem.theme.WhiteColor
+import com.devd.commonsystem.utils.FeelData
 import com.devd.commonsystem.utils.getFirstDayMillis
 import kotlinx.coroutines.launch
 import java.time.Instant
@@ -67,6 +69,7 @@ import java.time.YearMonth
 import java.time.ZoneId
 import java.time.temporal.ChronoUnit
 import kotlin.math.ceil
+import kotlin.math.min
 
 @SuppressLint("ConfigurationScreenWidthHeight")
 @Preview
@@ -104,6 +107,18 @@ fun CustomCalendarScreen(
         onChangeDate(newMonth.getFirstDayMillis(), isPreMove, isNextMove)
 
         newMonth
+    }
+
+    val anchors = DraggableAnchors {
+        CalendarState.Collapsed at 0f // 축소 상태 (1:1)
+        CalendarState.Expanded at 300f // 확장 상태 (9:16) - 실제 드래그 거리(px)
+    }
+
+    val state = remember {
+        AnchoredDraggableState(
+            initialValue = CalendarState.Expanded,
+            anchors = anchors
+        )
     }
 
     Column(
@@ -145,6 +160,7 @@ fun CustomCalendarScreen(
             CalendarGrid(
                 currentMonth = pageMonth,
                 imageList = infoList[pageMonth],
+                state = state,
                 onDateSelector = onDateSelector
             )
         }
@@ -192,11 +208,14 @@ fun DaysOfWeekHeader() {
         }
     }
 }
+
 enum class CalendarState { Collapsed, Expanded }
+
 @Composable
 fun CalendarGrid(
     currentMonth: YearMonth,
     imageList: List<CalendarImageInfo>?,
+    state: AnchoredDraggableState<CalendarState>,
     onDateSelector: (info: CalendarImageInfo) -> Unit
 ) {
     // 이달 초로 이동
@@ -210,24 +229,10 @@ fun CalendarGrid(
 
     val calendarItemCount = imageList?.size ?: (7 * weekCount)
 
-
     val deviceWidthPx = LocalWindowInfo.current.containerDpSize.width
     val density = LocalDensity.current
     val boxWidth = with(density) { (deviceWidthPx / 7) }
     val imagePixel = with(density) { boxWidth.toPx().toInt() }
-
-    val anchors = DraggableAnchors {
-        CalendarState.Collapsed at 0f // 축소 상태 (1:1)
-        CalendarState.Expanded at 300f // 확장 상태 (9:16) - 실제 드래그 거리(px)
-    }
-
-    val state = remember {
-        AnchoredDraggableState(
-            initialValue = CalendarState.Expanded,
-            anchors = anchors
-        )
-    }
-
 
     val dragProgress by remember {
         derivedStateOf {
@@ -238,7 +243,6 @@ fun CalendarGrid(
     }
 
     val currentAspectRatio = lerp(1f, 9 / 16f, dragProgress)
-    val extraTextAlpha = 1f - dragProgress // 축소될 때(0.0) 보이고 확장될 때(1.0) 사라짐
     val imageAlpha = dragProgress // 확장될 때 보임
 
     SideEffect {
@@ -251,11 +255,12 @@ fun CalendarGrid(
     }
 
     Column(
-        modifier = Modifier.fillMaxWidth()
+        modifier = Modifier
+            .fillMaxWidth()
             .anchoredDraggable(
                 state = state,
                 orientation = Orientation.Vertical,
-                enabled = true,
+                enabled = true
 
             )
     ) {
@@ -275,7 +280,7 @@ fun CalendarGrid(
                             .aspectRatio(currentAspectRatio)
 //                            .aspectRatio(9 / 16f)
                             .background(
-                                color = if (isFuture) WhiteColor else BlackF4Color,
+                                color = if (isFuture || imageUrl != null) WhiteColor else BlackF4Color,
                             )
                             .clickable {
                                 imageList?.getOrNull(day)?.diaryId?.let { onDateSelector(imageList[day]) }
@@ -290,7 +295,7 @@ fun CalendarGrid(
                                     .data(it)
                                     .size(Size(imagePixel, imagePixel))
                                     .build(),
-                                alpha = if (isCurrentMonth) 1f else 0.4f,
+                                alpha = if (isCurrentMonth) imageAlpha else min(imageAlpha, 0.4f),
                                 contentDescription = null
                             )
                         }
@@ -302,17 +307,31 @@ fun CalendarGrid(
                                     color = if (isToday) Black33Color else TransParents,
                                     shape = CircleShape
                                 )
-                                .alpha(if(isFuture && !isCurrentMonth) 0.4f else 1f)
-                                .padding(vertical = 3.dp, horizontal = 5.dp),
+                                .alpha(if (isFuture && !isCurrentMonth) 0.4f else 1f)
+                                .padding(vertical = 0.dp, horizontal = 5.dp),
                             text = dayInfo?.day?.toString() ?: "${date.dayOfMonth}",
                             style = MaterialTheme.typography.labelLarge.copy(
                                 color = if (isToday) WhiteColor
                                 else if (isFuture && isCurrentMonth) Black33Color
-                                else if (imageUrl != null && isCurrentMonth) WhiteColor
+                                else if (imageUrl != null && isCurrentMonth && imageAlpha >= 0.5f) WhiteColor
+                                else if (imageUrl != null && isCurrentMonth && imageAlpha < 0.5f) Black33Color
                                 else if (imageUrl == null && isCurrentMonth) BlackD9Color
-                                else BlackD9Color
+                                else BlackD9Color,
+                                fontSize = if (imageAlpha == 1f) 11.sp else 9.sp
                             )
                         )
+                        if (dayInfo?.mood != null) Image(
+                            modifier = Modifier
+                                .padding(
+                                    end = 4.dp, bottom = 4.dp
+                                )
+                                .size(30.dp)
+                                .align(Alignment.BottomEnd)
+                                .alpha(1 - imageAlpha),
+                            painter = painterResource(FeelData.feelList[dayInfo.mood]),
+                            contentDescription = null,
+                        )
+
                         HorizontalDivider(
                             modifier = Modifier.fillMaxWidth(),
                             thickness = 1.dp,

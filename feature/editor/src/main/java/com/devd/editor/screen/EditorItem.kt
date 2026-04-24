@@ -31,20 +31,19 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.ColorFilter
-import androidx.compose.ui.layout.FirstBaseline
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.devd.commonsystem.R
-import com.devd.commonsystem.theme.AccentColor
-import com.devd.commonsystem.theme.AccentOpacity40Color
+import com.devd.commonsystem.theme.Black33Color
+import com.devd.commonsystem.theme.Black88Color
 import com.devd.commonsystem.theme.BlackColor
-import com.devd.commonsystem.theme.GreyOpacity40Color
+import com.devd.commonsystem.theme.BlackD9Color
 import com.devd.commonsystem.theme.OneDayTextFieldColors
+import com.devd.commonsystem.theme.SemiVioletColor
 import com.devd.commonsystem.theme.WhiteColor
 
 @Preview
@@ -80,87 +79,110 @@ fun EditorItem(
     Column(
         modifier = modifier.then(Modifier)
     ) {
-        Spacer(Modifier.height(5.dp))
-        TextField(
+        Column(
             modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 5.dp)
-                .heightIn(min = with(LocalDensity.current) { (30.sp * 2).toDp() }),
-            state = textFieldState,
-            lineLimits = TextFieldLineLimits.MultiLine(1, 2),
-            placeholder = {
-                Text(
-                    text = "일기의 내용은 되도록 짧게해주세요\n너무 길면 안 보일 수 있습니다.(최대 100자)",
-                    style = MaterialTheme.typography.labelMedium.copy(
-                        color = GreyOpacity40Color
-                    )
-                )
-            },
-            inputTransformation = {
-                if (length > 100) revertAllChanges()
-                onChangeDiaryText.invoke(asCharSequence().toString())
-            },
-            shape = RoundedCornerShape(0.dp),
-            textStyle = MaterialTheme.typography.bodyMedium.copy(
-                color = BlackColor
-            ),
-            contentPadding = PaddingValues(10.dp),
-            colors = OneDayTextFieldColors
-        )   // 일기 내용 입력창
-        Spacer(Modifier.width(10.dp))
-        Row(
-            modifier = Modifier.padding(start = 5.dp, top = 10.dp, end = 5.dp),
+                .background(color = WhiteColor, shape = RoundedCornerShape(15.dp))
+                .border(width = 1.dp, color = BlackD9Color, shape = RoundedCornerShape(15.dp))
+                .padding(horizontal = 15.dp, vertical = 10.dp),
         ) {
             Text(
-                modifier = Modifier.alignBy(FirstBaseline),
-                text = "해시 태그", style = MaterialTheme.typography.bodyMedium,
+                text = "기록하기",
+                style = MaterialTheme.typography.labelMedium.copy(
+                    color = Black33Color
+                )
             )
-            Spacer(Modifier.width(10.dp))
-            Column(
+            Spacer(Modifier.height(5.dp))
+            TextField(
                 modifier = Modifier
-                    .weight(1f)
-                    .alignByBaseline()
-            ) {
-                TextField(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .heightIn(min = 15.dp),
-                    state = hashTextField,
-                    placeholder = {
-                        Text(
-                            text = "띄어쓰기를 사용하면 HashTag가 적용 됩니다",
-                            style = MaterialTheme.typography.labelMedium.copy(
-                                color = GreyOpacity40Color
-                            )
+                    .fillMaxWidth()
+                    .heightIn(min = with(LocalDensity.current) { (30.sp * 2).toDp() }),
+                state = textFieldState,
+                lineLimits = TextFieldLineLimits.MultiLine(1, 2),
+                placeholder = {
+                    Text(
+                        modifier = Modifier.align(Alignment.Start),
+                        text = "오늘의 일기를 기록하세요 (최대 50자)",
+                        style = MaterialTheme.typography.labelMedium.copy(
+                            color = Black88Color,
                         )
-                    },
-                    lineLimits = TextFieldLineLimits.MultiLine(1, 1),
-                    inputTransformation = {
-                        if (length > 8) revertAllChanges()
-                        if (asCharSequence().toString().contains(" ")) {
-                            if (asCharSequence().isNotBlank()) addHashTag(hashTextField.text.toString())
-                            delete(0, length)
-                        }
-                    },
-                    keyboardOptions = KeyboardOptions.Default.copy(
-                        imeAction = ImeAction.Done
-                    ),
-                    onKeyboardAction = {
-                        if (hashTextField.text.isEmpty()) return@TextField
-                        addHashTag(hashTextField.text.toString())
-                        hashTextField.clearText()
-                    },
-                    shape = RoundedCornerShape(5.dp),
-                    textStyle = MaterialTheme.typography.labelLarge.copy(
-                        color = BlackColor
-                    ),
-                    colors = OneDayTextFieldColors,
-                    contentPadding = PaddingValues(horizontal = 10.dp, vertical = 5.dp)
-                )   // 해시 태그 입력창
-                Spacer(Modifier.height(10.dp))
-                HashTagList(hashList) { deleteWord ->
-                    removeHashTag(deleteWord)
-                }
+                    )
+                },
+                inputTransformation = {
+                    if (length > 50) revertAllChanges()
+                    onChangeDiaryText.invoke(asCharSequence().toString())
+                },
+                contentPadding = PaddingValues(0.dp),
+                shape = RoundedCornerShape(0.dp),
+                textStyle = MaterialTheme.typography.bodyMedium.copy(
+                    color = BlackColor
+                ),
+                colors = OneDayTextFieldColors
+            )   // 일기 내용 입력창
+        }
+        Spacer(Modifier.height(5.dp))
+        Text(
+            modifier = Modifier
+                .align(Alignment.End)
+                .padding(end = 15.dp),
+            text = "${textFieldState.text.length}/50",
+            style = MaterialTheme.typography.labelMedium.copy(
+                color = Black88Color
+            )
+        )
+        Spacer(Modifier.height(10.dp))
+        Column(
+            modifier = Modifier
+                .background(color = WhiteColor, shape = RoundedCornerShape(15.dp))
+                .border(width = 1.dp, color = BlackD9Color, shape = RoundedCornerShape(15.dp))
+                .padding(horizontal = 15.dp, vertical = 10.dp),
+        ) {
+            Text(
+                text = "해시태그",
+                style = MaterialTheme.typography.labelMedium.copy(
+                    color = Black33Color
+                )
+            )
+            Spacer(Modifier.height(5.dp))
+            TextField(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .heightIn(min = 15.dp),
+                state = hashTextField,
+                placeholder = {
+                    Text(
+                        modifier = Modifier.align(Alignment.Start),
+                        text = "띄어쓰기를 사용하면 해시태그가 적용 됩니다",
+                        style = MaterialTheme.typography.labelMedium.copy(
+                            color = Black88Color,
+                        )
+                    )
+                },
+                lineLimits = TextFieldLineLimits.MultiLine(1, 1),
+                inputTransformation = {
+                    if (length > 8) revertAllChanges()
+                    if (asCharSequence().toString().contains(" ")) {
+                        if (asCharSequence().isNotBlank()) addHashTag(hashTextField.text.toString())
+                        delete(0, length)
+                    }
+                },
+                keyboardOptions = KeyboardOptions.Default.copy(
+                    imeAction = ImeAction.Done
+                ),
+                onKeyboardAction = {
+                    if (hashTextField.text.isEmpty()) return@TextField
+                    addHashTag(hashTextField.text.toString())
+                    hashTextField.clearText()
+                },
+                shape = RoundedCornerShape(0.dp),
+                textStyle = MaterialTheme.typography.labelLarge.copy(
+                    color = BlackColor
+                ),
+                colors = OneDayTextFieldColors,
+                contentPadding = PaddingValues(0.dp)
+            )   // 해시 태그 입력창
+            Spacer(Modifier.height(10.dp))
+            HashTagList(hashList) { deleteWord ->
+                removeHashTag(deleteWord)
             }
         }
     }
@@ -188,36 +210,22 @@ fun HashTagList(
         hashList.forEach {
             Row(
                 modifier = Modifier
-                    .border(
-                        width = 1.dp,
-                        color = AccentColor,
-                        shape = RoundedCornerShape(20.dp)
-                    )
                     .clickable(onClick = { onDeleteClick.invoke(it) })
-                    .background(color = AccentOpacity40Color, shape = RoundedCornerShape(20.dp))
-                    .padding(horizontal = 6.dp, 4.dp),
+                    .background(color = SemiVioletColor, shape = RoundedCornerShape(5.dp))
+                    .padding(horizontal = 4.dp, 3.dp),
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Text(
-                    text = "#",
-                    style =MaterialTheme.typography.labelLarge.copy(
-                        fontStyle = FontStyle.Italic,
-                        color = WhiteColor
-                    )
-                )
-                Spacer(Modifier.width(2.dp))
-                Text(
-                    text = it,
+                    text = "# $it",
                     style = MaterialTheme.typography.labelLarge.copy(
-                        fontStyle = FontStyle.Italic,
-                        color = WhiteColor
+                        color = Black33Color
                     )
                 )
-                Spacer(Modifier.width(6.dp))
+                Spacer(Modifier.width(3.dp))
                 Image(
-                    modifier = Modifier.size(11.dp),
-                    painter = painterResource(R.drawable.icon_hash_delete),
-                    colorFilter = ColorFilter.tint(WhiteColor),
+                    modifier = Modifier.size(10.dp),
+                    painter = painterResource(R.drawable.icon_close),
+                    colorFilter = ColorFilter.tint(Black88Color),
                     contentDescription = null
                 )
             }

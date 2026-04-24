@@ -1,11 +1,11 @@
 package com.devd.editor.screen
 
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.border
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.scrollBy
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
@@ -15,9 +15,10 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.ime
 import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.text.input.rememberTextFieldState
 import androidx.compose.foundation.text.input.setTextAndPlaceCursorAtEnd
 import androidx.compose.foundation.verticalScroll
@@ -33,6 +34,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalFocusManager
@@ -43,7 +45,11 @@ import androidx.core.net.toUri
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.devd.commonsystem.R
-import com.devd.commonsystem.theme.BlackColor
+import com.devd.commonsystem.theme.Black33Color
+import com.devd.commonsystem.theme.Black88Color
+import com.devd.commonsystem.theme.BlackF4Color
+import com.devd.commonsystem.theme.TransParents
+import com.devd.commonsystem.ui.TextButton
 import com.devd.commonsystem.ui.calendar.CustomDatePickerDialog
 import com.devd.commonsystem.ui.calendar.RangeType
 import com.devd.commonsystem.ui.cropImageDialog.ShowCropDialog
@@ -51,6 +57,7 @@ import com.devd.commonsystem.ui.dialog.OptionBottomSheet
 import com.devd.commonsystem.ui.dialog.ShowImagePicker
 import com.devd.commonsystem.ui.dialog.ShowMessageDialog
 import com.devd.commonsystem.ui.loading.LoadingDialog
+import com.devd.commonsystem.utils.FeelData
 import com.devd.commonsystem.utils.noRippleClickable
 import com.devd.commonsystem.utils.rememberImagePicker
 import com.devd.commonsystem.utils.uriToFile
@@ -60,6 +67,7 @@ import com.devd.editor.data.DiaryInfoState
 import com.devd.editor.data.Local
 import com.devd.editor.data.SAVE_SUCCESS
 import com.devd.editor.data.SAVE_UPDATE
+import com.devd.editor.screen.dialog.FeelBottomSheet
 import com.devd.model.local.DiaryBookInfo
 import com.devd.model.local.SheetItem
 
@@ -112,6 +120,7 @@ fun EditorScreenRoute(
         selectDiary = uiState.bookList.getOrNull(uiState.bookPos),
         onBookTitleClick = { isShowBookSelect = true },
         onChangeDiaryText = viewModel::setDiaryText,
+        onChangeFeel = viewModel::changeFeel,
         onChangeHashTag = viewModel::changeHashTag,
         onSaveDairy = viewModel::showAskSavePopup,
         onBackIconClick = { onBackIconClick(null) },
@@ -199,6 +208,7 @@ fun EditorScreen(
     onShowImagePicker: () -> Unit = {},
     onBookTitleClick: () -> Unit = {},
     onSaveDairy: () -> Unit = {},
+    onChangeFeel: (Int) -> Unit = {},
     onBackIconClick: () -> Unit = {},
     onChangeCalendar: () -> Unit = {},
     onChangeDiaryText: (String) -> Unit = {},
@@ -206,6 +216,8 @@ fun EditorScreen(
 ) {
 
     val contentsTextState = rememberTextFieldState(diaryState?.diaryContents ?: "z")
+
+    var isShowFeelSheet by remember { mutableStateOf(false) }
 
     val hashTagList = remember { mutableStateListOf<String>() }
     val focusManger = LocalFocusManager.current
@@ -245,70 +257,50 @@ fun EditorScreen(
                 .fillMaxWidth()
                 .padding(horizontal = 20.dp, vertical = 15.dp),
             verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.SpaceBetween
         ) {
             Image(
                 modifier = Modifier
                     .height(24.dp)
                     .noRippleClickable(onClick = onBackIconClick),
-                painter = painterResource(R.drawable.icon_back_arrow),
+                painter = painterResource(R.drawable.icon_andgle_left),
                 contentDescription = null,
             )
-            Row(
-                modifier = Modifier.clickable(onClick = onBookTitleClick),
-                verticalAlignment = Alignment.CenterVertically,
-            ) {
-                Text(
-                    text = selectDiary?.title ?: "",
-                    style = MaterialTheme.typography.titleMedium
+            Spacer(Modifier.width(10.dp))
+            Text(
+                text = "새 일기 쓰기",
+                style = MaterialTheme.typography.titleMedium
+            )
+        }
+        Row(
+            modifier = Modifier
+                .clickable(onClick = onBookTitleClick)
+                .align(Alignment.End)
+                .padding(end = 20.dp),
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            Text(
+                text = selectDiary?.title ?: "",
+                style = MaterialTheme.typography.titleMedium.copy(
+                    color = Black33Color
                 )
-                Spacer(Modifier.width(5.dp))
-                Image(
-                    modifier = Modifier.height(16.dp),
-                    painter = painterResource(R.drawable.icon_drop_down),
-                    contentDescription = null
-                )
-            }
+            )
+            Spacer(Modifier.width(5.dp))
             Image(
-                modifier = Modifier
-                    .height(24.dp)
-                    .noRippleClickable(onClick = onSaveDairy),
-                painter = painterResource(R.drawable.icon_pencil),
-                contentDescription = null,
+                modifier = Modifier.height(16.dp),
+                painter = painterResource(R.drawable.icon_drop_down),
+                colorFilter = ColorFilter.tint(Black33Color),
+                contentDescription = null
             )
         }
         Spacer(Modifier.height(15.dp))
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.SpaceBetween
-        ) {
-            EditorDateItem(
-                writeDate = writeDate,
-                isCanChangeDate = isCanChangeDate,
-                onShowCalendar = {
-                    onChangeCalendar()
-                }
-            )   // 날짜 View
-            Column(
-                modifier = Modifier.padding(end = 15.dp),
-                horizontalAlignment = Alignment.CenterHorizontally
-            ) {
-                Text(
-                    text = "Feel",
-                    style = MaterialTheme.typography.labelLarge.copy(
-                        color = BlackColor
-                    )
-                )
-                Image(
-                    modifier = Modifier
-                        .border(width = 1.dp, color = BlackColor, shape = RoundedCornerShape(5.dp))
-                        .padding(5.dp),
-                    painter = painterResource(R.drawable.icon_pencil),
-                    contentDescription = null
-                )
+        EditorDateItem(
+            modifier = Modifier.align(Alignment.CenterHorizontally),
+            writeDate = writeDate,
+            isCanChangeDate = isCanChangeDate,
+            onShowCalendar = {
+                onChangeCalendar()
             }
-        }
+        )   // 날짜 View
         Spacer(Modifier.height(20.dp))
         CardPreviewItem(
             imageUrl = diaryState?.imageUrl,
@@ -317,14 +309,57 @@ fun EditorScreen(
             onChangeImage = onShowImagePicker
         )   // 일기 미리보기
         Spacer(Modifier.height(10.dp))
+        Text(
+            modifier = Modifier.padding(start = 20.dp),
+            text = "오늘 날의 기분은?",
+            style = MaterialTheme.typography.labelSmall.copy(
+                color = Black33Color
+            )
+        )
+        Spacer(Modifier.height(5.dp))
+        Image(
+            modifier = Modifier
+                .size(60.dp)
+                .align(Alignment.CenterHorizontally)
+                .background(
+                    color = if ((diaryState?.diaryMood ?: -1) == -1) BlackF4Color else TransParents,
+                    shape = CircleShape
+                )
+                .clickable(onClick = {
+                    isShowFeelSheet = true
+                }),
+            painter = if ((diaryState?.diaryMood ?: -1) == -1)
+                painterResource(R.drawable.icon_select_feel)
+            else painterResource(FeelData.feelList[diaryState?.diaryMood!!]),
+            colorFilter =  if ((diaryState?.diaryMood ?: -1) == -1) ColorFilter.tint(Black88Color) else null,
+            contentDescription = null
+        )
+        Spacer(Modifier.height(20.dp))
         EditorItem(
-            modifier = Modifier,
+            modifier = Modifier.padding(horizontal = 20.dp),
             textFieldState = contentsTextState,
             hashList = diaryState?.diaryTag ?: emptyList(),
             onChangeDiaryText = onChangeDiaryText,
             onChangeTagItem = onChangeHashTag,
         )   // 일기 작성
         Spacer(Modifier.height(20.dp))
+        TextButton(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 20.dp),
+            contentsPadding = PaddingValues(vertical = 15.dp),
+            text = "작성 완료",
+            onClick = onSaveDairy
+        )
     }
 
+    if (isShowFeelSheet) {
+        FeelBottomSheet(
+            selectIndex = diaryState?.diaryMood ?: -1,
+            onItemClick = onChangeFeel,
+            onDismissRequest = {
+                isShowFeelSheet = false
+            }
+        )
+    }
 }

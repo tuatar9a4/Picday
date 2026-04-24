@@ -32,7 +32,7 @@ data class DiaryEntity(
     val createdAt: Long,
     var updatedAt: Long,
 
-    val mood: Int? = null,
+    var mood: Int? = null,
     val weather: Int? = null,
 
     val isDeleted: Boolean = false

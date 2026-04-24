@@ -31,6 +31,7 @@ val WhiteOpacity40Color = Color(0x66FFFFFF)
 val BlackColor = Color(0xFF000000)
 val BlackOpacity40Color = Color(0x66000000)
 val BlackOpacity30Color = Color(0x4d000000)
+val BlackOpacity15Color = Color(0x26000000)
 val BlackOpacity90Color = Color(0x1a000000)
 val RedColor = Color(0xFFE3242B)
 val YellowColor = Color(0xFFFFE14E)
@@ -78,8 +79,8 @@ val OneDayTextFieldColors
     get() = TextFieldDefaults.colors().copy(
     focusedIndicatorColor = Color.White,
     unfocusedIndicatorColor = Color.White,
-    focusedContainerColor = PrimaryColor,
-    unfocusedContainerColor = PrimaryColor,
+    focusedContainerColor = WhiteColor,
+    unfocusedContainerColor = WhiteColor,
     cursorColor = AccentColor,
     textSelectionColors = TextSelectionColors(
         handleColor = Color.Black, backgroundColor = AccentOpacity40Color

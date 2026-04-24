@@ -14,6 +14,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -24,6 +25,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
@@ -34,10 +36,12 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import coil3.compose.AsyncImage
 import com.devd.commonsystem.R
+import com.devd.commonsystem.theme.BlackD9Color
+import com.devd.commonsystem.theme.BlackF4Color
+import com.devd.commonsystem.theme.BlackOpacity15Color
 import com.devd.commonsystem.theme.BlackOpacity40Color
-import com.devd.commonsystem.theme.SecondaryColor
+import com.devd.commonsystem.theme.TransParents
 import com.devd.commonsystem.theme.WhiteColor
-import com.devd.commonsystem.theme.WhiteOpacity40Color
 import com.devd.commonsystem.utils.noRippleClickable
 import com.devd.commonsystem.utils.rememberImageUrl
 import com.devd.editor.data.ImageType
@@ -64,8 +68,8 @@ fun CardPreviewItem(
     Box(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(horizontal = 80.dp)
-            .background(color = SecondaryColor, shape = RoundedCornerShape(10.dp))
+            .padding(horizontal = 100.dp)
+            .background(color = BlackF4Color, shape = RoundedCornerShape(10.dp))
             .aspectRatio(9 / 16f)
     ) {
         imageUrl?.let {
@@ -83,11 +87,10 @@ fun CardPreviewItem(
             Image(
                 modifier = Modifier
                     .align(Alignment.Center)
-                    .padding(horizontal = 60.dp)
-                    .fillMaxSize()
+                    .size(36.dp)
                     .noRippleClickable(onClick = onChangeImage),
-                painter = painterResource(R.drawable.icon_photo),
-                colorFilter = ColorFilter.tint(WhiteOpacity40Color),
+                painter = painterResource(R.drawable.icon_camera),
+                colorFilter = ColorFilter.tint(BlackD9Color),
                 contentDescription = null
             )
         }
@@ -96,7 +99,13 @@ fun CardPreviewItem(
                 .align(Alignment.BottomCenter)
                 .fillMaxWidth()
                 .background(
-                    color = BlackOpacity40Color,
+                    brush = Brush.verticalGradient(
+                        colorStops = arrayOf(
+                            0.0f to TransParents,
+                            0.5f to BlackOpacity15Color,
+                            1.0f to BlackOpacity40Color,
+                        ),
+                    ),
                     shape = RoundedCornerShape(bottomEnd = 10.dp, bottomStart = 10.dp)
                 )
                 .padding(start = 5.dp, end = 5.dp, top = 5.dp, bottom = 10.dp),
@@ -122,7 +131,7 @@ fun CardPreviewItem(
             ) {
                 items(diaryTag) {
                     Text(
-                        text = "# $it",
+                        text = "#$it",
                         style = MaterialTheme.typography.labelLarge.copy(
                             fontStyle = FontStyle.Italic,
                             color = WhiteColor

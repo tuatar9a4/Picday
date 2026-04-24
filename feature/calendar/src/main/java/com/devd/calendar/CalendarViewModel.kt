@@ -189,7 +189,8 @@ class CalendarViewModel @Inject constructor(
                 diaryId = diaryWithDay?.diaryId,
                 imageStr = diaryWithDay?.imageUrlList?.firstOrNull(),
                 contents = diaryWithDay?.content,
-                tagList = diaryWithDay?.tagList
+                tagList = diaryWithDay?.tagList,
+                mood = diaryWithDay?.mood
             )
         }
     }

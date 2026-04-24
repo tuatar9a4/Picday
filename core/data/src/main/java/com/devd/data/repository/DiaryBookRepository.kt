@@ -193,6 +193,7 @@ class DiaryBookRepository @Inject constructor(
             content = diaryInfo.content,
             createdAt = diaryInfo.createDate,
             updatedAt = diaryInfo.updateDate,
+            mood = diaryInfo.mood
         )
         val diaryId = diaryDao.insertDiary(diary)
 
@@ -229,6 +230,7 @@ class DiaryBookRepository @Inject constructor(
         val diaryExtras = diaryDao.getDiaryById(diaryId = diaryInfo.diaryId)!!
         val diary = diaryExtras.diary
         diary.content = diaryInfo.content
+        diary.mood = diaryInfo.mood
         diary.updatedAt = System.currentTimeMillis()
         diaryDao.updateDiary(diary)
 

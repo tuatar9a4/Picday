@@ -43,7 +43,8 @@ fun SimpleDiaryCardScreen(
         diaryId = 7479,
         imageStr = "accumsan",
         contents = "fusce",
-        tagList = listOf("11")
+        tagList = listOf("11"),
+        mood = 0
     ),
     onBackPress: () -> Unit = {}
 ) {

@@ -33,7 +33,6 @@ import com.devd.commonsystem.theme.BlackColor
 import com.devd.commonsystem.ui.Toolbar
 import com.devd.commonsystem.ui.dialog.OptionBottomSheet
 import com.devd.commonsystem.ui.loading.LoadingDialog
-import com.devd.model.local.DiaryPhaseType
 import com.devd.model.local.SheetItem
 import java.time.YearMonth
 
@@ -51,9 +50,7 @@ fun CalendarScreenRoute(
     CalendarScreen(
         modifier = modifier,
         monthToList = uiState.monthToList,
-        percentType = uiState.writeDisplayType,
         bookName = uiState.bookName,
-        writePercent = uiState.writePercent,
         onShowBookList = { viewModel.fetchBookList() },
         onShowSimpleCard = { item -> dialogDiaryInfo.value = item },
         onChangeDate = viewModel::fetchDiaryImageWithMonth,
@@ -88,9 +85,7 @@ fun CalendarScreenRoute(
 fun CalendarScreen(
     modifier: Modifier = Modifier,
     monthToList: Map<YearMonth, List<CalendarImageInfo>> = emptyMap(),
-    percentType: DiaryPhaseType = DiaryPhaseType.MOON,
     bookName: String = "",
-    writePercent: Float = 0.5f,
     onShowSimpleCard: (CalendarImageInfo) -> Unit = {},
     onShowBookList: () -> Unit = {},
     onChangeDate: (selectMonth: Long, isPre: Boolean, isNext: Boolean) -> Unit = { _, _, _ -> },

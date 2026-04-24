@@ -51,7 +51,7 @@ data class EditorUiState(
     var editMode: EditMode = EditMode.Edit,
     var diaryInfo: DiaryInfoState = DiaryInfoState(-1),
     var bookList: List<DiaryBookInfo> = emptyList(),
-    var bookPos: Int = 0,
+    var bookPos: Int = -1,
     var imageUrlForCrop: Uri? = null
 ) {
     val selectBookId get() = bookList.getOrNull(bookPos)?.bookId!!
@@ -130,6 +130,7 @@ class EditorViewModel @Inject constructor(
                         bookId = editorUiState.value.selectBookId,
                         diaryId = route.diaryId,
                         imageUrl = Remote(diary.imageUrlList.first()),
+                        diaryMood = diary.mood?:-1,
                         diaryContents = diary.content,
                         diaryTag = diary.tagList
                     )
@@ -241,6 +242,10 @@ class EditorViewModel @Inject constructor(
         changeSelectData(selectMillis)
     }
 
+    fun changeFeel(select : Int){
+        _editorUiState.update { it.copy(diaryInfo = it.diaryInfo.copy(diaryMood = select)) }
+    }
+
     fun showAskSavePopup() {
         viewModelScope.launch {
             if (!checkValidateDiaryInfo()) return@launch
@@ -264,6 +269,12 @@ class EditorViewModel @Inject constructor(
             )
             return false
         }
+        if (diaryInfo.diaryMood == -1) { //일기장 기분 미입력
+            _messageDialog.emit(
+                MessageInfo(type = SAVE_FAIL, messageId = R.string.request_diary_feel_message)
+            )
+            return false
+        }
         return true
     }
 
@@ -277,7 +288,8 @@ class EditorViewModel @Inject constructor(
                     imageUrls = listOf(imageName),
                     tags = diaryInfo.diaryTag,
                     createDate = customDatePickerDialogState.value.selectedDate,
-                    updateDate = System.currentTimeMillis()
+                    updateDate = System.currentTimeMillis(),
+                    mood = diaryInfo.diaryMood
                 )
             )
             _messageDialog.emit(
@@ -296,7 +308,8 @@ class EditorViewModel @Inject constructor(
                     diaryId = diaryInfo.diaryId!!,
                     content = diaryInfo.diaryContents,
                     imageUrls = listOf(imageUrl),
-                    tags = diaryInfo.diaryTag
+                    tags = diaryInfo.diaryTag,
+                    mood = diaryInfo.diaryMood
                 )
             )
             _messageDialog.emit(

@@ -35,6 +35,7 @@
     <string name="ask_delete_diary_message">"일기를 삭제하시겠습니까?"</string>
     <string name="request_diary_image_message">"이미지가 없이 저장할 수 없습니다"</string>
     <string name="request_diary_contents_message">"2자 이상의 내용이 필요합니다."</string>
+    <string name="request_diary_feel_message">"오늘의 기분을 선택해주세요."</string>
     <string name="not_found_delete_diary">"삭제할 다이어리가 없습니다."</string>
     <string name="success_save_new_book_message">"일기장 생성에 성공하였습니다."</string>
     <string name="fail_save_new_book_message">"일기장 생성에 실패하였습니다."</string>

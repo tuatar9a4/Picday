@@ -11,6 +11,7 @@ data class CalendarImageInfo(
     val diaryId: Long?,
     val imageStr: String?,
     val contents: String?,
+    val mood: Int?,
     val tagList: List<String>?,
 ) {
     @Composable
