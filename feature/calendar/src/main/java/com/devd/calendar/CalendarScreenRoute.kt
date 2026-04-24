@@ -7,7 +7,6 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
@@ -24,10 +23,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.devd.calendar.data.CalendarImageInfo
 import com.devd.calendar.screen.CustomCalendarScreen
-import com.devd.calendar.screen.MonthWritePercentScreen
 import com.devd.calendar.screen.SimpleDiaryCardScreen
 import com.devd.commonsystem.R
 import com.devd.commonsystem.theme.BlackColor
@@ -41,8 +40,7 @@ import java.time.YearMonth
 @Composable
 fun CalendarScreenRoute(
     modifier: Modifier = Modifier,
-    viewModel: CalendarViewModel = hiltViewModel(),
-    onBackClick: () -> Unit
+    viewModel: CalendarViewModel = hiltViewModel()
 ) {
 
     val uiState by viewModel.calendarUiState.collectAsState()
@@ -59,7 +57,6 @@ fun CalendarScreenRoute(
         onShowBookList = { viewModel.fetchBookList() },
         onShowSimpleCard = { item -> dialogDiaryInfo.value = item },
         onChangeDate = viewModel::fetchDiaryImageWithMonth,
-        onBackClick = onBackClick
     )
 
     if (dialogDiaryInfo.value != null) {
@@ -97,7 +94,6 @@ fun CalendarScreen(
     onShowSimpleCard: (CalendarImageInfo) -> Unit = {},
     onShowBookList: () -> Unit = {},
     onChangeDate: (selectMonth: Long, isPre: Boolean, isNext: Boolean) -> Unit = { _, _, _ -> },
-    onBackClick: () -> Unit = {}
 ) {
     Column(
         modifier = modifier.then(
@@ -107,14 +103,17 @@ fun CalendarScreen(
         )
     ) {
         Toolbar(
-            titleBox = {
+            rightButtons = {
                 Row(
                     modifier = Modifier.clickable(onClick = onShowBookList),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     Text(
                         text = bookName,
-                        style = MaterialTheme.typography.titleMedium.copy(color = BlackColor)
+                        style = MaterialTheme.typography.titleMedium.copy(
+                            color = BlackColor,
+                            fontSize = 18.sp
+                        )
                     )
                     Spacer(Modifier.width(5.dp))
                     Image(
@@ -123,16 +122,6 @@ fun CalendarScreen(
                         contentDescription = null
                     )
                 }
-            },
-            leftButtons = {
-                Image(
-                    modifier = Modifier
-                        .size(32.dp)
-                        .padding(4.dp)
-                        .clickable(onClick = onBackClick),
-                    painter = painterResource(R.drawable.icon_back_arrow),
-                    contentDescription = null
-                )
             }
         )
         Spacer(Modifier.height(5.dp))
@@ -142,12 +131,12 @@ fun CalendarScreen(
             onChangeDate = onChangeDate
         )
         Spacer(Modifier.height(10.dp))
-        MonthWritePercentScreen(
-            modifier = Modifier.padding(horizontal = 20.dp),
-            type = percentType,
-            percent = writePercent
-        )
-        Spacer(Modifier.height(20.dp))
+//        MonthWritePercentScreen(
+//            modifier = Modifier.padding(horizontal = 20.dp),
+//            type = percentType,
+//            percent = writePercent
+//        )
+//        Spacer(Modifier.height(20.dp))
     }
 
 }

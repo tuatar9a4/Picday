@@ -4,6 +4,10 @@ import android.annotation.SuppressLint
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.gestures.AnchoredDraggableState
+import androidx.compose.foundation.gestures.DraggableAnchors
+import androidx.compose.foundation.gestures.Orientation
+import androidx.compose.foundation.gestures.anchoredDraggable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -17,39 +21,46 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
-import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.SideEffect
+import androidx.compose.runtime.derivedStateOf
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalWindowInfo
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import androidx.compose.ui.util.lerp
 import coil3.compose.AsyncImage
 import coil3.request.ImageRequest
 import coil3.size.Size
 import com.devd.calendar.data.CalendarImageInfo
 import com.devd.commonsystem.R
-import com.devd.commonsystem.theme.AccentColor
-import com.devd.commonsystem.theme.BlackOpacity40Color
+import com.devd.commonsystem.theme.Black33Color
+import com.devd.commonsystem.theme.BlackColor
+import com.devd.commonsystem.theme.BlackD9Color
+import com.devd.commonsystem.theme.BlackF4Color
 import com.devd.commonsystem.theme.RedColor
+import com.devd.commonsystem.theme.TransParents
 import com.devd.commonsystem.theme.WhiteColor
 import com.devd.commonsystem.utils.getFirstDayMillis
 import kotlinx.coroutines.launch
-import java.time.DayOfWeek
 import java.time.Instant
 import java.time.LocalDate
 import java.time.YearMonth
@@ -98,7 +109,6 @@ fun CustomCalendarScreen(
     Column(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(horizontal = 16.dp)
     ) {
         CalendarHeader(
             currentMonth = currentMonth,
@@ -149,23 +159,19 @@ fun CalendarHeader(
 ) {
     Row(
         modifier = Modifier.fillMaxWidth(),
-        horizontalArrangement = Arrangement.SpaceBetween,
+        horizontalArrangement = Arrangement.Center,
         verticalAlignment = Alignment.CenterVertically
     ) {
-        Image(
-            modifier = Modifier.clickable(onClick = onPreviousMonth),
-            painter = painterResource(id = R.drawable.icon_andgle_left),
-            contentDescription = null
-        )
-
         Text(
-            text = "${currentMonth.year}년 ${currentMonth.monthValue}월",
-            style = MaterialTheme.typography.titleLarge,
-            fontWeight = FontWeight.Bold
+            text = "${currentMonth.year}.${currentMonth.monthValue}",
+            style = MaterialTheme.typography.titleLarge.copy(
+                fontSize = 18.sp,
+                color = BlackColor
+            ),
         )
         Image(
-            modifier = Modifier.clickable(onClick = onNextMonth),
-            painter = painterResource(id = R.drawable.icon_angle_right),
+            painter = painterResource(R.drawable.icon_drop_down),
+            colorFilter = ColorFilter.tint(BlackColor),
             contentDescription = null
         )
     }
@@ -186,7 +192,7 @@ fun DaysOfWeekHeader() {
         }
     }
 }
-
+enum class CalendarState { Collapsed, Expanded }
 @Composable
 fun CalendarGrid(
     currentMonth: YearMonth,
@@ -204,13 +210,54 @@ fun CalendarGrid(
 
     val calendarItemCount = imageList?.size ?: (7 * weekCount)
 
-    val deviceWidthPx = LocalWindowInfo.current.containerDpSize.width - 32.dp
+
+    val deviceWidthPx = LocalWindowInfo.current.containerDpSize.width
     val density = LocalDensity.current
     val boxWidth = with(density) { (deviceWidthPx / 7) }
     val imagePixel = with(density) { boxWidth.toPx().toInt() }
 
+    val anchors = DraggableAnchors {
+        CalendarState.Collapsed at 0f // 축소 상태 (1:1)
+        CalendarState.Expanded at 300f // 확장 상태 (9:16) - 실제 드래그 거리(px)
+    }
+
+    val state = remember {
+        AnchoredDraggableState(
+            initialValue = CalendarState.Expanded,
+            anchors = anchors
+        )
+    }
+
+
+    val dragProgress by remember {
+        derivedStateOf {
+            val fullRange = 300f // Expanded 앵커에 설정한 px 값
+            val currentOffset = state.offset.coerceIn(0f, fullRange)
+            currentOffset / fullRange
+        }
+    }
+
+    val currentAspectRatio = lerp(1f, 9 / 16f, dragProgress)
+    val extraTextAlpha = 1f - dragProgress // 축소될 때(0.0) 보이고 확장될 때(1.0) 사라짐
+    val imageAlpha = dragProgress // 확장될 때 보임
+
+    SideEffect {
+        state.updateAnchors(
+            DraggableAnchors {
+                CalendarState.Collapsed at 0f
+                CalendarState.Expanded at 300f
+            }
+        )
+    }
+
     Column(
         modifier = Modifier.fillMaxWidth()
+            .anchoredDraggable(
+                state = state,
+                orientation = Orientation.Vertical,
+                enabled = true,
+
+            )
     ) {
         (0..<calendarItemCount).toList().chunked(7).forEach { week ->
             Row() {
@@ -218,33 +265,32 @@ fun CalendarGrid(
                     val dayInfo = imageList?.getOrNull(day)
                     val date = calendarStartDay.plusDays((day).toLong())
                     val isToday = dayInfo?.isToday ?: (date == LocalDate.now())
+                    val isFuture = (date > LocalDate.now())
                     val isCurrentMonth =
                         dayInfo?.isCurrentMonth ?: (YearMonth.from(date) == currentMonth)
-                    val isSunDay = dayInfo?.isSunDay ?: (date.dayOfWeek == DayOfWeek.SUNDAY)
+                    val imageUrl = dayInfo?.imageUrl()
                     Box(
                         modifier = Modifier
                             .width(boxWidth)
-                            .aspectRatio(9 / 16f)
-                            .padding(2.dp)
+                            .aspectRatio(currentAspectRatio)
+//                            .aspectRatio(9 / 16f)
                             .background(
-                                color = BlackOpacity40Color,
-                                shape = RoundedCornerShape(5.dp)
+                                color = if (isFuture) WhiteColor else BlackF4Color,
                             )
                             .clickable {
                                 imageList?.getOrNull(day)?.diaryId?.let { onDateSelector(imageList[day]) }
                             },
-                        contentAlignment = Alignment.Center
                     ) {
-                        dayInfo?.imageUrl()?.let {
+                        imageUrl?.let {
                             AsyncImage(
                                 modifier = Modifier
-                                    .fillMaxSize()
-                                    .clip(RoundedCornerShape(5.dp)),
+                                    .fillMaxSize(),
                                 contentScale = ContentScale.Crop,
                                 model = ImageRequest.Builder(LocalContext.current)
                                     .data(it)
                                     .size(Size(imagePixel, imagePixel))
                                     .build(),
+                                alpha = if (isCurrentMonth) 1f else 0.4f,
                                 contentDescription = null
                             )
                         }
@@ -252,12 +298,25 @@ fun CalendarGrid(
                             modifier = Modifier
                                 .padding(2.dp)
                                 .align(Alignment.TopStart)
-                                .alpha(if (isToday || isCurrentMonth) 1f else 0.4f)
+                                .background(
+                                    color = if (isToday) Black33Color else TransParents,
+                                    shape = CircleShape
+                                )
+                                .alpha(if(isFuture && !isCurrentMonth) 0.4f else 1f)
                                 .padding(vertical = 3.dp, horizontal = 5.dp),
                             text = dayInfo?.day?.toString() ?: "${date.dayOfMonth}",
                             style = MaterialTheme.typography.labelLarge.copy(
-                                color = if (isToday) AccentColor else if (isSunDay) RedColor else WhiteColor
+                                color = if (isToday) WhiteColor
+                                else if (isFuture && isCurrentMonth) Black33Color
+                                else if (imageUrl != null && isCurrentMonth) WhiteColor
+                                else if (imageUrl == null && isCurrentMonth) BlackD9Color
+                                else BlackD9Color
                             )
+                        )
+                        HorizontalDivider(
+                            modifier = Modifier.fillMaxWidth(),
+                            thickness = 1.dp,
+                            color = BlackF4Color
                         )
                     }
                 }

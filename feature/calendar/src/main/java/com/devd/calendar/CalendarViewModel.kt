@@ -154,6 +154,10 @@ class CalendarViewModel @Inject constructor(
 
     private suspend fun fetchMonthData(millis: Long): List<CalendarImageInfo> {
         val (start, end) = millis.getCurrentMonthRangeMillis(true)
+        bookId = if (bookId == -1L) {
+            val uuid = dataStoreRepository.getUserInfo()?.uuid!!
+            diaryRepository.fetchMajorDiaryBook(uuid)?.bookId!!
+        } else bookId
         val diaryList = diaryRepository.fetchMonthDairiesByDiaryBook(bookId, start, end)
         return createCalendarImageInfos(millis, diaryList)
     }

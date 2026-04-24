@@ -94,8 +94,7 @@ fun MyNavHost(
                 )
 
                 customCalendarScreen(
-                    modifier = modifier,
-                    onBackClick = { navController.popBackStack() }
+                    modifier = modifier
                 )
 
                 bookcaseScreen(

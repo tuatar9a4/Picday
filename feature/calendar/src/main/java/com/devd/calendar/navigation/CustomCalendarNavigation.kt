@@ -16,12 +16,10 @@ data object CustomCalendarRoute/*(
 
 fun NavGraphBuilder.customCalendarScreen(
     modifier: Modifier = Modifier,
-    onBackClick : () -> Unit = {}
 ) {
     composable<CustomCalendarRoute> {
         CalendarScreenRoute(
-            modifier = modifier,
-            onBackClick = onBackClick
+            modifier = modifier
         )
     }
 }
