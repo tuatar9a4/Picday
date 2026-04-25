@@ -15,6 +15,9 @@ fun Project.configureKotlinAndroid() {
     properties.load(project.rootProject.file("local.properties").inputStream())
 
     val ociBuketKey = properties.getProperty("oracle.buket.key")
+    val admobServiceId = properties.getProperty("admob.service.id")
+    val admobBannerId = properties.getProperty("admob.banner.id")
+    val admobInterstitialId = properties.getProperty("admob.interstitial.id")
 
 //    Plugins
     pluginManager.apply("org.jetbrains.kotlin.android")
@@ -26,6 +29,9 @@ fun Project.configureKotlinAndroid() {
         defaultConfig {
             minSdk = 29
             resValue("string", "ociBuketKey", ociBuketKey)
+            resValue("string", "admobServiceId", admobServiceId)
+            resValue("string", "admobBannerId", admobBannerId)
+            resValue("string", "admobInterstitialId", admobInterstitialId)
         }
 
         compileOptions {

@@ -1,5 +1,6 @@
 package com.devd.bookcase
 
+import android.app.Activity
 import android.net.Uri
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.SharedTransitionLayout
@@ -70,6 +71,7 @@ import com.devd.commonsystem.ui.dialog.book.DiaryBookDialog
 import com.devd.commonsystem.ui.dialog.book.DiaryBookDialogType
 import com.devd.commonsystem.ui.loading.LoadingDialog
 import com.devd.commonsystem.utils.noRippleClickable
+import com.devd.commonsystem.utils.preloadInterstitialAd
 import com.devd.commonsystem.utils.rememberImagePicker
 import com.devd.commonsystem.utils.rememberImageUrl
 import com.devd.commonsystem.utils.shareBitmap
@@ -81,10 +83,14 @@ import com.devd.model.local.SheetItem
 import com.devd.permission.Consts
 import com.devd.permission.IPermissionHandler
 import com.devd.permission.rememberPermissionHandler
+import com.google.android.gms.ads.AdError
+import com.google.android.gms.ads.FullScreenContentCallback
+import com.google.android.gms.ads.interstitial.InterstitialAd
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
+import timber.log.Timber
 
 sealed interface BookcaseInterface {
     data class OnOpenDiaryBook(val bookInfo: DiaryBookInfo) : BookcaseInterface
@@ -112,14 +118,14 @@ fun BookcaseRoute(
     val context = LocalContext.current
     var bookInfo by remember { mutableStateOf<DiaryBookInfo?>(null) }
 
-    val isOpenBook = remember { mutableStateOf(false) }
-
     /* ImagePicker */
     val showImagePicker = remember { mutableStateOf(false) }
     val showCropUi = remember { mutableStateOf<Uri?>(null) }
     val imagePicker = rememberImagePicker { uri ->
         uri?.let { showCropUi.value = uri }
     }
+
+    var interstitialAd by remember { mutableStateOf<InterstitialAd?>(null) }
 
     suspend fun checkPermission() {
         val grant = permissionHandler.requestPermissionIfNeeded(Consts.CAMERA_PERMISSION)
@@ -158,15 +164,59 @@ fun BookcaseRoute(
     }
 
     /* ADD */
+    fun insertOrModifyBook(){
+        val uri = viewModel.imageUrl
+        if (uri != null) {
+            val file = uri.let { context.uriToFile(it) }
+            viewModel.uploadImage(file, bookInfo!!)
+            bookInfo = null
+        } else if (bookInfo!!.bookImage != null) {
+            if (bookInfo!!.bookId == -1L) viewModel.insertDiaryBook(bookInfo!!)
+            else viewModel.updateBookInfo(bookInfo!!)
+            bookInfo = null
+        }
+    }
+
     fun addNewDiaryBook() {
-        if (uiState.bookList.size >= 3) {   // 3개 초과는 광고보고 생성
-            viewModel.showMessageDialog(
-                MessageInfo(
-                    type = LIMIT_BOOK_LIST_COUNT,
-                    messageId = R.string.limit_book_list_count
-                )
-            )
-        } else {
+        viewModel.visibleProgress(true)
+        context.preloadInterstitialAd {
+            interstitialAd = it
+            Timber.d("CheckAD => interstitialAd load=>$interstitialAd")
+            interstitialAd?.fullScreenContentCallback =
+                object : FullScreenContentCallback() {
+                    override fun onAdDismissedFullScreenContent() {
+                        // Called when fullscreen content is dismissed.
+                        Timber.d("CheckAD => Ad was dismissed.")
+                        // Don't forget to set the ad reference to null so you
+                        // don't show the ad a second time.
+                        interstitialAd = null
+                    }
+
+                    override fun onAdFailedToShowFullScreenContent(adError: AdError) {
+                        // Called when fullscreen content failed to show.
+                        Timber.d("CheckAD => Ad failed to show.")
+                        // Don't forget to set the ad reference to null so you
+                        // don't show the ad a second time.
+                        interstitialAd = null
+                    }
+
+                    override fun onAdShowedFullScreenContent() {
+                        // Called when fullscreen content is shown.
+                        Timber.d("CheckAD => Ad showed fullscreen content.")
+                    }
+
+                    override fun onAdImpression() {
+                        // Called when an impression is recorded for an ad.
+                        insertOrModifyBook()
+                        Timber.d("CheckAD => Ad recorded an impression.")
+                    }
+
+                    override fun onAdClicked() {
+                        // Called when ad is clicked.
+                        Timber.d("CheckAD => Ad was clicked.")
+                    }
+                }
+            viewModel.visibleProgress(false)
             bookInfo =
                 viewModel.newBookInfo.copy(createDate = System.currentTimeMillis())
         }
@@ -255,18 +305,17 @@ fun BookcaseRoute(
                     description = description,
                     bookPhaseType = monthType
                 )
-                if (uri != null) {
-                    val file = uri.let { context.uriToFile(it) }
-                    viewModel.uploadImage(file, bookInfo!!)
-                    bookInfo = null
-                } else if (bookInfo!!.bookImage != null) {
-                    if (bookInfo!!.bookId == -1L) viewModel.insertDiaryBook(bookInfo!!)
-                    else viewModel.updateBookInfo(bookInfo!!)
-                    bookInfo = null
-                } else {
+                if( uri == null && bookInfo!!.bookImage == null){
                     viewModel.showMessageDialog(
                         MessageInfo(NEED_BOOK_IMAGE, R.string.request_diary_image_message)
                     )
+                    return@DiaryBookDialog
+                }
+                viewModel.imageUrl = uri
+                if ((bookInfo?.bookId ?: -1) == -1L && interstitialAd != null) {
+                    interstitialAd?.show(context as Activity)
+                } else {
+                    insertOrModifyBook()
                 }
             },
             onDismissRequest = { bookInfo = null }

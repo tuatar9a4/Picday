@@ -30,6 +30,11 @@ import androidx.core.content.FileProvider
 import coil3.compose.AsyncImage
 import com.devd.commonsystem.R
 import com.devd.model.local.DiaryPhaseType
+import com.devd.permission.BuildConfig
+import com.google.android.gms.ads.AdRequest
+import com.google.android.gms.ads.LoadAdError
+import com.google.android.gms.ads.interstitial.InterstitialAd
+import com.google.android.gms.ads.interstitial.InterstitialAdLoadCallback
 import java.io.File
 
 val LocalSharedTransitionScope = staticCompositionLocalOf<SharedTransitionScope?> { null }
@@ -138,3 +143,22 @@ fun Modifier.dropShadow(
         offset = DpOffset(x = offsetX, y = offsetY)
     )
 )
+
+fun Context.preloadInterstitialAd(callbackAd: (InterstitialAd?) -> Unit) {
+    InterstitialAd.load(
+        this,
+        if (BuildConfig.DEBUG) "ca-app-pub-3940256099942544/1033173712"
+        else getString(R.string.admobInterstitialId),
+        AdRequest.Builder().build(),
+        object : InterstitialAdLoadCallback() {
+            override fun onAdFailedToLoad(adError: LoadAdError) {
+                callbackAd(null)
+
+            }
+
+            override fun onAdLoaded(interstitialAd: InterstitialAd) {
+                callbackAd(interstitialAd)
+            }
+        }
+    )
+}

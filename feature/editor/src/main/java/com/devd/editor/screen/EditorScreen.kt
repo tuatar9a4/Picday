@@ -1,5 +1,6 @@
 package com.devd.editor.screen
 
+import android.app.Activity
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -59,6 +60,7 @@ import com.devd.commonsystem.ui.dialog.ShowMessageDialog
 import com.devd.commonsystem.ui.loading.LoadingDialog
 import com.devd.commonsystem.utils.FeelData
 import com.devd.commonsystem.utils.noRippleClickable
+import com.devd.commonsystem.utils.preloadInterstitialAd
 import com.devd.commonsystem.utils.rememberImagePicker
 import com.devd.commonsystem.utils.uriToFile
 import com.devd.editor.EditorViewModel
@@ -70,6 +72,10 @@ import com.devd.editor.data.SAVE_UPDATE
 import com.devd.editor.screen.dialog.FeelBottomSheet
 import com.devd.model.local.DiaryBookInfo
 import com.devd.model.local.SheetItem
+import com.google.android.gms.ads.AdError
+import com.google.android.gms.ads.FullScreenContentCallback
+import com.google.android.gms.ads.interstitial.InterstitialAd
+import kotlin.random.Random
 
 @Composable
 fun rememberImeBottomSize(): Int {
@@ -88,11 +94,31 @@ fun EditorScreenRoute(
     /* UiState */
     val uiState by viewModel.editorUiState.collectAsStateWithLifecycle()
 
+    var interstitialAd by remember { mutableStateOf<InterstitialAd?>(null) }
+
     /* Resolvation Move Back */
     LaunchedEffect(viewModel.shouldBackPage) {
         if (viewModel.shouldBackPage) {
             onBackIconClick.invoke(uiState.diaryInfo.diaryId)
             viewModel.shouldBackPage = false
+        }
+        context.preloadInterstitialAd {
+            interstitialAd = it
+            interstitialAd?.fullScreenContentCallback = object : FullScreenContentCallback() {
+                override fun onAdFailedToShowFullScreenContent(p0: AdError) {
+                    interstitialAd = null
+                }
+
+                override fun onAdDismissedFullScreenContent() {
+                    interstitialAd = null
+                }
+
+                override fun onAdImpression() {
+                    val file =
+                        (uiState.diaryInfo.imageUrl as? Local)?.uri?.let { context.uriToFile(it) }
+                    viewModel.uploadImageToBuket(fileUrl = file)
+                }
+            }
         }
     }
 
@@ -140,9 +166,14 @@ fun EditorScreenRoute(
                 }
 
                 ASK_SAVE -> {
-                    val file =
-                        (uiState.diaryInfo.imageUrl as? Local)?.uri?.let { context.uriToFile(it) }
-                    viewModel.uploadImageToBuket(fileUrl = file)
+                    val isSuccess = Random.nextFloat() < 0.3f
+                    if (isSuccess && interstitialAd != null) {
+                        interstitialAd?.show(context as Activity)
+                    } else {
+                        val file =
+                            (uiState.diaryInfo.imageUrl as? Local)?.uri?.let { context.uriToFile(it) }
+                        viewModel.uploadImageToBuket(fileUrl = file)
+                    }
                 }
 
                 else -> {
@@ -267,7 +298,7 @@ fun EditorScreen(
             )
             Spacer(Modifier.width(10.dp))
             Text(
-                text = "새 일기 쓰기",
+                text = if ((diaryState?.bookId ?: -1L) == -1L) "새 일기 쓰기" else "수정 하기",
                 style = MaterialTheme.typography.titleMedium
             )
         }
@@ -331,7 +362,9 @@ fun EditorScreen(
             painter = if ((diaryState?.diaryMood ?: -1) == -1)
                 painterResource(R.drawable.icon_select_feel)
             else painterResource(FeelData.feelList[diaryState?.diaryMood!!]),
-            colorFilter =  if ((diaryState?.diaryMood ?: -1) == -1) ColorFilter.tint(Black88Color) else null,
+            colorFilter = if ((diaryState?.diaryMood
+                    ?: -1) == -1
+            ) ColorFilter.tint(Black88Color) else null,
             contentDescription = null
         )
         Spacer(Modifier.height(20.dp))

@@ -35,4 +35,6 @@ dependencies {
 
     implementation(libs.coil.image.compose)
     implementation(libs.coil.http.compose)
+
+    implementation(libs.play.service.ads)
 }

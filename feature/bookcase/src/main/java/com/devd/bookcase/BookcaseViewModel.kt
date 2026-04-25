@@ -1,5 +1,6 @@
 package com.devd.bookcase
 
+import android.net.Uri
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -55,6 +56,8 @@ class BookcaseViewModel @Inject constructor(
 
     val newBookInfo = DiaryBookInfo(bookId = -1L, title = "")
 
+    var imageUrl: Uri? = null
+
     var storeDeleteBookId: Long? = null
     var storeDeleteDiaryId: Long? = null
     var isInitScroll = true
@@ -70,6 +73,10 @@ class BookcaseViewModel @Inject constructor(
             _bookcaseUiState.update { it.copy(isLoading = true) }
             collectDiaryBook()
         }
+    }
+
+    fun visibleProgress(isVisible: Boolean) {
+        _bookcaseUiState.update { it.copy(isLoading = isVisible) }
     }
 
     suspend fun collectDiaryBook() {

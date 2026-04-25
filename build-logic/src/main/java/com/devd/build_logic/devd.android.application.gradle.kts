@@ -37,4 +37,6 @@ dependencies{
 
     debugImplementation(libs.findLibrary("androidx.compose.ui.tooling.preview").get())
     debugImplementation(libs.findLibrary("androidx.compose.ui.tooling").get())
+
+    implementation(libs.findLibrary("play.service.ads").get())
 }

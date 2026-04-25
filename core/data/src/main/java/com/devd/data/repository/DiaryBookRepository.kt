@@ -27,8 +27,10 @@ import kotlinx.coroutines.flow.map
 import java.time.Instant
 import java.time.YearMonth
 import java.time.ZoneId
+import java.time.temporal.ChronoUnit
 import java.util.Date
 import javax.inject.Inject
+import kotlin.math.abs
 
 class DiaryBookRepository @Inject constructor(
     @param:NetworkModule.DiaryServer private val diaryService: DiaryService,
@@ -58,6 +60,7 @@ class DiaryBookRepository @Inject constructor(
                 bookPhaseType = bookPhaseType,
                 bookColor = bookColor,
                 isMajor = !hasDiaryBook(uuid),
+                lastWriteDate = 0,
                 createdAt = currentMillis,
                 updatedAt = currentMillis,
             )
@@ -209,7 +212,6 @@ class DiaryBookRepository @Inject constructor(
         diaryImageDao.insertImages(imageRequest)
 
         diaryTagDao.deleteByDiary(diaryId)
-
         diaryInfo.tags.forEach { tagName ->
             val tagId = tagDao.getTagByName(tagName)?.id
                 ?: tagDao.insertTag(TagEntity(name = tagName))
@@ -221,6 +223,22 @@ class DiaryBookRepository @Inject constructor(
                 )
             )
         }
+
+        val bookInfo = diaryBookDao.selectDiaryBook(diaryInfo.bookId)
+        val oneDiff = isOneDayDifference(diary.createdAt, diaryInfo.createDate)
+        diaryBookDao.updateDiaryBook(
+            bookInfo.copy(
+                conWriteCount = if (oneDiff) bookInfo.conWriteCount + 1 else 1,
+            )
+        )
+    }
+
+    private fun isOneDayDifference(timeA: Long, timeB: Long): Boolean {
+        val dateA = Instant.ofEpochMilli(timeA).atZone(ZoneId.systemDefault()).toLocalDate()
+        val dateB = Instant.ofEpochMilli(timeB).atZone(ZoneId.systemDefault()).toLocalDate()
+
+        // 두 날짜 사이의 일수(day) 차이의 절대값이 1인지 확인
+        return abs(ChronoUnit.DAYS.between(dateA, dateB)) == 1L
     }
 
     @Transaction

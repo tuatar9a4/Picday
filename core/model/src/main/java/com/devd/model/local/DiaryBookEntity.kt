@@ -25,6 +25,7 @@ data class DiaryBookEntity(
 
     val isMajor: Boolean = false,
 
+    val lastWriteDate : Long = 0,
     val conWriteCount: Long = 0,
 
     val createdAt: Long,

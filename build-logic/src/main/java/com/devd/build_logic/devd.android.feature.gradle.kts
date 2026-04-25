@@ -60,5 +60,7 @@ dependencies{
     implementation(libs.findLibrary("coil.image.compose").get())
     implementation(libs.findLibrary("coil.http.compose").get())
 
+    implementation(libs.findLibrary("play.service.ads").get())
+
 
 }

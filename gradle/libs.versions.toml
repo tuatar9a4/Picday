@@ -126,6 +126,8 @@ compose-rich-editor = { group = "com.github.donald-okara", name = "TextieMDLibra
 coil-image-compose = { group = "io.coil-kt.coil3", name = "coil-compose", version.ref = "coilVersion" }
 coil-http-compose = { group = "io.coil-kt.coil3", name = "coil-network-okhttp", version.ref = "coilVersion" }
 
+#ADmob
+play-service-ads = {group ="com.google.android.gms",name ="play-services-ads",version = "24.8.0"}
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

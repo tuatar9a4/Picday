@@ -5,6 +5,7 @@ import android.util.Log
 import com.devd.datastore.DataStoreKey
 import com.devd.datastore.DataStoreRepository
 import com.devd.firebase.fcm.FcmExtension
+import com.google.android.gms.ads.MobileAds
 import dagger.hilt.android.HiltAndroidApp
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -25,6 +26,7 @@ class OneDayOneShotApp : Application() {
             Timber.plant(ReleaseTree())
         }
         fetchFcmToken()
+        initAdmob()
     }
 
 
@@ -37,6 +39,13 @@ class OneDayOneShotApp : Application() {
             Timber.d("CheckFcmToken fcmToken => ${fcmToken}")
             if (originFcmToken != fcmToken)
                 dataStoreRepository.setPreferData(DataStoreKey.FcmToken, fcmToken)
+        }
+    }
+
+    fun initAdmob(){
+        CoroutineScope(Dispatchers.IO).launch {
+            // Initialize the Google Mobile Ads SDK on a background thread.
+            MobileAds.initialize(this@OneDayOneShotApp) {}
         }
     }
 

@@ -1,37 +1,30 @@
 package com.devd.home.screen
 
-import androidx.compose.foundation.Image
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.ColorFilter
-import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.core.net.toUri
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.devd.commonsystem.R
-import com.devd.commonsystem.theme.BlackD9Color
-import com.devd.commonsystem.theme.WhiteColor
-import com.devd.commonsystem.ui.Toolbar
+import com.devd.commonsystem.ui.admob.BannerAd
 import com.devd.commonsystem.ui.calendar.CustomDatePickerDialog
 import com.devd.commonsystem.ui.cropImageDialog.ShowCropDialog
 import com.devd.commonsystem.ui.dialog.ShowImagePicker
@@ -42,12 +35,16 @@ import com.devd.commonsystem.ui.loading.LoadingDialog
 import com.devd.commonsystem.utils.centerItemIndex
 import com.devd.commonsystem.utils.isCurrentMonth
 import com.devd.commonsystem.utils.rememberImagePicker
+import com.devd.home.BuildConfig
 import com.devd.home.HomeUiState
 import com.devd.home.HomeViewModel
 import com.devd.model.local.DiaryInfo
 import com.devd.permission.Consts
 import com.devd.permission.IPermissionHandler
 import com.devd.permission.rememberPermissionHandler
+import com.google.android.gms.ads.AdRequest
+import com.google.android.gms.ads.AdSize
+import com.google.android.gms.ads.AdView
 import kotlinx.coroutines.launch
 import java.io.File
 
@@ -180,6 +177,15 @@ fun HomeScreen(
     onSettingClick: () -> Unit = {},
     onBookClick: () -> Unit = {}
 ) {
+    val context = LocalContext.current
+    val adId =  if (BuildConfig.DEBUG) "ca-app-pub-3940256099942544/9214589741"
+    else stringResource(R.string.admobBannerId)
+    val adView = remember { AdView(context).apply {
+        setAdSize(AdSize.BANNER)
+        adUnitId = adId
+        loadAd(AdRequest.Builder().build())
+    } }
+
     Box(
         modifier = modifier.then(
             Modifier.fillMaxWidth()
@@ -191,22 +197,23 @@ fun HomeScreen(
                 .verticalScroll(rememberScrollState()),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Toolbar(
-                titleBox = {
-                    Text("", style = MaterialTheme.typography.titleMedium.copy(color = WhiteColor))
-                },
-                rightButtons = {
-                    Image(
-                        modifier = Modifier
-                            .size(36.dp)
-                            .padding(4.dp)
-                            .clickable(onClick = onSettingClick),
-                        painter = painterResource(R.drawable.icon_setting),
-                        contentDescription = null,
-                        colorFilter = ColorFilter.tint(color = BlackD9Color)
-                    )
-                }
-            )
+//            Toolbar(
+//                titleBox = {
+//                    Text("", style = MaterialTheme.typography.titleMedium.copy(color = WhiteColor))
+//                },
+//                rightButtons = {
+//                    Image(
+//                        modifier = Modifier
+//                            .size(36.dp)
+//                            .padding(4.dp)
+//                            .clickable(onClick = onSettingClick),
+//                        painter = painterResource(R.drawable.icon_setting),
+//                        contentDescription = null,
+//                        colorFilter = ColorFilter.tint(color = BlackD9Color)
+//                    )
+//                }
+//            )
+            Box(modifier = Modifier.fillMaxWidth()) { BannerAd(adView, Modifier.fillMaxWidth()) }
             Spacer(Modifier.height(4.dp))
             BookCardScreen(
                 modifier = Modifier.align(Alignment.CenterHorizontally),
