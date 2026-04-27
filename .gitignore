@@ -11,6 +11,8 @@
 /.idea/deploymentTargetSelector.xml
 /.idea/git_toolbox_blame.xml
 /app/src/main/assets/adi-registration.properties
+/app/release/*
+gradle/gradle-daemon-jvm.properties
 .DS_Store
 /build
 /captures
