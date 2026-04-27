@@ -41,7 +41,7 @@ import androidx.compose.ui.unit.dp
 import com.devd.commonsystem.R
 import com.devd.commonsystem.theme.Black88Color
 import com.devd.commonsystem.theme.BlackColor
-import com.devd.commonsystem.theme.BlackOpacity90Color
+import com.devd.commonsystem.theme.BlackOpacity30Color
 import com.devd.commonsystem.theme.SemiVioletColor
 import com.devd.commonsystem.utils.FeelData
 import com.devd.model.local.DiaryInfo
@@ -53,8 +53,6 @@ fun OpenableBookPreview() {
     Box(
         modifier = Modifier
             .graphicsLayer(clip = false)
-            .fillMaxSize()
-            .padding(horizontal = 50.dp)
             .background(BlackColor),
         contentAlignment = Alignment.CenterStart,
     ) {
@@ -74,8 +72,8 @@ fun OpenableBookPreview() {
                     tagList = listOf()
                 )
             ),
-            bookSize = IntSize(900, 1600),
-            bookImage = "@3"
+            bookSize = IntSize(200, 300),
+            bookImage = null
         )
 
     }
@@ -172,22 +170,24 @@ fun OpenableBook(
                 }
             }
         }
-        Box(
-            modifier = Modifier
-                .align(Alignment.CenterStart)
-                .fillMaxHeight()
-                .padding(vertical = 1.dp)
-                .width(8.dp)
-                .background(
-                    brush = Brush.horizontalGradient(
-                        colors = listOf(
-                            Color.Transparent,       // 왼쪽 끝: 투명
-                            BlackOpacity90Color,      // 중앙: 진하게
-                            Color.Transparent        // 오른쪽 끝: 투명
+        if (rotation < -90f){
+            Box(
+                modifier = Modifier
+                    .align(Alignment.CenterStart)
+                    .fillMaxHeight()
+                    .padding(vertical = 20.5.dp)
+                    .width(8.dp)
+                    .background(
+                        brush = Brush.horizontalGradient(
+                            colors = listOf(
+                                Color.Transparent,       // 왼쪽 끝: 투명
+                                BlackOpacity30Color,      // 중앙: 진하게
+                                Color.Transparent        // 오른쪽 끝: 투명
+                            )
                         )
                     )
-                )
-        )
+            )
+        }
         BookCover(
             modifier = Modifier.graphicsLayer {
                 rotationY = rotation

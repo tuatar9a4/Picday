@@ -1,21 +1,35 @@
 import com.devd.build_logic.app.configureFirebaseConsole
+import java.util.Properties
 
 plugins {
     id("devd.android.application")
     id("com.google.gms.google-services")
 }
 
-android {
-    namespace = "com.devd.onedayoneshot"
+val localProperties = Properties().apply {
+    val file = rootProject.file("local.properties")
+    if (file.exists()) file.inputStream().use { load(it) }
+}
 
+android {
+    namespace = "com.devd.picday"
     defaultConfig {
-        applicationId = "com.devd.onedayoneshot"
+        targetSdk = 36
+        applicationId = "com.devd.picday"
         versionCode = 1
-        versionName = "1.0"
+        versionName = "1.0.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
 
+    signingConfigs {
+        create("release"){
+            storeFile = localProperties.getProperty("KEY_PATH")?.let { file(it) }
+            storePassword = localProperties.getProperty("STORE_PASSWORD")
+            keyAlias = localProperties.getProperty("KEY_ALIAS")
+            keyPassword = localProperties.getProperty("KEY_PASSWORD")
+        }
+    }
     buildTypes {
         release {
             isMinifyEnabled = false
@@ -23,6 +37,7 @@ android {
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
             )
+            signingConfig = signingConfigs.getByName("release")
         }
     }
     compileOptions {

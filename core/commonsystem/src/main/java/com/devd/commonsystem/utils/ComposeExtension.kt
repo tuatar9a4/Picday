@@ -146,8 +146,7 @@ fun Modifier.dropShadow(
 fun Context.preloadInterstitialAd(callbackAd: (InterstitialAd?) -> Unit) {
     InterstitialAd.load(
         this,
-        if (BuildConfig.DEBUG) "ca-app-pub-3940256099942544/1033173712"
-        else getString(R.string.admobInterstitialId),
+        getString(R.string.admobInterstitialId),
         AdRequest.Builder().build(),
         object : InterstitialAdLoadCallback() {
             override fun onAdFailedToLoad(adError: LoadAdError) {

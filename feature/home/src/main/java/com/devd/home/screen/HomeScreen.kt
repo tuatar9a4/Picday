@@ -5,6 +5,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.rememberScrollState
@@ -35,7 +36,6 @@ import com.devd.commonsystem.ui.loading.LoadingDialog
 import com.devd.commonsystem.utils.centerItemIndex
 import com.devd.commonsystem.utils.isCurrentMonth
 import com.devd.commonsystem.utils.rememberImagePicker
-import com.devd.home.BuildConfig
 import com.devd.home.HomeUiState
 import com.devd.home.HomeViewModel
 import com.devd.model.local.DiaryInfo
@@ -178,8 +178,7 @@ fun HomeScreen(
     onBookClick: () -> Unit = {}
 ) {
     val context = LocalContext.current
-    val adId =  if (BuildConfig.DEBUG) "ca-app-pub-3940256099942544/9214589741"
-    else stringResource(R.string.admobBannerId)
+    val adId =  stringResource(R.string.admobBannerId)
     val adView = remember { AdView(context).apply {
         setAdSize(AdSize.BANNER)
         adUnitId = adId
@@ -213,7 +212,7 @@ fun HomeScreen(
 //                    )
 //                }
 //            )
-            Box(modifier = Modifier.fillMaxWidth()) { BannerAd(adView, Modifier.fillMaxWidth()) }
+            Box(modifier = Modifier.fillMaxWidth().heightIn(min = 50.dp)) { BannerAd(adView, Modifier.fillMaxWidth()) }
             Spacer(Modifier.height(4.dp))
             BookCardScreen(
                 modifier = Modifier.align(Alignment.CenterHorizontally),

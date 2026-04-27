@@ -1,4 +1,4 @@
-package com.devd.onedayoneshot
+package com.devd.picday
 
 import androidx.lifecycle.ViewModel
 import com.devd.datastore.DataStoreRepository

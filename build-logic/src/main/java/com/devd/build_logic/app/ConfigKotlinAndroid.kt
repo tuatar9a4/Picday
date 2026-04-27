@@ -23,7 +23,6 @@ fun Project.configureKotlinAndroid() {
     pluginManager.apply("org.jetbrains.kotlin.android")
     pluginManager.apply("org.jetbrains.kotlin.plugin.compose")
     pluginManager.apply("org.jetbrains.kotlin.plugin.serialization")
-
     androidExtension.apply {
         compileSdk = 36
         defaultConfig {

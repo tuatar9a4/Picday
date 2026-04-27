@@ -1,4 +1,4 @@
-package com.devd.onedayoneshot.ui
+package com.devd.picday.ui
 
 import androidx.compose.animation.SharedTransitionLayout
 import androidx.compose.runtime.Composable

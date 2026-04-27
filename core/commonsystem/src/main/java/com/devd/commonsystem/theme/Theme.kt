@@ -45,7 +45,7 @@ val LocalCustomColor = staticCompositionLocalOf {
 fun OneDayOneShotTheme(
     darkTheme: Boolean = isSystemInDarkTheme(),
     // Dynamic color is available on Android 12+
-    changeFontInt :Int =0,
+    changeFontInt: Int = 0,
     dynamicColor: Boolean = true,
     dynamicTypography: Typography = getCustomTypography(FontList.PINK_PONG.fontFamily),
     content: @Composable () -> Unit

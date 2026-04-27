@@ -1,4 +1,4 @@
-package com.devd.onedayoneshot.di
+package com.devd.picday.di
 
 import android.content.ContentResolver
 import android.content.Context

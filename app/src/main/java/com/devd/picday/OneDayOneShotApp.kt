@@ -1,4 +1,4 @@
-package com.devd.onedayoneshot
+package com.devd.picday
 
 import android.app.Application
 import android.util.Log

@@ -1,4 +1,4 @@
-package com.devd.onedayoneshot.ui
+package com.devd.picday.ui
 
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.padding
@@ -25,7 +25,7 @@ import com.devd.commonsystem.theme.Black33Opacity90Color
 import com.devd.commonsystem.theme.BlackD9Color
 import com.devd.commonsystem.theme.BlackF4Color
 import com.devd.commonsystem.theme.WhiteColor
-import com.devd.onedayoneshot.navigation.NaviBarItem
+import com.devd.picday.navigation.NaviBarItem
 
 @Preview
 @Composable

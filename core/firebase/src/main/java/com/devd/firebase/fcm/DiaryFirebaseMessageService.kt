@@ -29,7 +29,7 @@ class DiaryFirebaseMessageService : FirebaseMessagingService() {
     private fun sendNotification(messageBody: String) {
         // 알림 클릭 시 이동할 액티비티 지정 (Compose를 쓰신다면 보통 MainActivity가 됩니다)
         val intent = Intent()
-        intent.setClassName(this, "com.devd.onedayoneshot.MainActivity").apply {
+        intent.setClassName(this, "com.devd.picday.MainActivity").apply {
             addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
         }
 

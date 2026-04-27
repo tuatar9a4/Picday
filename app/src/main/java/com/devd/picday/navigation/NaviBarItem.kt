@@ -1,4 +1,4 @@
-package com.devd.onedayoneshot.navigation
+package com.devd.picday.navigation
 
 import com.devd.bookcase.navigation.BookcaseNaviRoute
 import com.devd.calendar.navigation.CustomCalendarRoute

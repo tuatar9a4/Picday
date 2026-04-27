@@ -18,6 +18,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.pager.HorizontalPager
+import androidx.compose.foundation.pager.PageSize
 import androidx.compose.foundation.pager.PagerState
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.rememberScrollState
@@ -37,6 +38,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.asAndroidBitmap
 import androidx.compose.ui.graphics.layer.GraphicsLayer
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.IntSize
@@ -381,10 +383,11 @@ fun BookcaseScreen(
                 )
                 HorizontalPager(
                     state = pagerState,
-                    contentPadding = PaddingValues(start = 100.dp, end = 50.dp),
+                    contentPadding = PaddingValues(horizontal = (LocalConfiguration.current.screenWidthDp.dp - 200.dp) / 2),
                     modifier = Modifier.fillMaxWidth(),
-                    pageSpacing = 20.dp,
-                    verticalAlignment = Alignment.CenterVertically
+                    pageSpacing = 40.dp,
+                    verticalAlignment = Alignment.CenterVertically,
+                    pageSize = PageSize.Fixed(200.dp),
                 ) { page ->
                     val bookInfo = bookList[page]
                     AnimatedVisibility(

@@ -34,7 +34,7 @@ class LoginActivity : ComponentActivity() {
 
     private fun moveToHome() {
         val intent = Intent()
-        intent.setClassName(this, "com.devd.onedayoneshot.MainActivity")
+        intent.setClassName(this, "com.devd.picday.MainActivity")
         intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
         startActivity(intent)
         finish()

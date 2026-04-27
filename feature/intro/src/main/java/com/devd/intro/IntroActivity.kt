@@ -71,7 +71,7 @@ class IntroActivity : ComponentActivity() {
         lifecycleScope.launch {
             if (!viewModel.fetchSavedNickName()) return@launch
             val intent = Intent()
-            intent.setClassName(this@IntroActivity, "com.devd.onedayoneshot.MainActivity")
+            intent.setClassName(this@IntroActivity, "com.devd.picday.MainActivity")
             startActivity(intent)
             finish()
         }

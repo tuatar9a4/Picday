@@ -47,7 +47,7 @@ fun DiaryContentsScreen(
             Text(
                 modifier = Modifier.fillMaxWidth(),
                 text = diaryDate,
-                style = MaterialTheme.typography.labelSmall.copy(
+                style = MaterialTheme.typography.displaySmall.copy(
                     color = Black88Color
                 )
             )
@@ -55,9 +55,10 @@ fun DiaryContentsScreen(
             Text(
                 modifier = Modifier
                     .fillMaxWidth()
+                    .padding(end = 40.dp)
                     .heightIn(min = 40.dp),
                 text = diaryContents,
-                style = MaterialTheme.typography.titleSmall.copy(
+                style = MaterialTheme.typography.bodySmall.copy(
                     color = Black33Color
                 )
             )

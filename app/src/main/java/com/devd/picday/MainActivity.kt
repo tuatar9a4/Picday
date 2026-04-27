@@ -1,4 +1,4 @@
-package com.devd.onedayoneshot
+package com.devd.picday
 
 import android.os.Bundle
 import androidx.activity.ComponentActivity
@@ -21,9 +21,9 @@ import com.devd.calendar.navigation.CustomCalendarRoute
 import com.devd.commonsystem.theme.OneDayOneShotTheme
 import com.devd.commonsystem.theme.WhiteColor
 import com.devd.home.navigation.HomeRoute
-import com.devd.onedayoneshot.navigation.NaviBarItem
-import com.devd.onedayoneshot.ui.MainNavigationBar
-import com.devd.onedayoneshot.ui.MyNavHost
+import com.devd.picday.navigation.NaviBarItem
+import com.devd.picday.ui.MainNavigationBar
+import com.devd.picday.ui.MyNavHost
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
