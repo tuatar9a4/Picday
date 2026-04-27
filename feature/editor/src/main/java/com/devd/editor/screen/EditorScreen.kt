@@ -60,9 +60,9 @@ import com.devd.commonsystem.ui.dialog.ShowMessageDialog
 import com.devd.commonsystem.ui.loading.LoadingDialog
 import com.devd.commonsystem.utils.FeelData
 import com.devd.commonsystem.utils.noRippleClickable
+import com.devd.commonsystem.utils.optimizeUriToFile
 import com.devd.commonsystem.utils.preloadInterstitialAd
 import com.devd.commonsystem.utils.rememberImagePicker
-import com.devd.commonsystem.utils.uriToFile
 import com.devd.editor.EditorViewModel
 import com.devd.editor.data.ASK_SAVE
 import com.devd.editor.data.DiaryInfoState
@@ -115,7 +115,7 @@ fun EditorScreenRoute(
 
                 override fun onAdImpression() {
                     val file =
-                        (uiState.diaryInfo.imageUrl as? Local)?.uri?.let { context.uriToFile(it) }
+                        (uiState.diaryInfo.imageUrl as? Local)?.uri?.let { context.optimizeUriToFile(it) }
                     viewModel.uploadImageToBuket(fileUrl = file)
                 }
             }
@@ -171,7 +171,7 @@ fun EditorScreenRoute(
                         interstitialAd?.show(context as Activity)
                     } else {
                         val file =
-                            (uiState.diaryInfo.imageUrl as? Local)?.uri?.let { context.uriToFile(it) }
+                            (uiState.diaryInfo.imageUrl as? Local)?.uri?.let { context.optimizeUriToFile(it) }
                         viewModel.uploadImageToBuket(fileUrl = file)
                     }
                 }

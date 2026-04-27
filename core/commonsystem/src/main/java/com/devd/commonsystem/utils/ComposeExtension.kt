@@ -22,7 +22,6 @@ import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.graphics.shadow.Shadow
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.dp
@@ -85,7 +84,7 @@ fun Context.createCameraUri(): Uri {
 
 @Composable
 fun String.rememberImageUrl(): String {
-    val ociKey = stringResource(R.string.ociBuketKey)
+    val ociKey =BuildConfig.OCI_BUCKET_KEY
     return remember(this) {
         "https://cnud835pjoeg.objectstorage.ap-seoul-1.oci.customer-oci.com/p/$ociKey/n/cnud835pjoeg/b/devd_storage/o/diary/$this"
     }

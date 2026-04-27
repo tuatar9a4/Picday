@@ -93,8 +93,10 @@ class IntroViewModel @Inject constructor(
             val newUserId = userInfo.uuid
             var uploadImagePath: String? = null
             if (imageFile != null) {
-                when (val result =
-                    oracleRepository.uploadImageFile(newUserId, imageFile).last()) {
+                val res =
+                    oracleRepository.fetchUploadUrl(newUserId, imageFile.name) ?: return@launch
+                Timber.d("CheckUrl  uploadUrl => ${res}")
+                when (val result = oracleRepository.uploadImageFile(res.uploadUrl, imageFile).last()) {
                     is SuccessUpload -> uploadImagePath = "$newUserId/${result.uploadFileName}"
                     is FailUpload -> {
                         _introUiState.update {

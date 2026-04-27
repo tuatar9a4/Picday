@@ -129,7 +129,7 @@ fun NickNameScreen(
 @Composable
 fun NickNameScreenPreview() {
     NickNameScreen(
-        editText = mutableStateOf(""),
-        isCheckDuplicate = mutableStateOf(false),
+        editText = remember { mutableStateOf("") },
+        isCheckDuplicate = remember { mutableStateOf(false) },
     )
 }

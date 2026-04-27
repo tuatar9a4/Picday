@@ -129,11 +129,13 @@ class DiaryBookRepository @Inject constructor(
 
     suspend fun deleteBookInfo(bookId: Long) =
         safeApiCall(Dispatchers.IO) {
+            val deleteBook = diaryBookDao.selectDiaryBook(bookId)
             diaryBookDao.softDeleteDiaryBook(bookId.toString())
+            deleteBook
         }.run {
             return@run when (this) {
-                is CallResult.Success -> null
-                is CallResult.NetworkError -> this.message
+                is CallResult.Success -> this.res.transToModel()
+                is CallResult.NetworkError -> null
             }
         }
 

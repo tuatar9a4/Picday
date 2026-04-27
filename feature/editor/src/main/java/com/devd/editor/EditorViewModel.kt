@@ -77,6 +77,7 @@ class EditorViewModel @Inject constructor(
     val customDatePickerDialogState: StateFlow<CustomDatePickerDialogState> get() = _customDatePickerDialogState.asStateFlow()
 
     var shouldBackPage by mutableStateOf(false)
+    private var originImage: String? = null
 
     init {
         viewModelScope.launch {
@@ -130,7 +131,7 @@ class EditorViewModel @Inject constructor(
                         bookId = editorUiState.value.selectBookId,
                         diaryId = route.diaryId,
                         imageUrl = Remote(diary.imageUrlList.first()),
-                        diaryMood = diary.mood?:-1,
+                        diaryMood = diary.mood ?: -1,
                         diaryContents = diary.content,
                         diaryTag = diary.tagList
                     )
@@ -149,7 +150,10 @@ class EditorViewModel @Inject constructor(
     }
 
     fun updateImageUrl(uri: Uri) {
-        _editorUiState.update { it.copy(diaryInfo = it.diaryInfo.copy(imageUrl = Local(uri))) }
+        _editorUiState.update {
+            originImage = (it.diaryInfo.imageUrl as? Remote)?.url
+            it.copy(diaryInfo = it.diaryInfo.copy(imageUrl = Local(uri)))
+        }
     }
 
     fun changeCropImageDialog(uri: Uri?) {
@@ -217,8 +221,10 @@ class EditorViewModel @Inject constructor(
             _editorUiState.update { it.copy(isShowLoading = true) }
             _messageDialog.emit(MessageInfo(type = NONE))
             fileUrl?.let {  // fileUrl 이 있을 경우 서버에 업로드 필요!
+                val res =
+                    oracleRepository.fetchUploadUrl(userUUID, fileUrl.name) ?: return@launch
                 oracleRepository.uploadImageFile(
-                    header = userUUID,
+                    uploadUrl = res.uploadUrl,
                     file = fileUrl
                 ).collect { result ->
                     if (result is SuccessUpload) { // 이미지 업로드 성공
@@ -242,7 +248,7 @@ class EditorViewModel @Inject constructor(
         changeSelectData(selectMillis)
     }
 
-    fun changeFeel(select : Int){
+    fun changeFeel(select: Int) {
         _editorUiState.update { it.copy(diaryInfo = it.diaryInfo.copy(diaryMood = select)) }
     }
 
@@ -303,6 +309,7 @@ class EditorViewModel @Inject constructor(
         viewModelScope.launch {
             val diaryInfo = editorUiState.value.diaryInfo
             val imageUrl = updateImage ?: (diaryInfo.imageUrl as Remote).url!!
+            originImage?.let { oracleRepository.deleteBucketImage(it) }
             diaryBookRepository.updateDiaryWithExtras(
                 UpdateDiaryRequest(
                     diaryId = diaryInfo.diaryId!!,

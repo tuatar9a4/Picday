@@ -1,6 +1,6 @@
 package com.devd.data.repository
 
-import com.devd.data.di.RepositoryModule
+import com.devd.data.utils.CallResult
 import com.devd.data.utils.SafeNetCall
 import com.devd.data.utils.StreamRequestBody
 import com.devd.model.local.FailUpload
@@ -8,21 +8,23 @@ import com.devd.model.local.StartUpload
 import com.devd.model.local.SuccessUpload
 import com.devd.model.local.Uploading
 import com.devd.network.di.NetworkModule
+import com.devd.network.service.DiaryService
 import com.devd.network.service.OracleService
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.flowOn
+import timber.log.Timber
 import java.io.File
 import javax.inject.Inject
 
 class OracleRepository @Inject constructor(
-    @param:RepositoryModule.OciKey private val ociBuketKey: String,
-    @param:NetworkModule.OciServer private val oracleService: OracleService
+    @param:NetworkModule.OciServer private val oracleService: OracleService,
+    @param:NetworkModule.DiaryServer private val diaryService: DiaryService,
 ) : SafeNetCall() {
 
     fun uploadImageFile(
-        header: String,
+        uploadUrl: String,
         file: File
     ) = callbackFlow {
         trySend(StartUpload)
@@ -34,9 +36,7 @@ class OracleRepository @Inject constructor(
                 trySend(Uploading(it))
             }
             oracleService.uploadFile(
-                key = ociBuketKey,
-                header = header,
-                fileName = file.name,
+                url = uploadUrl,
                 file = requestBody
             )
         }.onSuccess {
@@ -47,5 +47,24 @@ class OracleRepository @Inject constructor(
         }
         close()
     }.flowOn(Dispatchers.IO).distinctUntilChanged()
+
+    suspend fun fetchUploadUrl(
+        uuid: String,
+        fileName: String,
+    ) = safeApiCall(Dispatchers.IO) {
+        Timber.d("CheckUrl  uuid => ${uuid} | fileName : $fileName")
+        diaryService.fetchUploadImageUrl(uuid, fileName)
+    }.run {
+        when (this) {
+            is CallResult.Success -> this.res
+            is CallResult.NetworkError -> null
+        }
+    }
+
+    suspend fun deleteBucketImage(
+        fileName: String,
+    ) = safeApiCall(Dispatchers.IO) {
+        diaryService.deleteBucketImage(fileName)
+    }
 
 }

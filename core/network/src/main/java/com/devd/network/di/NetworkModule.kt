@@ -33,8 +33,7 @@ class NetworkModule {
 
     @DiaryServer
     @Provides
-    fun provideDiaryServerUri() = "http://112.170.16.43:8080/"
-//    fun provideDiaryServerUri() = "http://10.0.2.2:8080/"
+    fun provideDiaryServerUri() = "http://193.123.232.164:8080/"
 
     @OciServer
     @Provides

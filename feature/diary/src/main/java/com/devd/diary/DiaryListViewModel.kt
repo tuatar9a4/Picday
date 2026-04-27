@@ -5,6 +5,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.toRoute
 import com.devd.data.repository.DiaryBookRepository
+import com.devd.data.repository.OracleRepository
 import com.devd.diary.navigation.DiaryInfoListType
 import com.devd.diary.navigation.DiaryListRoute
 import com.devd.model.local.DiaryInfo
@@ -34,6 +35,7 @@ sealed class PopupCode() {
 @HiltViewModel
 class DiaryListViewModel @Inject constructor(
     private val diaryBookRepository: DiaryBookRepository,
+    private val oracleRepository: OracleRepository,
     savedStateHandle: SavedStateHandle // 추가
 ) : ViewModel() {
 
@@ -70,7 +72,9 @@ class DiaryListViewModel @Inject constructor(
                 it.copy(popupCode = PopupCode.NotFoundItem, isLoading = false)
             }
             _diaryListUiState.update { it.copy(isLoading = true) }
+
             diaryBookRepository.deleteDiaryWithExtras(id)?.let { deleteItem ->
+                oracleRepository.deleteBucketImage(fileName = deleteItem.imageUrlList.first())
                 _diaryListUiState.update {
                     val newList = it.diaryList.toMutableList()
                     newList.removeIf { item ->

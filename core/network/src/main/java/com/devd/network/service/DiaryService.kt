@@ -1,5 +1,6 @@
 package com.devd.network.service
 
+import com.devd.model.remote.BucketUploadRes
 import com.devd.model.remote.DiaryBatchSyncReq
 import com.devd.model.remote.DiaryBatchSyncRes
 import com.devd.model.remote.DiaryBookBatchSyncReq
@@ -11,6 +12,7 @@ import com.devd.model.remote.SignupRequest
 import com.devd.model.remote.SignupResponse
 import com.devd.model.remote.TokenResponse
 import retrofit2.http.Body
+import retrofit2.http.DELETE
 import retrofit2.http.GET
 import retrofit2.http.Header
 import retrofit2.http.POST
@@ -46,5 +48,16 @@ interface DiaryService {
     suspend fun syncDiariesBatch(
         @Body request: DiaryBatchSyncReq
     ): DiaryBatchSyncRes
+
+    @GET("api/v1/oracle/uploadUrl")
+    suspend fun fetchUploadImageUrl(
+        @Query("uuid") uuid:String,
+        @Query("fileName") fileName :String,
+    ) : BucketUploadRes
+
+    @DELETE("api/v1/oracle/deleteObject")
+    suspend fun deleteBucketImage(
+        @Query("fileName") fileName :String,
+    )
 
 }

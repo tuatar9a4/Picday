@@ -157,11 +157,14 @@ class BookcaseViewModel @Inject constructor(
         viewModelScope.launch {
             val userUUID = dataStoreRepository.getUserInfo()?.uuid ?: return@launch
             _bookcaseUiState.update { it.copy(isLoading = true) }
+            val res =
+                oracleRepository.fetchUploadUrl(userUUID, file.name) ?: return@launch
             oracleRepository.uploadImageFile(
-                header = userUUID,
+                uploadUrl = res.uploadUrl,
                 file = file
             ).collect { result ->
                 if (result is SuccessUpload) { // 이미지 업로드 성공
+                    updateBookInfo.bookImage?.let { oracleRepository.deleteBucketImage(it) }
                     val book = updateBookInfo.copy(bookImage = "$userUUID/${result.uploadFileName}")
                     if (book.bookId == -1L) insertDiaryBook(book) else updateBookInfo(book)
                 } else if (result is FailUpload) {  // 이미지 업로드 실패[일기 저장실패]
@@ -253,19 +256,19 @@ class BookcaseViewModel @Inject constructor(
         storeDeleteBookId ?: return
         _bookcaseUiState.update { it.copy(isLoading = true) }
         viewModelScope.launch {
-            val errorMessage = diaryBookRepository.deleteBookInfo(storeDeleteBookId!!)
-            val (code, message) = if (errorMessage == null) {
+            val deleteBook = diaryBookRepository.deleteBookInfo(storeDeleteBookId!!)
+            val (code, message) = if (deleteBook != null) {
+                deleteBook.bookImage?.let { oracleRepository.deleteBucketImage(fileName = it) }
                 SUCCESS_DELETE_BOOK to R.string.success_delete_book_message
             } else {
                 FAIL_DELETE_BOOK to R.string.fail_delete_book_message
             }
             _bookcaseUiState.update {
                 it.copy(
-                    isLoading = true,
+                    isLoading = false,
                     messageDialog = MessageInfo(code, message)
                 )
             }
-
         }
     }
 
@@ -281,8 +284,10 @@ class BookcaseViewModel @Inject constructor(
         _bookcaseUiState.update { it.copy(isLoading = true) }
         viewModelScope.launch {
             val deleteItem = diaryBookRepository.deleteDiaryWithExtras(storeDeleteDiaryId!!)
+
             var newItem = bookcaseUiState.value.diaryList
             deleteItem?.let { deleteItem ->
+                oracleRepository.deleteBucketImage(fileName = deleteItem.imageUrlList.first())
                 val temp = bookcaseUiState.value.diaryList.toMutableList()
                 temp.removeIf { it.diaryId == deleteItem.diaryId }
                 newItem = temp

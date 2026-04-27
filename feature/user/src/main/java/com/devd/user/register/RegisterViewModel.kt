@@ -98,8 +98,10 @@ class RegisterViewModel @Inject constructor(
                 val newUserId = userInfo?.uuid!!
                 var uploadImagePath: String? = null
                 if (imageFile != null) {
+                    val res =
+                        oracleRepository.fetchUploadUrl(newUserId, imageFile.name) ?: return@launch
                     when (val result =
-                        oracleRepository.uploadImageFile(newUserId, imageFile).last()) {
+                        oracleRepository.uploadImageFile(res.uploadUrl, imageFile).last()) {
                         is SuccessUpload -> uploadImagePath = "$newUserId/${result.uploadFileName}"
                         is FailUpload -> return@launch _simpleMessage.emit(
                             SimpleMessageState(result.errorMessage)

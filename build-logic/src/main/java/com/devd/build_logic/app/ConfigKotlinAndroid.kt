@@ -28,7 +28,7 @@ fun Project.configureKotlinAndroid() {
         compileSdk = 36
         defaultConfig {
             minSdk = 29
-            resValue("string", "ociBuketKey", ociBuketKey)
+            buildConfigField("String","OCI_BUCKET_KEY",ociBuketKey)
             resValue("string", "admobServiceId", admobServiceId)
             resValue("string", "admobBannerId", admobBannerId)
             resValue("string", "admobInterstitialId", admobInterstitialId)
