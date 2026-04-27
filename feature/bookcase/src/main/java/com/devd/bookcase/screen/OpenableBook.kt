@@ -43,6 +43,7 @@ import com.devd.commonsystem.theme.Black88Color
 import com.devd.commonsystem.theme.BlackColor
 import com.devd.commonsystem.theme.BlackOpacity90Color
 import com.devd.commonsystem.theme.SemiVioletColor
+import com.devd.commonsystem.utils.FeelData
 import com.devd.model.local.DiaryInfo
 
 
@@ -98,7 +99,7 @@ fun OpenableBook(
     LaunchedEffect(diaryList, state.currentPage) {
         val diaryItem = diaryList.getOrNull(state.currentPage) ?: return@LaunchedEffect
         diaryDate = diaryItem.getDateStr("YYYY.MM.dd")
-        feelIcon = 32
+        feelIcon = diaryItem.mood
     }
 
     Box(
@@ -164,7 +165,7 @@ fun OpenableBook(
                     ) {
                         Image(
                             modifier = Modifier.size(36.dp),
-                            painter = painterResource(R.drawable.icon_library),
+                            painter = painterResource(FeelData.feelList[it]),
                             contentDescription = null
                         )
                     }

@@ -137,7 +137,7 @@ fun SharedTransitionScope.OpenedBook(
     selectBook: DiaryBookInfo?,
     diaryList: List<DiaryInfo> = emptyList(),
     state: PagerState,
-    layerMap : MutableMap<Int, GraphicsLayer>,
+    layerMap: MutableMap<Int, GraphicsLayer>,
     bookClickAction: (BookcaseInterface) -> Unit = {},
     onDiaryMoreClick: (GraphicsLayer?) -> Unit,
     onBackClick: () -> Unit,
@@ -231,7 +231,6 @@ fun SharedTransitionScope.OpenedBook(
                         modifier = Modifier
                             .size(36.dp)
                             .noRippleClickable(onClick = {
-
                                 onDiaryMoreClick(layerMap[state.currentPage])
                             })
                             .align(Alignment.CenterEnd),
