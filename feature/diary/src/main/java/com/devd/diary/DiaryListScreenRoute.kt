@@ -2,23 +2,24 @@ package com.devd.diary
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.pager.rememberPagerState
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.ColorFilter
@@ -28,14 +29,21 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.devd.commonsystem.R
+import com.devd.commonsystem.theme.Black33Color
 import com.devd.commonsystem.theme.BlackColor
+import com.devd.commonsystem.theme.BlackF4Color
 import com.devd.commonsystem.theme.BlackOpacity40Color
+import com.devd.commonsystem.theme.RedColor
 import com.devd.commonsystem.theme.WhiteColor
+import com.devd.commonsystem.ui.Toolbar
+import com.devd.commonsystem.ui.dialog.OptionBottomSheet
 import com.devd.commonsystem.ui.dialog.ShowMessageDialog
 import com.devd.commonsystem.ui.loading.LoadingDialog
+import com.devd.commonsystem.utils.FeelData
 import com.devd.diary.screen.DiaryContentsScreen
 import com.devd.diary.screen.DiaryImageScreen
 import com.devd.model.local.DiaryInfo
+import com.devd.model.local.SheetItem
 
 @Composable
 fun DiaryListScreenRoute(
@@ -105,84 +113,120 @@ fun DiaryListScreen(
     /* ContentsInfo */
     val currentDiary = diaryList.getOrNull(pagerState.currentPage)
 
-    val dateStr = currentDiary?.getDateStr("yyyy.MM.dd HH:mm") ?: ""
-    val contentsStr = currentDiary?.content ?: ""
-    val hashTag = currentDiary?.tagList ?: emptyList()
+    var isShowOptionSheet by remember { mutableStateOf(false) }
 
-    Box(
+
+    Column(
         modifier = modifier.then(
             Modifier
                 .fillMaxSize()
                 .background(BlackColor)
         )
     ) {
-        DiaryImageScreen(
-            pagerState = pagerState,
-            imageList = diaryList.map { it.imageUrlList.firstOrNull() },
-        )
-        Row(
+        Toolbar(
             modifier = Modifier
                 .fillMaxWidth()
-                .background(BlackOpacity40Color)
-                .padding(horizontal = 15.dp, vertical = 5.dp),
-            horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically
+                .background(WhiteColor),
+            leftButtons = {
+                Image(
+                    modifier = Modifier.clickable(onClick = onBackClick),
+                    painter = painterResource(R.drawable.icon_andgle_left),
+                    contentDescription = null,
+                    colorFilter = ColorFilter.tint(Black33Color)
+                )
+            },
+            rightButtons = {
+                Image(
+                    modifier = Modifier.clickable(onClick = {
+                        isShowOptionSheet = true
+                    }),
+                    painter = painterResource(R.drawable.icon_more),
+                    contentDescription = null,
+                    colorFilter = ColorFilter.tint(Black33Color)
+                )
+            }
+        )
+        Column(
+            modifier = Modifier.fillMaxWidth()
         ) {
-            Row() {
-                Image(
-                    modifier = Modifier
-                        .size(32.dp)
-                        .padding(4.dp)
-                        .clickable(onClick = onBackClick),
-                    painter = painterResource(R.drawable.icon_back_arrow),
-                    contentDescription = null,
-                    colorFilter = ColorFilter.tint(WhiteColor)
+            Box(
+                modifier = Modifier.weight(1f),
+            ) {
+                DiaryImageScreen(
+                    modifier = Modifier.fillMaxSize(),
+                    pagerState = pagerState,
+                    imageList = diaryList.map { it.imageUrlList.firstOrNull() },
                 )
-                Spacer(Modifier.width(37.dp))
-            }
-            Text(
-                text = "BookName",
-                style = MaterialTheme.typography.bodyMedium.copy(
-                    color = WhiteColor
-                )
-            )
-            Row() {
-                Image(
+                Text(
                     modifier = Modifier
-                        .size(32.dp)
-                        .clickable(onClick = { onDeleteClick(pagerState.currentPage) })
-                        .padding(4.dp),
-                    painter = painterResource(R.drawable.icon_delete_trash),
-                    contentDescription = null,
-                    colorFilter = ColorFilter.tint(WhiteColor)
-                )
-                Spacer(Modifier.width(5.dp))
-                Image(
-                    modifier = Modifier
-                        .size(32.dp)
-                        .clickable(onClick = {
-                            val diaryInfo = diaryList[pagerState.currentPage]
-                            onEditClick(
-                                diaryInfo.imageUrlList.firstOrNull(),
-                                diaryInfo.diaryBookId,
-                                diaryInfo.diaryId
-                            )
-                        })
-                        .padding(4.dp),
-                    painter = painterResource(R.drawable.icon_pencil),
-                    contentDescription = null,
-                    colorFilter = ColorFilter.tint(WhiteColor)
+                        .align(Alignment.TopEnd)
+                        .padding(end = 20.dp, top = 10.dp)
+                        .background(BlackOpacity40Color, CircleShape)
+                        .border(1.dp, BlackF4Color, CircleShape)
+                        .padding(horizontal = 10.dp, vertical = 5.dp),
+                    text = "${pagerState.currentPage+1}/${diaryList.size}",
+                    style = MaterialTheme.typography.bodySmall.copy(
+                        color = WhiteColor
+                    )
                 )
             }
+            DiaryContentsScreen(
+                modifier = Modifier,
+                diaryDate = currentDiary?.getDateStr("yyyy.MM.dd HH:mm") ?: "",
+                diaryContents = currentDiary?.content ?: "",
+                diaryFeel = FeelData.feelList.getOrNull(currentDiary?.mood ?: 0),
+                diaryTagList = currentDiary?.tagList ?: emptyList()
+            )   // 하단 컨텐츠
         }
-        DiaryContentsScreen(
-            modifier = Modifier.align(Alignment.BottomCenter),
-            diaryDate = dateStr,
-            diaryContents = contentsStr,
-            diaryTagList = hashTag
-        )   // 하단 컨텐츠
     }
 
+    if (isShowOptionSheet) {
+        OptionBottomSheet(
+            title = "",
+            items = listOf(
+                SheetItem(
+                    itemIcon = R.drawable.icon_pencil,
+                    id = "0",
+                    text = "일기 수정"
+                ),
+                SheetItem(
+                    itemIcon = R.drawable.icon_share,
+                    id = "1",
+                    text = "공유하기"
+                ),
+                SheetItem(
+                    itemIcon = R.drawable.icon_delete_trash,
+                    id = "2",
+                    itemColor = RedColor,
+                    text = "삭제"
+                )
+            ),
+            onItemSelected = {
+                isShowOptionSheet = false
+                when (it.id) {
+                    "0" -> {
+                        val diaryInfo = diaryList[pagerState.currentPage]
+                        onEditClick(
+                            diaryInfo.imageUrlList.firstOrNull(),
+                            diaryInfo.diaryBookId,
+                            diaryInfo.diaryId
+                        )
+                    }
+
+                    "1" -> {
+
+                    }
+
+                    "2" -> {
+                        onDeleteClick(pagerState.currentPage)
+                    }
+                }
+            },
+            onDismissRequest = {
+                isShowOptionSheet = false
+            }
+        )
+    }
 }
 
 
