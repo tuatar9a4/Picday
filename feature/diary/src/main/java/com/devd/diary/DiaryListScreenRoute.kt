@@ -163,7 +163,7 @@ fun DiaryListScreen(
                         .padding(end = 20.dp, top = 10.dp)
                         .background(BlackOpacity40Color, CircleShape)
                         .border(1.dp, BlackF4Color, CircleShape)
-                        .padding(horizontal = 10.dp, vertical = 5.dp),
+                        .padding(horizontal = 13.dp, vertical = 5.dp),
                     text = "${pagerState.currentPage+1}/${diaryList.size}",
                     style = MaterialTheme.typography.bodySmall.copy(
                         color = WhiteColor

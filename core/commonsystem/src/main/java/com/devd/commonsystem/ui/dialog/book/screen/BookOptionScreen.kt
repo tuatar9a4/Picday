@@ -9,12 +9,13 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -32,15 +33,11 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.devd.commonsystem.R
 import com.devd.commonsystem.theme.Black33Color
-import com.devd.commonsystem.theme.BlackColor
 import com.devd.commonsystem.theme.BlackD9Color
-import com.devd.commonsystem.theme.BlackF2Color
 import com.devd.commonsystem.theme.WhiteColor
-import com.devd.commonsystem.ui.TextButton
 import com.devd.commonsystem.ui.ThemeIcon
 import com.devd.commonsystem.ui.dialog.book.DiaryBookDialogType
 import com.devd.commonsystem.ui.dialog.book.screen.sheet.ColorThemeSheet
@@ -96,7 +93,6 @@ fun BookOptionScreen(
 
     if (showMonthTypeSelectSheet) {
         MonthThemeSheet(
-            selectPos = monthTypeState.value.ordinal,
             onItemSelect = { selectItem ->
                 showMonthTypeSelectSheet = false
                 monthTypeState.value = selectItem
@@ -122,7 +118,6 @@ fun BookOptionScreen(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MonthThemeSheet(
-    selectPos: Int,
     onItemSelect: (selectItem: DiaryPhaseType) -> Unit,
     onDismissRequest: () -> Unit,
 ) {
@@ -132,20 +127,21 @@ fun MonthThemeSheet(
     ) {
         Column(
             modifier = Modifier
-                .padding(start = 20.dp, end = 20.dp, bottom = 20.dp)
+                .padding(bottom = 20.dp)
         ) {
             Text(
                 text = "한달을 표현할 아이템을 선택해주세요",
                 style = MaterialTheme.typography.bodyMedium
             )
             Spacer(Modifier.height(30.dp))
-            Row(
+            LazyRow(
                 modifier = Modifier
                     .fillMaxWidth()
                     .horizontalScroll(rememberScrollState()),
-                horizontalArrangement = Arrangement.spacedBy(8.dp)
+                horizontalArrangement = Arrangement.spacedBy(8.dp),
+                contentPadding = PaddingValues(10.dp)
             ) {
-                DiaryPhaseType.entries.forEachIndexed { index, type ->
+                itemsIndexed(DiaryPhaseType.entries) { index, type ->
                     ThemeIcon(
                         modifier = Modifier
                             .size(80.dp)
@@ -155,15 +151,6 @@ fun MonthThemeSheet(
                 }
             }
         }
-        Spacer(Modifier.height(30.dp))
-        TextButton(
-            modifier = Modifier.fillMaxWidth(),
-            contentsPadding = PaddingValues(vertical = 20.dp),
-            enableButtonColor = BlackF2Color,
-            text = stringResource(R.string.close),
-            textColor = BlackColor
-        ) {
-            onDismissRequest()
-        }
+        Spacer(Modifier.height(20.dp))
     }
 }

@@ -119,7 +119,6 @@ fun CalendarScreen(
                 }
             }
         )
-        Spacer(Modifier.height(5.dp))
         CustomCalendarScreen(
             infoList = monthToList,
             onDateSelector = onShowSimpleCard,

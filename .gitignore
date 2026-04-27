@@ -9,6 +9,8 @@
 /.idea/navEditor.xml
 /.idea/assetWizardSettings.xml
 /.idea/deploymentTargetSelector.xml
+/.idea/git_toolbox_blame.xml
+/app/src/main/assets/adi-registration.properties
 .DS_Store
 /build
 /captures
