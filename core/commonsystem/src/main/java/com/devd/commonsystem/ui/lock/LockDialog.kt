@@ -28,7 +28,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -68,7 +67,7 @@ fun LockDialog(
 
     var step by remember { mutableIntStateOf(0) }
 
-    if(type == LockType.REGISTER){
+    if (type == LockType.REGISTER) {
         BackHandler() {
             onDismissClick()
         }
@@ -130,7 +129,7 @@ fun LockDialog(
                     color = Black33Color
                 )
             )
-            if(type == LockType.REGISTER){
+            if (type == LockType.REGISTER) {
                 Spacer(Modifier.height(10.dp))
                 Text(
                     modifier = Modifier.padding(horizontal = 20.dp),
@@ -198,16 +197,19 @@ fun PinCodeIndicator(
                 }
                 // 2. 현재 입력해야 할 포커스 지점 (숫자 표시)
                 index == inputCount -> {
-                    Text(
+                    Box(
                         modifier = Modifier.size(40.dp),
-                        text = inputText[index].toString(),
-                        textAlign = TextAlign.Center,
-                        style = MaterialTheme.typography.bodyLarge.copy(
-                            fontFamily = FontList.STAR_DUST.fontFamily,
-                            color = Black33Color,
-                            fontSize = 22.sp
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Text(
+                            text = inputText[index].toString(),
+                            maxLines = 1,
+                            style = MaterialTheme.typography.bodyLarge.copy(
+                                color = Black33Color,
+                                fontSize = 22.sp,
+                            )
                         )
-                    )
+                    }
                 }
                 // 3. 아직 입력 안 된 부분
                 else -> {
