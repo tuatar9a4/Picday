@@ -14,12 +14,14 @@ data object SettingNaviRoute/*(
 
 fun NavGraphBuilder.settingScreen(
     modifier: Modifier = Modifier,
+    onLockPage: (Boolean) ->Unit,
     onBackClick: () -> Unit = {}
 ) {
     composable<SettingNaviRoute> {
         SettingScreenRoute(
             modifier = modifier,
-            onBackClick = onBackClick
+            onBackClick = onBackClick,
+            onLockPage = onLockPage
         )
     }
 }

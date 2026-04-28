@@ -16,6 +16,7 @@ import androidx.compose.material3.Switch
 import androidx.compose.material3.SwitchDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -51,11 +52,16 @@ import com.devd.setting.dialog.AlarmTimSelectDialog
 fun SettingScreenRoute(
     modifier: Modifier = Modifier,
     viewModel: SettingViewModel = hiltViewModel(),
+    onLockPage: (Boolean) -> Unit,
     onBackClick: () -> Unit,
 ) {
     val uiState by viewModel.settingUiState.collectAsState()
     var isFontListSheet by remember { mutableStateOf(false) }
     var isDiaryLockSheet by remember { mutableStateOf(false) }
+
+    LaunchedEffect(isDiaryLockSheet) {
+        onLockPage(isDiaryLockSheet)
+    }
 
     BackHandler() {
         onBackClick()

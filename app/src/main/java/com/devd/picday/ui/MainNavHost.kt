@@ -107,8 +107,10 @@ fun MyNavHost(
                 )
                 settingScreen(
                     modifier = modifier,
+                    onLockPage = {isShowLock ->
+                        changeShowBottomBar(!isShowLock)
+                    },
                     onBackClick = {
-                        changeShowBottomBar(true)
                         navController.popBackStack()
                     }
                 )

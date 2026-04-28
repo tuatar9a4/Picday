@@ -92,6 +92,7 @@ class MainActivity : ComponentActivity() {
                             .padding(innerPadding),
                         navController = navController
                     ) { isShow ->
+                        isShowBottomNav.value = isShow
                     }
                 }
             }
