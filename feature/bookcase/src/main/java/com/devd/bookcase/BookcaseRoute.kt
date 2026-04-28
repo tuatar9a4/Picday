@@ -73,11 +73,11 @@ import com.devd.commonsystem.ui.dialog.book.DiaryBookDialog
 import com.devd.commonsystem.ui.dialog.book.DiaryBookDialogType
 import com.devd.commonsystem.ui.loading.LoadingDialog
 import com.devd.commonsystem.utils.noRippleClickable
+import com.devd.commonsystem.utils.optimizeUriToFile
 import com.devd.commonsystem.utils.preloadInterstitialAd
 import com.devd.commonsystem.utils.rememberImagePicker
 import com.devd.commonsystem.utils.rememberImageUrl
 import com.devd.commonsystem.utils.shareBitmap
-import com.devd.commonsystem.utils.uriToFile
 import com.devd.model.local.DiaryBookInfo
 import com.devd.model.local.DiaryInfo
 import com.devd.model.local.DiaryPhaseType
@@ -169,8 +169,8 @@ fun BookcaseRoute(
     fun insertOrModifyBook(){
         val uri = viewModel.imageUrl
         if (uri != null) {
-            val file = uri.let { context.uriToFile(it) }
-            viewModel.uploadImage(file, bookInfo!!)
+            val file = uri.let { context.optimizeUriToFile(it) }
+            file?.let { viewModel.uploadImage(file, bookInfo!!) }
             bookInfo = null
         } else if (bookInfo!!.bookImage != null) {
             if (bookInfo!!.bookId == -1L) viewModel.insertDiaryBook(bookInfo!!)

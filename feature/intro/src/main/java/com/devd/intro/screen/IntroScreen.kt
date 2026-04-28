@@ -37,7 +37,7 @@ import com.devd.commonsystem.ui.dialog.book.DiaryBookDialogType
 import com.devd.commonsystem.ui.loading.LoadingDialog
 import com.devd.commonsystem.ui.lock.LockDialog
 import com.devd.commonsystem.ui.lock.LockType
-import com.devd.commonsystem.utils.uriToFile
+import com.devd.commonsystem.utils.optimizeUriToFile
 import com.devd.intro.IntroViewModel
 
 @Composable
@@ -67,7 +67,7 @@ fun IntroScreenRoute(
                 viewModel.dismissDiaryBookDialog()
             },
             onSaveClick = { imageUrl, title, description, monthType, color ->
-                val uploadFile = imageUrl?.let { context.uriToFile(it) }
+                val uploadFile = imageUrl?.let { context.optimizeUriToFile(it) }
                 viewModel.saveAndMakeBookInfo(uploadFile, title, description, monthType, color)
             }
         )

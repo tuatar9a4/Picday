@@ -21,22 +21,6 @@ fun Context.getFileName(uri: Uri): String? {
     return uri.lastPathSegment
 }
 
-fun Context.uriToFile(uri: Uri): File {
-    val resolver = contentResolver
-
-//    val fileName = getFileName(uri) ?: "temp_image_${System.currentTimeMillis()}.jpg"
-    val fileName = "upload_image_${System.currentTimeMillis()}.jpg"
-    val file = File(cacheDir, fileName)
-
-    resolver.openInputStream(uri)?.use { inputStream ->
-        file.outputStream().use { outputStream ->
-            inputStream.copyTo(outputStream)
-        }
-    }
-
-    return file
-}
-
 fun Context.optimizeUriToFile(
     uri: Uri,
     reqWidth: Int = 1280,

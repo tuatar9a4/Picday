@@ -74,7 +74,7 @@ class DiaryListViewModel @Inject constructor(
             _diaryListUiState.update { it.copy(isLoading = true) }
 
             diaryBookRepository.deleteDiaryWithExtras(id)?.let { deleteItem ->
-                oracleRepository.deleteBucketImage(fileName = deleteItem.imageUrlList.first())
+                oracleRepository.deleteBucketImage(fileNames = listOf(deleteItem.imageUrlList.first()))
                 _diaryListUiState.update {
                     val newList = it.diaryList.toMutableList()
                     newList.removeIf { item ->

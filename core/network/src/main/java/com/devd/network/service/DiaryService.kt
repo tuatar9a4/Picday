@@ -57,7 +57,7 @@ interface DiaryService {
 
     @DELETE("api/v1/oracle/deleteObject")
     suspend fun deleteBucketImage(
-        @Query("fileName") fileName :String,
+        @Query("fileName") fileName :List<String>,
     )
 
 }

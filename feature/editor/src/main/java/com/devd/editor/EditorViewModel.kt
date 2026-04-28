@@ -309,7 +309,7 @@ class EditorViewModel @Inject constructor(
         viewModelScope.launch {
             val diaryInfo = editorUiState.value.diaryInfo
             val imageUrl = updateImage ?: (diaryInfo.imageUrl as Remote).url!!
-            originImage?.let { oracleRepository.deleteBucketImage(it) }
+            originImage?.let { oracleRepository.deleteBucketImage(listOf(it)) }
             diaryBookRepository.updateDiaryWithExtras(
                 UpdateDiaryRequest(
                     diaryId = diaryInfo.diaryId!!,

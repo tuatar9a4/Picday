@@ -1,7 +1,6 @@
 package com.devd.bookcase
 
 import android.net.Uri
-import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.devd.bookcase.data.ASK_DELETE_BOOK
@@ -49,11 +48,8 @@ data class BookcaseUiState(
 class BookcaseViewModel @Inject constructor(
     private val diaryBookRepository: DiaryBookRepository,
     private val dataStoreRepository: DataStoreRepository,
-    private val oracleRepository: OracleRepository,
-    savedStateHandle: SavedStateHandle
+    private val oracleRepository: OracleRepository
 ) : ViewModel() {
-//    private val route = savedStateHandle.toRoute<BookcaseNaviRoute>()
-
     val newBookInfo = DiaryBookInfo(bookId = -1L, title = "")
 
     var imageUrl: Uri? = null
@@ -164,7 +160,7 @@ class BookcaseViewModel @Inject constructor(
                 file = file
             ).collect { result ->
                 if (result is SuccessUpload) { // 이미지 업로드 성공
-                    updateBookInfo.bookImage?.let { oracleRepository.deleteBucketImage(it) }
+                    updateBookInfo.bookImage?.let { oracleRepository.deleteBucketImage(listOf(it)) }
                     val book = updateBookInfo.copy(bookImage = "$userUUID/${result.uploadFileName}")
                     if (book.bookId == -1L) insertDiaryBook(book) else updateBookInfo(book)
                 } else if (result is FailUpload) {  // 이미지 업로드 실패[일기 저장실패]
@@ -256,9 +252,15 @@ class BookcaseViewModel @Inject constructor(
         storeDeleteBookId ?: return
         _bookcaseUiState.update { it.copy(isLoading = true) }
         viewModelScope.launch {
+            val diaryListOfBook =
+                diaryBookRepository.fetchAllDairiesByDiaryBook(storeDeleteBookId!!)
             val deleteBook = diaryBookRepository.deleteBookInfo(storeDeleteBookId!!)
             val (code, message) = if (deleteBook != null) {
-                deleteBook.bookImage?.let { oracleRepository.deleteBucketImage(fileName = it) }
+                deleteBook.bookImage?.let {
+                    val removeList =
+                        diaryListOfBook.map { bookInfo -> bookInfo.imageUrlList.first() } + listOf(it)
+                    oracleRepository.deleteBucketImage(fileNames = removeList)
+                }
                 SUCCESS_DELETE_BOOK to R.string.success_delete_book_message
             } else {
                 FAIL_DELETE_BOOK to R.string.fail_delete_book_message
@@ -287,7 +289,7 @@ class BookcaseViewModel @Inject constructor(
 
             var newItem = bookcaseUiState.value.diaryList
             deleteItem?.let { deleteItem ->
-                oracleRepository.deleteBucketImage(fileName = deleteItem.imageUrlList.first())
+                oracleRepository.deleteBucketImage(fileNames = listOf(deleteItem.imageUrlList.first()))
                 val temp = bookcaseUiState.value.diaryList.toMutableList()
                 temp.removeIf { it.diaryId == deleteItem.diaryId }
                 newItem = temp

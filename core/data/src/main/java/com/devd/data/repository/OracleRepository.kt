@@ -62,9 +62,9 @@ class OracleRepository @Inject constructor(
     }
 
     suspend fun deleteBucketImage(
-        fileName: String,
+        fileNames: List<String>,
     ) = safeApiCall(Dispatchers.IO) {
-        diaryService.deleteBucketImage(fileName)
+        diaryService.deleteBucketImage(fileNames)
     }
 
 }
