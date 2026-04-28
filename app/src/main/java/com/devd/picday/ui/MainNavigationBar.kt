@@ -21,9 +21,9 @@ import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.devd.commonsystem.theme.Black33Color
-import com.devd.commonsystem.theme.Black33Opacity90Color
 import com.devd.commonsystem.theme.BlackD9Color
 import com.devd.commonsystem.theme.BlackF4Color
+import com.devd.commonsystem.theme.TransParents
 import com.devd.commonsystem.theme.WhiteColor
 import com.devd.picday.navigation.NaviBarItem
 
@@ -33,7 +33,8 @@ fun MainNavigationBar(
     navigationItems: List<NaviBarItem> = listOf(
         NaviBarItem.Library,
         NaviBarItem.Home,
-        NaviBarItem.Calendar
+        NaviBarItem.Calendar,
+        NaviBarItem.Setting
     ),
     currentScreen: MutableState<NaviBarItem> = remember { mutableStateOf(NaviBarItem.Home) },
     navController: NavHostController = rememberNavController()
@@ -70,7 +71,7 @@ fun MainNavigationBar(
                 colors = NavigationBarItemDefaults.colors().copy(
                     selectedTextColor = Black33Color,
                     selectedIconColor = Black33Color,
-                    selectedIndicatorColor = Black33Opacity90Color,
+                    selectedIndicatorColor = TransParents,
                     unselectedTextColor = BlackD9Color,
                     unselectedIconColor = BlackD9Color
                 ),
@@ -78,7 +79,7 @@ fun MainNavigationBar(
                 selected = currentScreen.value == it,
                 onClick = {
                     currentScreen.value = it
-                    navController.navigate(it.mainRoute){
+                    navController.navigate(it.mainRoute) {
                         // 기존 탭의 상태(스크롤 등)를 저장
                         popUpTo(navController.graph.findStartDestination().id) { saveState = true }
                         // 2. 중복 방지:

@@ -13,10 +13,10 @@ val settingList = listOf(
         type = SettingType.ALERT_TIME,
         settingType = ItemType.ActionValue(isArrow = true, value = "시간")
     ),
-//    SettingItem(
-//        type = SettingType.MONTH_TYPE,
-//        settingType = ItemType.ActionValue(isArrow = true, value = "Moon")
-//    ),
+    SettingItem(
+        type = SettingType.DIARY_LOCK,
+        settingType = ItemType.Switch(isOn = true)
+    ),
     SettingItem(
         type = SettingType.APP_VERSION,
         settingType = ItemType.Value("")

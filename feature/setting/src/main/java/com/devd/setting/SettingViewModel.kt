@@ -6,6 +6,7 @@ import com.devd.commonsystem.utils.FontList
 import com.devd.commonsystem.utils.getDateStr
 import com.devd.data.repository.DiaryBookRepository
 import com.devd.datastore.DataStoreKey
+import com.devd.datastore.DataStoreKey.DiaryLockPassword
 import com.devd.datastore.DataStoreRepository
 import com.devd.firebase.fcm.FcmExtension
 import com.devd.model.local.LocalSettingData
@@ -19,7 +20,6 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import timber.log.Timber
 import java.time.LocalTime
 import java.time.ZoneId
 import java.time.ZonedDateTime
@@ -81,8 +81,8 @@ class SettingViewModel @Inject constructor(
                     it.copy(settingType = ItemType.Value(""))
                 }
 
+                SettingType.DIARY_LOCK -> it.copy(settingType = ItemType.Switch(isOn = savedSettingData.isLockDiary))
                 SettingType.CLOUD_SYNC -> null
-                SettingType.MONTH_TYPE -> null
             }
         }
         _settingUiState.update {
@@ -153,7 +153,7 @@ class SettingViewModel @Inject constructor(
 
                 SettingType.ALERT_TIME -> Unit
                 SettingType.CLOUD_SYNC -> Unit
-                SettingType.MONTH_TYPE -> Unit
+                SettingType.DIARY_LOCK -> Unit
                 SettingType.APP_VERSION -> Unit
             }
         }
@@ -195,7 +195,6 @@ class SettingViewModel @Inject constructor(
 
                 val result = FcmExtension.sendAlarmDataToFirebaseServer(data)
                 dataStoreRepository.setPreferData(DataStoreKey.SavedAlarmTime, sendTime)
-                Timber.d("................? => $result")
                 _settingUiState.update {
                     it.copy(
                         isLoading = false,
@@ -212,6 +211,27 @@ class SettingViewModel @Inject constructor(
         }
     }
 
+    fun setLockPassword(lockPassword: String?) {
+        viewModelScope.launch {
+            if (lockPassword != null) {
+                _settingUiState.update { it.copy(isLoading = true) }
+                dataStoreRepository.setPreferData(DiaryLockPassword, lockPassword)
+            } else {
+                dataStoreRepository.clearPreferData(DiaryLockPassword)
+            }
+            dataStoreRepository.setLocalSettingData(savedSettingData.copy(isLockDiary = lockPassword != null))
+            _settingUiState.update {
+                it.copy(
+                    isLoading = false,
+                    settingData = setValueWithType(
+                        SettingType.DIARY_LOCK,
+                        isOn = lockPassword != null
+                    )
+                )
+            }
+        }
+    }
+
     fun dismissAlarmDialog() {
         _settingUiState.update { it.copy(alarmDialogInfo = it.alarmDialogInfo.copy(isShow = false)) }
     }
@@ -224,18 +244,21 @@ class SettingViewModel @Inject constructor(
     private fun setValueWithType(
         type: SettingType,
         valueStr: String? = null,
-        valueId: Int? = null
+        valueId: Int? = null,
+        isOn: Boolean? = null,
     ): List<SettingItem> {
         val newList = settingUiState.value.settingData.map { item ->
             if (item.type == type) {
-                val currentType = item.settingType
-                return@map when (currentType) {
+                return@map when (val currentType = item.settingType) {
                     is ItemType.Action -> item
                     is ItemType.ActionValue -> item.copy(
                         settingType = currentType.copy(value = valueStr, valueId = valueId)
                     )
 
                     is ItemType.Value -> item
+                    is ItemType.Switch -> item.copy(
+                        settingType = currentType.copy(isOn = isOn ?: false)
+                    )
                 }
             } else {
                 item

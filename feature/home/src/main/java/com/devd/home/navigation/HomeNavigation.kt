@@ -18,7 +18,6 @@ fun NavGraphBuilder.homeScreen(
     modifier: Modifier = Modifier,
     onNavigateToList: (list: List<DiaryInfo>, pos: Int) -> Unit,
     onNavigateToEditor: (String?, Long, Long?) -> Unit,
-    onSettingClick :(userId: String) -> Unit,
 ) {
     composable<HomeRoute> {
         CompositionLocalProvider(
@@ -27,7 +26,6 @@ fun NavGraphBuilder.homeScreen(
             HomeScreenRoute(
                 modifier = modifier,
                 onEditorMove = onNavigateToEditor,
-                onSettingClick = onSettingClick,
                 onMoveDiaryList = onNavigateToList
             )
         }

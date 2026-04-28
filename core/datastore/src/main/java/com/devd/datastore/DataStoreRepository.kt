@@ -7,6 +7,7 @@ import androidx.datastore.core.IOException
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.emptyPreferences
+import androidx.datastore.preferences.core.stringPreferencesKey
 import com.devd.model.local.LocalSettingData
 import com.devd.model.local.UserInfo
 import com.google.gson.Gson
@@ -57,6 +58,12 @@ class DataStoreRepository @Inject constructor(
             val value = flow.firstOrNull()
             value
         }.getOrNull()
+    }
+
+    override suspend fun <T> clearPreferData(data: DataStoreKey<T>) {
+        sharedPreferences.edit { preferences ->
+            preferences.remove(stringPreferencesKey(data.key))
+        }
     }
 
     suspend fun setUserInfo(userInfo: UserInfo): UserInfo {

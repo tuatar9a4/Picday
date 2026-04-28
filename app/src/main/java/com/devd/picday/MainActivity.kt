@@ -38,7 +38,9 @@ class MainActivity : ComponentActivity() {
             OneDayOneShotTheme(
                 changeFontInt = viewModel.appFontCurrent.value
             ) {
-                val items = listOf(NaviBarItem.Library, NaviBarItem.Home, NaviBarItem.Calendar)
+                val items = listOf(
+                    NaviBarItem.Library, NaviBarItem.Home, NaviBarItem.Calendar, NaviBarItem.Setting
+                )
                 val currentScreen = remember { mutableStateOf<NaviBarItem>(NaviBarItem.Home) }
                 val isShowBottomNav = remember { mutableStateOf(true) }
                 val navController = rememberNavController()

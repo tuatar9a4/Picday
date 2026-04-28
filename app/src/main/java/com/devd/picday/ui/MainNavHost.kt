@@ -17,7 +17,6 @@ import com.devd.editor.navigation.editorScreen
 import com.devd.home.navigation.HomeRoute
 import com.devd.home.navigation.homeScreen
 import com.devd.model.local.EditMode
-import com.devd.setting.navigation.SettingNaviRoute
 import com.devd.setting.navigation.settingScreen
 
 @Composable
@@ -55,12 +54,6 @@ fun MyNavHost(
                                 initList = list,
                                 startPos = pos
                             )
-                        )
-                    },
-                    onSettingClick = { uuid ->
-                        changeShowBottomBar(false)
-                        navController.navigate(
-                            SettingNaviRoute(uuid)
                         )
                     }
                 )

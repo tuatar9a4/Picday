@@ -12,6 +12,8 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Switch
+import androidx.compose.material3.SwitchDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -21,6 +23,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
@@ -29,10 +32,16 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import com.devd.commonsystem.R
 import com.devd.commonsystem.theme.AccentColor
 import com.devd.commonsystem.theme.BlackColor
+import com.devd.commonsystem.theme.BlackD9Color
+import com.devd.commonsystem.theme.TransParents
+import com.devd.commonsystem.theme.VioletColor
+import com.devd.commonsystem.theme.WhiteColor
 import com.devd.commonsystem.ui.Toolbar
 import com.devd.commonsystem.ui.dialog.OptionBottomSheet
 import com.devd.commonsystem.ui.dialog.ShowMessageDialog
 import com.devd.commonsystem.ui.loading.LoadingDialog
+import com.devd.commonsystem.ui.lock.LockDialog
+import com.devd.commonsystem.ui.lock.LockType
 import com.devd.commonsystem.utils.FontList
 import com.devd.model.local.SheetItem
 import com.devd.setting.data.ItemType
@@ -47,6 +56,7 @@ fun SettingScreenRoute(
 ) {
     val uiState by viewModel.settingUiState.collectAsState()
     var isFontListSheet by remember { mutableStateOf(false) }
+    var isDiaryLockSheet by remember { mutableStateOf(false) }
 
     BackHandler() {
         onBackClick()
@@ -63,8 +73,12 @@ fun SettingScreenRoute(
                 }
 
                 SettingType.ALERT_TIME -> viewModel.checkFcmToken()
-                SettingType.MONTH_TYPE -> TODO()
-                SettingType.APP_VERSION -> TODO()
+                SettingType.DIARY_LOCK -> {
+                    if (value == "1") viewModel.setLockPassword(lockPassword = null)
+                    else isDiaryLockSheet = true
+                }
+
+                SettingType.APP_VERSION -> Unit
             }
         }
     )
@@ -100,6 +114,20 @@ fun SettingScreenRoute(
             },
             { hour, min ->
                 viewModel.registerScheduleUserPush("$hour$min")
+            }
+        )
+    }
+
+    if (isDiaryLockSheet) {
+        LockDialog(
+            modifier = modifier,
+            type = LockType.REGISTER,
+            inputFinish = { password ->
+                viewModel.setLockPassword(password)
+                isDiaryLockSheet = false
+            },
+            onDismissClick = {
+                isDiaryLockSheet = false
             }
         )
     }
@@ -145,6 +173,14 @@ fun SettingScreen(
                     onItemClick = { onItemClick(item.type, item.settingType.value) })
 
                 is ItemType.Value -> ValueItem(item.type, item.settingType)
+                is ItemType.Switch -> SwitchItem(
+                    key = item.type,
+                    type = item.settingType,
+                    onChangeSwitch = {
+                        onItemClick(item.type, if (item.settingType.isOn) "1" else "0")
+                    }
+
+                )
             }
 
         }
@@ -181,7 +217,7 @@ fun ActionItem(
 @Preview
 @Composable
 fun ActionValueItem(
-    key: SettingType = SettingType.MONTH_TYPE,
+    key: SettingType = SettingType.APP_VERSION,
     type: ItemType.ActionValue = ItemType.ActionValue(true, "2026-03-13"),
     onItemClick: () -> Unit = {}
 ) {
@@ -226,6 +262,14 @@ fun ValueItem(
     key: SettingType = SettingType.ALERT_TIME,
     type: ItemType.Value = ItemType.Value("2026-03-13")
 ) {
+    val packInfo =
+        LocalContext.current.packageManager.getPackageInfo(LocalContext.current.packageName, 0)
+
+    val valueStr = when (key) {
+        SettingType.APP_VERSION -> packInfo.versionName
+        else -> type.valueId?.let { stringResource(it) } ?: type.value
+    }
+
     Row(
         modifier = Modifier
             .padding(vertical = 10.dp, horizontal = 15.dp)
@@ -238,7 +282,7 @@ fun ValueItem(
                 color = BlackColor
             )
         )
-        type.valueId?.let { stringResource(it) } ?: type.value?.let {
+        valueStr?.let {
             Text(
                 text = it,
                 style = MaterialTheme.typography.labelLarge.copy(
@@ -249,3 +293,41 @@ fun ValueItem(
     }
 }
 
+@Preview
+@Composable
+fun SwitchItem(
+    key: SettingType = SettingType.DIARY_LOCK,
+    type: ItemType.Switch = ItemType.Switch(isOn = false),
+    onChangeSwitch: () -> Unit = {}
+) {
+    Row(
+        modifier = Modifier
+            .padding(vertical = 10.dp, horizontal = 15.dp)
+            .fillMaxWidth()
+            .clickable(onClick = onChangeSwitch),
+        horizontalArrangement = Arrangement.SpaceBetween,
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Text(
+            text = stringResource(key.strId),
+            style = MaterialTheme.typography.bodyMedium.copy(
+                color = BlackColor
+            )
+        )
+        Switch(
+            checked = type.isOn,
+
+            colors = SwitchDefaults.colors().copy(
+                checkedTrackColor = VioletColor,
+                checkedThumbColor = WhiteColor,
+                uncheckedTrackColor = BlackD9Color,
+                uncheckedThumbColor = WhiteColor,
+                checkedBorderColor = TransParents,
+                uncheckedBorderColor = TransParents
+            ),
+            onCheckedChange = {
+                onChangeSwitch()
+            }
+        )
+    }
+}

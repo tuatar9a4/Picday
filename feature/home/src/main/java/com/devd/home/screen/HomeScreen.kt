@@ -53,7 +53,6 @@ import java.io.File
 fun HomeScreenRoute(
     modifier: Modifier = Modifier,
     onEditorMove: (imageUrl: String?, bookId: Long, diaryId: Long?) -> Unit = { _, _, _ -> },
-    onSettingClick: (userId: String) -> Unit = {},
     onMoveDiaryList: (List<DiaryInfo>, Int) -> Unit = { _, _ -> },
     viewModel: HomeViewModel = hiltViewModel()
 ) {
@@ -127,9 +126,6 @@ fun HomeScreenRoute(
         diaryState = diaryState,
         onShowCalendar = viewModel::showCalendarDialog,
         onEditorClick = { checkDiaryInfoBeforeMove() },
-        onSettingClick = {
-            onSettingClick(viewModel.storedUUID!!)
-        },
         onDiaryCardClick = { moveToDiaryList(uiState.diaryList, it) },
         onBookClick = viewModel::showBookDialog
     )
@@ -174,7 +170,6 @@ fun HomeScreen(
     onShowCalendar: () -> Unit = {},
     onEditorClick: () -> Unit = {},
     onDiaryCardClick: (Int) -> Unit = {},
-    onSettingClick: () -> Unit = {},
     onBookClick: () -> Unit = {}
 ) {
     val context = LocalContext.current

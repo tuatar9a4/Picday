@@ -47,7 +47,6 @@ fun OneDayOneShotTheme(
     // Dynamic color is available on Android 12+
     changeFontInt: Int = 0,
     dynamicColor: Boolean = true,
-    dynamicTypography: Typography = getCustomTypography(FontList.PINK_PONG.fontFamily),
     content: @Composable () -> Unit
 ) {
     val typography = remember(changeFontInt) {

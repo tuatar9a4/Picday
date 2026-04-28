@@ -35,6 +35,8 @@ import com.devd.commonsystem.ui.dialog.ShowMessageDialog
 import com.devd.commonsystem.ui.dialog.book.DiaryBookDialog
 import com.devd.commonsystem.ui.dialog.book.DiaryBookDialogType
 import com.devd.commonsystem.ui.loading.LoadingDialog
+import com.devd.commonsystem.ui.lock.LockDialog
+import com.devd.commonsystem.ui.lock.LockType
 import com.devd.commonsystem.utils.uriToFile
 import com.devd.intro.IntroViewModel
 
@@ -71,6 +73,17 @@ fun IntroScreenRoute(
         )
     }
     uiState.isLoading.LoadingDialog(message = "Checking ID...")
+    if (uiState.isShowLockDialog != null) {
+        LockDialog(
+            modifier = modifier,
+            type = LockType.INPUT,
+            onDismissClick = {},
+            inputFinish = { password ->
+                if (uiState.isShowLockDialog == password) viewModel.passLockDiary()
+                else viewModel.showUnMatchPassword()
+            }
+        )
+    }
     uiState.simpleMessage?.messageStr?.ShowMessageDialog(
         onRightButtonClick = { viewModel.dismissSimpleMessageDialog() }
     )

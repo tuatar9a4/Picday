@@ -36,6 +36,9 @@ sealed class DataStoreKey<T>(
     object SavedAlarmTime : DataStoreKey<String>("saved_alarm_time") {
         override fun preferencesKey() = stringPreferencesKey(key)
     }
+    object DiaryLockPassword : DataStoreKey<String>("diary_lock_password") {
+        override fun preferencesKey() = stringPreferencesKey(key)
+    }
 
 }
 

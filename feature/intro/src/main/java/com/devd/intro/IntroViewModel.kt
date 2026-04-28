@@ -34,6 +34,7 @@ data class IntroUiState(
     val isLoading: Boolean = false,
 
     val isShowBookDialog: Boolean = false,
+    val isShowLockDialog: String? = null,
     val simpleMessage: MessageData? = null
 )
 
@@ -58,7 +59,9 @@ class IntroViewModel @Inject constructor(
             _introUiState.update { it.copy(isLoading = true) }
             delay(1000)
             _introUiState.update { it.copy(isLoading = false) }
-            if (fetchSavedNickName()) _naviToHome.emit("")
+            if (fetchSavedNickName()) {
+                if (!checkLockDiary()) _naviToHome.emit("")
+            }
         }
     }
 
@@ -96,7 +99,8 @@ class IntroViewModel @Inject constructor(
                 val res =
                     oracleRepository.fetchUploadUrl(newUserId, imageFile.name) ?: return@launch
                 Timber.d("CheckUrl  uploadUrl => ${res}")
-                when (val result = oracleRepository.uploadImageFile(res.uploadUrl, imageFile).last()) {
+                when (val result =
+                    oracleRepository.uploadImageFile(res.uploadUrl, imageFile).last()) {
                     is SuccessUpload -> uploadImagePath = "$newUserId/${result.uploadFileName}"
                     is FailUpload -> {
                         _introUiState.update {
@@ -160,6 +164,31 @@ class IntroViewModel @Inject constructor(
     suspend fun fetchSavedNickName(): Boolean {
         val savedUUID = dataStoreRepository.getUserInfo()?.uuid ?: return false
         return diaryBookRepository.hasDiaryBook(savedUUID)
+    }
+
+    suspend fun checkLockDiary(): Boolean {
+        val lockPassword =
+            dataStoreRepository.getPreferData(DataStoreKey.DiaryLockPassword) ?: return false
+        _introUiState.update { it.copy(isShowLockDialog = lockPassword) }
+        return true
+    }
+
+    fun passLockDiary() {
+        viewModelScope.launch {
+            _introUiState.update { it.copy(isShowLockDialog = null) }
+            _naviToHome.emit("")
+        }
+    }
+
+    fun showUnMatchPassword() {
+        _introUiState.update {
+            it.copy(
+                simpleMessage = MessageData(
+                    messageType = "unMathchPw",
+                    messageStr = "비밀번호가 일치하지 않습니다."
+                )
+            )
+        }
     }
 
     private fun validateDiaryInfo(bookImage: File?, title: String): Boolean {
