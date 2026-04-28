@@ -203,7 +203,7 @@ fun PinCodeIndicator(
                         text = inputText[index].toString(),
                         textAlign = TextAlign.Center,
                         style = MaterialTheme.typography.bodyLarge.copy(
-                            fontFamily = FontList.PINK_PONG.fontFamily,
+                            fontFamily = FontList.STAR_DUST.fontFamily,
                             color = Black33Color,
                             fontSize = 22.sp
                         )
@@ -315,7 +315,7 @@ fun TestTextList() {
         Text(
             text = "Apple23",
             style = MaterialTheme.typography.bodyLarge.copy(
-                fontFamily = FontList.SUIT.fontFamily,
+                fontFamily = FontList.S_CORE_DREAM.fontFamily,
                 color = Black33Color,
                 fontSize = 22.sp
             )
@@ -324,7 +324,7 @@ fun TestTextList() {
         Text(
             text = "Apple23",
             style = MaterialTheme.typography.bodyLarge.copy(
-                fontFamily = FontList.NANUM_SQUARE.fontFamily,
+                fontFamily = FontList.MARUBURI.fontFamily,
                 color = Black33Color,
                 fontSize = 22.sp
             )
@@ -333,7 +333,7 @@ fun TestTextList() {
         Text(
             text = "Apple23",
             style = MaterialTheme.typography.bodyLarge.copy(
-                fontFamily = FontList.INTERROP.fontFamily,
+                fontFamily = FontList.HUMAN_BEOMSEOK.fontFamily,
                 color = Black33Color,
                 fontSize = 22.sp
             )
@@ -342,7 +342,7 @@ fun TestTextList() {
         Text(
             text = "Apple23",
             style = MaterialTheme.typography.bodyLarge.copy(
-                fontFamily = FontList.PINK_PONG.fontFamily,
+                fontFamily = FontList.STAR_DUST.fontFamily,
                 color = Black33Color,
                 fontSize = 22.sp
             )
@@ -351,7 +351,7 @@ fun TestTextList() {
         Text(
             text = "Apple2",
             style = MaterialTheme.typography.bodyLarge.copy(
-                fontFamily = FontList.PINK_PONG.fontFamily,
+                fontFamily = FontList.STAR_DUST.fontFamily,
                 color = Black33Color,
                 fontSize = 22.sp
             )

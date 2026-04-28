@@ -6,36 +6,36 @@ import androidx.compose.ui.text.font.FontWeight
 import com.devd.commonsystem.R
 
 enum class FontList(val fontFamily: FontFamily) {
-    SUIT(
+    S_CORE_DREAM(
         fontFamily = FontFamily(
-            Font(R.font.suit_extra_bold, weight = FontWeight(700)),
-            Font(R.font.suit_semi_bold, weight = FontWeight(600)),
-            Font(R.font.suit_medium, weight = FontWeight(500)),
-            Font(R.font.suit_light, weight = FontWeight(400)),
+            Font(R.font.sc_dream_extra_bold, weight = FontWeight(700)),
+            Font(R.font.sc_dream_bold, weight = FontWeight(600)),
+            Font(R.font.sc_dream_regular, weight = FontWeight(500)),
+            Font(R.font.sc_dream_light, weight = FontWeight(400)),
         )
     ),
-    PINK_PONG(
+    STAR_DUST(
         fontFamily = FontFamily(
-            Font(R.font.pinkfong_font_bold, weight = FontWeight(700)),
-            Font(R.font.pinkfong_font_bold, weight = FontWeight(600)),
-            Font(R.font.pinkfong_font_regular, weight = FontWeight(500)),
-            Font(R.font.pinkfong_font_light, weight = FontWeight(400)),
+            Font(R.font.star_dust_extra_bold, weight = FontWeight(700)),
+            Font(R.font.star_dust_bold, weight = FontWeight(600)),
+            Font(R.font.star_dust_regular, weight = FontWeight(500)),
+            Font(R.font.star_dust_regular, weight = FontWeight(400)),
         )
     ),
-    NANUM_SQUARE(
+    MARUBURI(
         fontFamily = FontFamily(
-            Font(R.font.nanumsquare_extra_bold, weight = FontWeight(700)),
-            Font(R.font.nanumsquare_bold, weight = FontWeight(600)),
-            Font(R.font.nanumsquare_regular, weight = FontWeight(500)),
-            Font(R.font.nanumsquare_light, weight = FontWeight(400)),
+            Font(R.font.maruburi_extra_bold, weight = FontWeight(700)),
+            Font(R.font.maruburi_bold, weight = FontWeight(600)),
+            Font(R.font.maruburi_regular, weight = FontWeight(500)),
+            Font(R.font.maruburi_light, weight = FontWeight(400)),
         )
     ),
-    INTERROP(
+    HUMAN_BEOMSEOK(
         fontFamily = FontFamily(
-            Font(R.font.interop_extra_bold, weight = FontWeight(700)),
-            Font(R.font.interop_bold, weight = FontWeight(600)),
-            Font(R.font.interop_regular, weight = FontWeight(500)),
-            Font(R.font.interop_light, weight = FontWeight(400)),
+            Font(R.font.human_beomseok_extra_bold, weight = FontWeight(700)),
+            Font(R.font.human_beomseok_bold, weight = FontWeight(600)),
+            Font(R.font.human_beomseok_regular, weight = FontWeight(500)),
+            Font(R.font.human_beomseok_light, weight = FontWeight(400)),
         )
     ),
 }

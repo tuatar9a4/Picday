@@ -112,5 +112,5 @@ fun getCustomTypography(fontFamily: FontFamily): Typography {
 }
 
 val LocalCustomTypography = compositionLocalOf {
-    getCustomTypography(FontList.SUIT.fontFamily)
+    getCustomTypography(FontList.S_CORE_DREAM.fontFamily)
 }

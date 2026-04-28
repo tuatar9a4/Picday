@@ -108,6 +108,7 @@ fun BookCardScreen(
                                 fontSize = 18.sp
                             )
                         )
+                        Spacer(Modifier.height(8.dp))
                         Text(
                             modifier = Modifier,
                             text = "\uD83D\uDD25 ${bookInfo.continueWriteCount}일 연속 기록 중",
