@@ -36,7 +36,6 @@ import com.devd.commonsystem.theme.BlackD9Color
 import com.devd.commonsystem.theme.TransParents
 import com.devd.commonsystem.theme.VioletColor
 import com.devd.commonsystem.theme.WhiteColor
-import com.devd.commonsystem.ui.Toolbar
 import com.devd.commonsystem.ui.dialog.OptionBottomSheet
 import com.devd.commonsystem.ui.dialog.ShowMessageDialog
 import com.devd.commonsystem.ui.loading.LoadingDialog
@@ -151,19 +150,6 @@ fun SettingScreen(
     Column(
         modifier = modifier.then(Modifier.fillMaxSize())
     ) {
-        Toolbar(
-            titleBox = {
-                Text(
-                    text = ""
-                )
-            },
-            leftButtons = {
-                Image(
-                    painter = painterResource(R.drawable.icon_back_arrow),
-                    contentDescription = null
-                )
-            }
-        )
         uiState.settingData.forEach { item ->
             when (item.settingType) {
                 is ItemType.Action -> ActionItem(item.type, item.settingType)

@@ -24,6 +24,7 @@ import com.devd.home.navigation.HomeRoute
 import com.devd.picday.navigation.NaviBarItem
 import com.devd.picday.ui.MainNavigationBar
 import com.devd.picday.ui.MyNavHost
+import com.devd.setting.navigation.SettingNaviRoute
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
@@ -61,6 +62,11 @@ class MainActivity : ComponentActivity() {
                         CustomCalendarRoute.javaClass.name -> {
                             isShowBottomNav.value = true
                             currentScreen.value = NaviBarItem.Calendar
+                        }
+
+                        SettingNaviRoute.javaClass.name -> {
+                            isShowBottomNav.value = true
+                            currentScreen.value = NaviBarItem.Setting
                         }
 
                         else -> {
