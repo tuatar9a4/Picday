@@ -19,10 +19,17 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.drawWithContent
 import androidx.compose.ui.graphics.ColorFilter
+import androidx.compose.ui.graphics.asAndroidBitmap
+import androidx.compose.ui.graphics.layer.GraphicsLayer
+import androidx.compose.ui.graphics.layer.drawLayer
+import androidx.compose.ui.graphics.rememberGraphicsLayer
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
@@ -40,10 +47,12 @@ import com.devd.commonsystem.ui.dialog.OptionBottomSheet
 import com.devd.commonsystem.ui.dialog.ShowMessageDialog
 import com.devd.commonsystem.ui.loading.LoadingDialog
 import com.devd.commonsystem.utils.FeelData
+import com.devd.commonsystem.utils.shareBitmap
 import com.devd.diary.screen.DiaryContentsScreen
 import com.devd.diary.screen.DiaryImageScreen
 import com.devd.model.local.DiaryInfo
 import com.devd.model.local.SheetItem
+import kotlinx.coroutines.launch
 
 @Composable
 fun DiaryListScreenRoute(
@@ -115,6 +124,9 @@ fun DiaryListScreen(
 
     var isShowOptionSheet by remember { mutableStateOf(false) }
 
+    val context = LocalContext.current
+    val scope = rememberCoroutineScope()
+    val graphicsLayer: GraphicsLayer = rememberGraphicsLayer()
 
     Column(
         modifier = modifier.then(
@@ -147,7 +159,15 @@ fun DiaryListScreen(
             }
         )
         Column(
-            modifier = Modifier.fillMaxWidth()
+            modifier = Modifier
+                .fillMaxWidth()
+                .drawWithContent {
+                    graphicsLayer.record {
+                        this@drawWithContent.drawContent()
+                    }
+                    // 화면에도 보여야 하므로 실제로도 그립니다.
+                    drawLayer(graphicsLayer)
+                }
         ) {
             Box(
                 modifier = Modifier.weight(1f),
@@ -164,7 +184,7 @@ fun DiaryListScreen(
                         .background(BlackOpacity40Color, CircleShape)
                         .border(1.dp, BlackF4Color, CircleShape)
                         .padding(horizontal = 13.dp, vertical = 5.dp),
-                    text = "${pagerState.currentPage+1}/${diaryList.size}",
+                    text = "${pagerState.currentPage + 1}/${diaryList.size}",
                     style = MaterialTheme.typography.bodySmall.copy(
                         color = WhiteColor
                     )
@@ -214,6 +234,10 @@ fun DiaryListScreen(
                     }
 
                     "1" -> {
+                        scope.launch {
+                            val image = graphicsLayer.toImageBitmap()
+                            context.shareBitmap(image.asAndroidBitmap())
+                        }
 
                     }
 

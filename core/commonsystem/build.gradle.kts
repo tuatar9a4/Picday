@@ -37,4 +37,5 @@ dependencies {
     implementation(libs.coil.http.compose)
 
     implementation(libs.play.service.ads)
+    implementation(libs.androix.exifinterface)
 }

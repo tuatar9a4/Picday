@@ -26,6 +26,7 @@ import com.devd.picday.ui.MainNavigationBar
 import com.devd.picday.ui.MyNavHost
 import com.devd.setting.navigation.SettingNaviRoute
 import dagger.hilt.android.AndroidEntryPoint
+import timber.log.Timber
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
@@ -48,6 +49,7 @@ class MainActivity : ComponentActivity() {
                 val navBackStackEntry by navController.currentBackStackEntryAsState()
                 LaunchedEffect(navBackStackEntry?.destination?.route) {
                     val currentRoute = navBackStackEntry?.destination?.route
+                    Timber.d("check=> ${currentRoute} != ${ HomeRoute.javaClass.name}")
                     when (currentRoute) {
                         HomeRoute.javaClass.name -> {
                             isShowBottomNav.value = true

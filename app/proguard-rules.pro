@@ -19,3 +19,20 @@
 # If you keep the line number information, uncomment this to
 # hide the original source file name.
 #-renamesourcefileattribute SourceFile
+
+-keepattributes *Annotation*, Signature, InnerClasses
+
+-keep class com.devd.model.** { *; }
+-keep class com.devd.room.** { *; }
+
+-keep class retrofit2.** { *; }
+-dontwarn retrofit2.**
+
+-keepclassmembers class * {
+    @com.google.gson.annotations.SerializedName <fields>;
+}
+
+-keep class androidx.exifinterface.media.ExifInterface { *; }
+
+# DataModel을 상속받는 모든 클래스와 그 멤버를 보존
+-keep class * implements com.devd.model.local.NavRoute { *; }

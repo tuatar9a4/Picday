@@ -36,7 +36,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
@@ -52,7 +51,6 @@ import coil3.compose.AsyncImage
 import coil3.request.ImageRequest
 import coil3.size.Size
 import com.devd.calendar.data.CalendarImageInfo
-import com.devd.commonsystem.R
 import com.devd.commonsystem.theme.Black33Color
 import com.devd.commonsystem.theme.BlackColor
 import com.devd.commonsystem.theme.BlackD9Color
@@ -185,11 +183,11 @@ fun CalendarHeader(
                 color = BlackColor
             ),
         )
-        Image(
-            painter = painterResource(R.drawable.icon_drop_down),
-            colorFilter = ColorFilter.tint(BlackColor),
-            contentDescription = null
-        )
+//        Image(
+//            painter = painterResource(R.drawable.icon_drop_down),
+//            colorFilter = ColorFilter.tint(BlackColor),
+//            contentDescription = null
+//        )
     }
 }
 

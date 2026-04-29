@@ -3,6 +3,7 @@ package com.devd.commonsystem.utils
 import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
+import android.graphics.Matrix
 import android.net.Uri
 import android.provider.OpenableColumns
 import androidx.core.graphics.scale
@@ -32,6 +33,7 @@ fun Context.optimizeUriToFile(
     // 2. 정확한 해상도로 리사이징 (원하는 크기에 가깝게 2차 조정)
     val resizedBitmap = resizeBitmap(sampledBitmap, reqWidth, reqHeight)
 
+    val finalBitmap = rotateImageIfRequired(this, resizedBitmap, uri)
     // 3. 파일 생성 및 압축 저장
     val fileName = "optimized_image_${System.currentTimeMillis()}.webp"
     val file = File(cacheDir, fileName)
@@ -49,11 +51,13 @@ fun Context.optimizeUriToFile(
             }
 
             // 퀄리티는 80~85 정도가 화질 저하 없이 용량을 크게 줄임
-            resizedBitmap.compress(format, 85, out)
+            finalBitmap.compress(format, 85, out)
         }
-        // 메모리 해제
+
+        // 메모리 해제 관리
         if (sampledBitmap != resizedBitmap) sampledBitmap.recycle()
-        resizedBitmap.recycle()
+        if (resizedBitmap != finalBitmap) resizedBitmap.recycle()
+        finalBitmap.recycle()
 
         file
     } catch (e: Exception) {
@@ -108,4 +112,24 @@ private fun resizeBitmap(bitmap: Bitmap, reqWidth: Int, reqHeight: Int): Bitmap 
     val newHeight = (height * scale).toInt()
 
     return bitmap.scale(newWidth, newHeight)
+}
+
+// 회전 처리를 위한 헬퍼 함수
+private fun rotateImageIfRequired(context: Context, bitmap: Bitmap, uri: Uri): Bitmap {
+    val input = context.contentResolver.openInputStream(uri) ?: return bitmap
+    val exif = androidx.exifinterface.media.ExifInterface(input)
+    val orientation = exif.getAttributeInt(
+        androidx.exifinterface.media.ExifInterface.TAG_ORIENTATION,
+        androidx.exifinterface.media.ExifInterface.ORIENTATION_NORMAL
+    )
+
+    val degrees = when (orientation) {
+        androidx.exifinterface.media.ExifInterface.ORIENTATION_ROTATE_90 -> 90f
+        androidx.exifinterface.media.ExifInterface.ORIENTATION_ROTATE_180 -> 180f
+        androidx.exifinterface.media.ExifInterface.ORIENTATION_ROTATE_270 -> 270f
+        else -> return bitmap // 회전이 필요 없으면 원본 반환
+    }
+
+    val matrix = Matrix().apply { postRotate(degrees) }
+    return Bitmap.createBitmap(bitmap, 0, 0, bitmap.width, bitmap.height, matrix, true)
 }

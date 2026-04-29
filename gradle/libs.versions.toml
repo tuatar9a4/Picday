@@ -48,6 +48,8 @@ composeRichEditorVersion = "1.0.4"
 # https://github.com/coil-kt/coil#jetpack-compose
 coilVersion = "3.1.0"
 
+exifinterfaceVersion = "1.3.7"
+
 [libraries]
 android-gradlePlugin = { group = "com.android.tools.build", name = "gradle", version.ref = "androidGradlePlugin" }
 kotlin-gradlePlugin = { module = "org.jetbrains.kotlin:kotlin-gradle-plugin", version.ref = "kotlin" }
@@ -128,6 +130,8 @@ coil-http-compose = { group = "io.coil-kt.coil3", name = "coil-network-okhttp", 
 
 #ADmob
 play-service-ads = {group ="com.google.android.gms",name ="play-services-ads",version = "24.8.0"}
+
+androix-exifinterface ={group="androidx.exifinterface",name ="exifinterface", version.ref ="exifinterfaceVersion"}
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
