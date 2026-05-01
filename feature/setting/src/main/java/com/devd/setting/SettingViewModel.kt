@@ -232,6 +232,10 @@ class SettingViewModel @Inject constructor(
         }
     }
 
+    fun showMessageDialog(messageId: String) {
+        _settingUiState.update { it.copy(messageDialog =  MessageData("needPermission", messageStr =messageId)) }
+    }
+
     fun dismissAlarmDialog() {
         _settingUiState.update { it.copy(alarmDialogInfo = it.alarmDialogInfo.copy(isShow = false)) }
     }

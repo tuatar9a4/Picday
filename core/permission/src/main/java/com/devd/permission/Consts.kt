@@ -7,6 +7,9 @@ object Consts{
     val CAMERA_PERMISSION = arrayOf(
         Manifest.permission.CAMERA
     )
+    val ALARM_PERMISSION = arrayOf(
+        Manifest.permission.POST_NOTIFICATIONS
+    )
 //    fun getFilePermissionList() : Array<String>{
 //        val fileListPermission = arrayListOf<String>()
 //        if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.Q){

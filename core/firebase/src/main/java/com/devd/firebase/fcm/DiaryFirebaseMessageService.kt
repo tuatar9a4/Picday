@@ -7,12 +7,24 @@ import android.content.Context
 import android.content.Intent
 import android.media.RingtoneManager
 import androidx.core.app.NotificationCompat
+import com.devd.datastore.DataStoreKey
+import com.devd.datastore.DataStoreRepository
 import com.devd.firebase.R
 import com.google.firebase.messaging.FirebaseMessagingService
 import com.google.firebase.messaging.RemoteMessage
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import timber.log.Timber
+import java.time.LocalTime
+import java.time.ZoneId
+import java.time.ZonedDateTime
+import java.time.format.DateTimeFormatter
+import javax.inject.Inject
 
 class DiaryFirebaseMessageService : FirebaseMessagingService() {
+
+    @Inject lateinit var dataStoreRepository : DataStoreRepository
 
     override fun onMessageReceived(message: RemoteMessage) {
         Timber.d("CheckMessage => ${message.data}")
@@ -24,6 +36,25 @@ class DiaryFirebaseMessageService : FirebaseMessagingService() {
 
     override fun onNewToken(token: String) {
         Timber.d("CheckToken : onNewToken => $token")
+        CoroutineScope(Dispatchers.IO).launch {
+            val formatter = DateTimeFormatter.ofPattern("HHmm")
+            val savedTime = dataStoreRepository.getPreferData(DataStoreKey.SavedAlarmTime)
+            val savedTimeToUtc = savedTime?.let {
+                val savedTime = LocalTime.of(
+                    it.take(2).toIntOrNull() ?: 0,
+                    it.takeLast(2).toIntOrNull() ?: 0
+                )
+                val localZonedSavedTime =
+                    ZonedDateTime.now(ZoneId.systemDefault()).with(savedTime)
+                localZonedSavedTime.withZoneSameInstant(ZoneId.of("UTC"))
+            }
+            val data: HashMap<String, Any?> = hashMapOf(
+                "fcmToken" to token,
+                "utcTimeBucket" to savedTimeToUtc?.format(formatter),
+                "previousBucket" to null
+            )
+            FcmExtension.sendAlarmDataToFirebaseServer(data)
+        }
     }
 
     private fun sendNotification(messageBody: String) {
@@ -43,7 +74,7 @@ class DiaryFirebaseMessageService : FirebaseMessagingService() {
         val defaultSoundUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION)
 
         val notificationBuilder = NotificationCompat.Builder(this, channelId)
-            .setSmallIcon(R.drawable.icon_photo) // TODO: 앱에 맞는 알림 아이콘(투명 배경 권장)으로 변경하세요.
+            .setSmallIcon(R.drawable.app_icon_stroke)
             .setContentText(messageBody)
             .setAutoCancel(true) // 터치 시 자동으로 알림 지우기
             .setSound(defaultSoundUri)

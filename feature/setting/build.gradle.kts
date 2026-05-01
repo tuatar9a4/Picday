@@ -15,4 +15,5 @@ dependencies {
     androidTestImplementation(libs.androidx.espresso.core)
 
     implementation(projects.core.firebase)
+    implementation(projects.core.permission)
 }

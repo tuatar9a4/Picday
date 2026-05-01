@@ -22,6 +22,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -45,9 +46,13 @@ import com.devd.commonsystem.ui.lock.LockDialog
 import com.devd.commonsystem.ui.lock.LockType
 import com.devd.commonsystem.utils.FontList
 import com.devd.model.local.SheetItem
+import com.devd.permission.Consts
+import com.devd.permission.IPermissionHandler
+import com.devd.permission.rememberPermissionHandler
 import com.devd.setting.data.ItemType
 import com.devd.setting.data.SettingType
 import com.devd.setting.dialog.AlarmTimSelectDialog
+import kotlinx.coroutines.launch
 
 @Composable
 fun SettingScreenRoute(
@@ -59,6 +64,18 @@ fun SettingScreenRoute(
     val uiState by viewModel.settingUiState.collectAsState()
     var isFontListSheet by remember { mutableStateOf(false) }
     var isDiaryLockSheet by remember { mutableStateOf(false) }
+
+    val permissionHandler: IPermissionHandler = rememberPermissionHandler()
+    val scope = rememberCoroutineScope()
+
+    suspend fun checkPermission() {
+        val grant = permissionHandler.requestPermissionIfNeeded(Consts.ALARM_PERMISSION)
+        if (grant.any { !it.value }) {
+            viewModel.showMessageDialog("푸쉬알림 권한이 필요합니다.")
+        } else {
+            viewModel.checkFcmToken()
+        }
+    }
 
     LaunchedEffect(isDiaryLockSheet) {
         onLockPage(isDiaryLockSheet)
@@ -78,7 +95,8 @@ fun SettingScreenRoute(
                     isFontListSheet = true
                 }
 
-                SettingType.ALERT_TIME -> viewModel.checkFcmToken()
+                SettingType.ALERT_TIME -> scope.launch { checkPermission() }
+
                 SettingType.DIARY_LOCK -> {
                     if (value == "1") viewModel.setLockPassword(lockPassword = null)
                     else isDiaryLockSheet = true
