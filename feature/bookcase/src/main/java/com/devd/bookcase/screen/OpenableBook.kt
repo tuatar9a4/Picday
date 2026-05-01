@@ -121,7 +121,7 @@ fun OpenableBook(
                 .fillMaxSize()
                 .clip(RoundedCornerShape(topEnd = 20.dp, bottomEnd = 20.dp))
         ) {
-            Spacer(Modifier.height(16.dp))
+            Spacer(Modifier.height(21.dp))
             Text(
                 modifier = Modifier.padding(start = 25.dp),
                 text = diaryDate ?: "",

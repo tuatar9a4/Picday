@@ -389,11 +389,11 @@ fun BookcaseScreen(
                     verticalAlignment = Alignment.CenterVertically,
                     pageSize = PageSize.Fixed(200.dp),
                 ) { page ->
-                    val bookInfo = bookList[page]
+                    val bookInfo = bookList.getOrNull(page)
                     AnimatedVisibility(
                         visible = bookInfo != selectBook
                     ) {
-                        bookInfo.bookImage?.rememberImageUrl()?.let {
+                        bookInfo?.bookImage?.rememberImageUrl()?.let {
                             BookCoverItem(
                                 modifier = Modifier
                                     .sharedBounds(

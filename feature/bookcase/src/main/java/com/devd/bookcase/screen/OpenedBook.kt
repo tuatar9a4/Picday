@@ -73,7 +73,7 @@ fun OpendBOokPreview() {
                 .padding(horizontal = 35.dp, vertical = 20.dp)
         ) {
             Text(
-                modifier = Modifier.align(Alignment.Center),
+                modifier = Modifier.align(Alignment.CenterStart),
                 text = targetItem.title,
                 style = MaterialTheme.typography.titleMedium.copy(
                     color = Black33Color
