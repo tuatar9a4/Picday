@@ -36,6 +36,7 @@ data class HomeUiState(
     var bookInfo: DiaryBookInfo? = null,
     var diaryList: List<DiaryInfo> = emptyList(),
     var searchDate: ZonedDateTime = Instant.now().atZone(ZoneId.systemDefault()),
+    val bookList: List<DiaryBookInfo>? = null,
     @param:StringRes var dialogMessage: Int? = null
 ) {
     @Composable
@@ -50,6 +51,8 @@ class HomeViewModel @Inject constructor(
 
     private val _homeUiState = MutableStateFlow(HomeUiState())
     val homeUiState: StateFlow<HomeUiState> get() = _homeUiState.asStateFlow()
+
+    var savedBookId: Long? = null
 
     private val _scrollPosition = MutableSharedFlow<Int>()
     val scrollPosition get() = _scrollPosition.asSharedFlow()
@@ -66,6 +69,18 @@ class HomeViewModel @Inject constructor(
                 showMessageDialog(R.string.fail_fetch_diary_book)
             }
         }
+    }
+
+    fun showBookList() {
+        viewModelScope.launch {
+            _homeUiState.update { it.copy(isLoading = true) }
+            val bookList = diaryBookRepository.fetchAllDiaryBooks(storedUUID!!)
+            _homeUiState.update { it.copy(isLoading = false, bookList = bookList) }
+        }
+    }
+
+    fun dismissBookList(){
+        _homeUiState.update { it.copy(bookList = null) }
     }
 
     private suspend fun fetchDairiesByDiaryBook(diaryBook: DiaryBookInfo, movePos: Boolean) {
@@ -97,9 +112,9 @@ class HomeViewModel @Inject constructor(
         if (movePos) moveToPosition(monthDiaries)
     }
 
-    suspend fun fetchTodayDiary() =
+    suspend fun fetchTodayDiary(bookId : Long) =
         diaryBookRepository.fetchOneDiaryForDate(
-            homeUiState.value.bookInfo?.bookId!!,
+            bookId,
             System.currentTimeMillis()
         )
 

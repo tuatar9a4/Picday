@@ -362,9 +362,8 @@ fun EditorScreen(
             painter = if ((diaryState?.diaryMood ?: -1) == -1)
                 painterResource(R.drawable.icon_select_feel)
             else painterResource(FeelData.feelList[diaryState?.diaryMood!!]),
-            colorFilter = if ((diaryState?.diaryMood
-                    ?: -1) == -1
-            ) ColorFilter.tint(Black88Color) else null,
+            colorFilter = if ((diaryState?.diaryMood ?: -1) == -1) ColorFilter.tint(Black88Color)
+            else null,
             contentDescription = null
         )
         Spacer(Modifier.height(20.dp))

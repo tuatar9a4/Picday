@@ -281,7 +281,7 @@ fun EmptyDiaryCardScreen(
                 Spacer(modifier = Modifier.size(20.dp))
                 Text(
                     text = "이 달에는 일기를 하나도 쓰지 않았아요...",
-                    style = MaterialTheme.typography.bodyLarge
+                    style = MaterialTheme.typography.displayMedium
                 )
 
             }

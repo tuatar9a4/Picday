@@ -43,6 +43,7 @@ import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import timber.log.Timber
 import java.io.File
 import javax.inject.Inject
 
@@ -115,6 +116,7 @@ class EditorViewModel @Inject constructor(
     }
 
     private suspend fun initDiaryInfo() {
+        Timber.d("diaryiD => ${route} , ${route.diaryId} , ${route.bookId}")
         route.diaryId?.let { // 편집
             val diary =
                 diaryBookRepository.fetchDairyByDiaryBook(editorUiState.value.selectBookId, it)
