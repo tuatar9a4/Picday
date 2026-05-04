@@ -5,6 +5,7 @@ import androidx.lifecycle.viewModelScope
 import com.devd.commonsystem.utils.FontList
 import com.devd.commonsystem.utils.getDateStr
 import com.devd.data.repository.DiaryBookRepository
+import com.devd.data.repository.OracleRepository
 import com.devd.datastore.DataStoreKey
 import com.devd.datastore.DataStoreKey.DiaryLockPassword
 import com.devd.datastore.DataStoreRepository
@@ -43,7 +44,8 @@ data class AlarmData(
 @HiltViewModel
 class SettingViewModel @Inject constructor(
     private val dataStoreRepository: DataStoreRepository,
-    private val diaryBookRepository: DiaryBookRepository
+    private val diaryBookRepository: DiaryBookRepository,
+    private val oracleRepository: OracleRepository
 ) : ViewModel() {
 
     private val _settingUiState = MutableStateFlow(SettingUiState())
@@ -82,7 +84,8 @@ class SettingViewModel @Inject constructor(
                 }
 
                 SettingType.DIARY_LOCK -> it.copy(settingType = ItemType.Switch(isOn = savedSettingData.isLockDiary))
-                SettingType.CLOUD_SYNC -> null
+                SettingType.DELETE_DATA -> it.copy(settingType = ItemType.Action(isArrow = true))
+                        SettingType.CLOUD_SYNC -> null
             }
         }
         _settingUiState.update {
@@ -152,6 +155,7 @@ class SettingViewModel @Inject constructor(
                 }
 
                 SettingType.ALERT_TIME -> Unit
+                SettingType.DELETE_DATA -> Unit
                 SettingType.CLOUD_SYNC -> Unit
                 SettingType.DIARY_LOCK -> Unit
                 SettingType.APP_VERSION -> Unit
@@ -232,8 +236,53 @@ class SettingViewModel @Inject constructor(
         }
     }
 
+    fun deleteAllDiaryData() {
+        viewModelScope.launch {
+            _settingUiState.update { it.copy(isLoading = true, messageDialog = null) }
+            val userInfo = dataStoreRepository.getUserInfo()
+            diaryBookRepository.fetchAllDiaryBooks(userInfo!!.uuid).forEach {
+                val diaryListOfBook = diaryBookRepository.fetchAllDairiesByDiaryBook(it.bookId)
+                val deleteBook = diaryBookRepository.deleteBookInfo(it.bookId)
+                deleteBook?.bookImage?.let { bookImage ->
+                    val removeList =
+                        diaryListOfBook.map { bookInfo -> bookInfo.imageUrlList.first() } + listOf(
+                            bookImage
+                        )
+                    oracleRepository.deleteBucketImage(fileNames = removeList)
+                }
+            }
+            _settingUiState.update {
+                it.copy(
+                    isLoading = false,
+                    messageDialog = MessageData(
+                        messageType = "completeDelete",
+                        messageStr = "삭제가 성공되었습니다. 앱을 재시작해주세요."
+                    )
+                )
+            }
+        }
+    }
+
+    fun requestDeleteData() {
+        _settingUiState.update {
+            it.copy(
+                messageDialog = MessageData(
+                    messageType = "deleteDiary",
+                    messageStr = "정말 데이터를 삭제하시겠습니까?\n 삭제된 일기데이터는 복구가 불가능하며 일기장을 새로 생성해야합니다.\n삭제 후 앱이 종료 됩니다."
+                )
+            )
+        }
+    }
+
     fun showMessageDialog(messageId: String) {
-        _settingUiState.update { it.copy(messageDialog =  MessageData("needPermission", messageStr =messageId)) }
+        _settingUiState.update {
+            it.copy(
+                messageDialog = MessageData(
+                    "needPermission",
+                    messageStr = messageId
+                )
+            )
+        }
     }
 
     fun dismissAlarmDialog() {

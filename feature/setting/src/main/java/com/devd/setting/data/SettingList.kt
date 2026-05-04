@@ -18,6 +18,10 @@ val settingList = listOf(
         settingType = ItemType.Switch(isOn = true)
     ),
     SettingItem(
+        type = SettingType.DELETE_DATA,
+        settingType = ItemType.Action(true)
+    ),
+    SettingItem(
         type = SettingType.APP_VERSION,
         settingType = ItemType.Value("")
     )

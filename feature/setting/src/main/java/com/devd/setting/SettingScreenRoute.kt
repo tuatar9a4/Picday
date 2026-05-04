@@ -1,5 +1,6 @@
 package com.devd.setting
 
+import android.app.Activity
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
@@ -61,6 +62,7 @@ fun SettingScreenRoute(
     onLockPage: (Boolean) -> Unit,
     onBackClick: () -> Unit,
 ) {
+    val context = LocalContext.current
     val uiState by viewModel.settingUiState.collectAsState()
     var isFontListSheet by remember { mutableStateOf(false) }
     var isDiaryLockSheet by remember { mutableStateOf(false) }
@@ -102,6 +104,7 @@ fun SettingScreenRoute(
                     else isDiaryLockSheet = true
                 }
 
+                SettingType.DELETE_DATA -> viewModel.requestDeleteData()
                 SettingType.APP_VERSION -> Unit
             }
         }
@@ -157,8 +160,27 @@ fun SettingScreenRoute(
     }
 
     uiState.messageDialog?.getMessage()?.ShowMessageDialog(
+        leftButtonMessage = if (uiState.messageDialog?.messageType == "deleteDiary") R.string.cancel else null,
+        onLeftButtonClick = when (uiState.messageDialog?.messageType) {
+            "deleteDiary" -> {
+                { viewModel.dismissMessageDialog() }
+            }
+
+            else -> null
+        },
         onRightButtonClick = {
-            viewModel.dismissMessageDialog()
+            when (uiState.messageDialog?.messageType) {
+                "deleteDiary" -> {
+                    viewModel.deleteAllDiaryData()
+                }
+
+                "completeDelete" -> {
+                    val activity = (context as? Activity)
+                    activity?.finish()
+                }
+
+                else -> viewModel.dismissMessageDialog()
+            }
         }
     )
 
@@ -178,7 +200,14 @@ fun SettingScreen(
         Spacer(Modifier.height(20.dp))
         uiState.settingData.forEach { item ->
             when (item.settingType) {
-                is ItemType.Action -> ActionItem(item.type, item.settingType)
+                is ItemType.Action -> ActionItem(
+                    key = item.type,
+                    type = item.settingType,
+                    onItemClick = {
+                        onItemClick(item.type, null)
+                    }
+                )
+
                 is ItemType.ActionValue -> ActionValueItem(
                     item.type,
                     item.settingType,
@@ -203,10 +232,12 @@ fun SettingScreen(
 @Composable
 fun ActionItem(
     key: SettingType = SettingType.CLOUD_SYNC,
-    type: ItemType.Action = ItemType.Action(true)
+    type: ItemType.Action = ItemType.Action(true),
+    onItemClick: () -> Unit = {}
 ) {
     Row(
         modifier = Modifier
+            .clickable(onClick = onItemClick)
             .padding(vertical = 10.dp, horizontal = 15.dp)
             .fillMaxWidth(),
         horizontalArrangement = Arrangement.SpaceBetween

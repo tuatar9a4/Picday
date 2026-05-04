@@ -7,6 +7,7 @@ enum class SettingType(var strId: Int) {
     FONT_TYPE(R.string.setting_font_type),
     ALERT_TIME(R.string.setting_alert_time),
     DIARY_LOCK(R.string.setting_lock_diary),
+    DELETE_DATA(R.string.delete_diary_data),
     APP_VERSION(R.string.setting_app_version)
 }
 
