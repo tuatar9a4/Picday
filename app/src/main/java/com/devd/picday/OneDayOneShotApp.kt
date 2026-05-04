@@ -23,8 +23,8 @@ class OneDayOneShotApp : Application() {
         if (BuildConfig.DEBUG) {
             Timber.plant(Timber.DebugTree())
         } else {
-            Timber.plant(Timber.DebugTree())
-//            Timber.plant(ReleaseTree())
+//            Timber.plant(Timber.DebugTree())
+            Timber.plant(ReleaseTree())
         }
         fetchFcmToken()
         initAdmob()
