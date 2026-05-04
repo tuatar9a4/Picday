@@ -37,16 +37,16 @@ interface DiaryBookDao {
     @Query(
         """
         SELECT * FROM diary_book 
-        WHERE userUuid = :uuid AND remoteID is NULL
+        WHERE userUuid = :uuid AND remoteID is NULL AND isDeleted = 0
         ORDER BY createdAt ASC
         """
     )
     suspend fun selectAllNotSyncDiaryBook(uuid: String): List<DiaryBookEntity>
 
-    @Query("SELECT * FROM diary_book WHERE userUuid = :uuid AND isMajor = 1")
+    @Query("SELECT * FROM diary_book WHERE userUuid = :uuid AND isMajor = 1 AND isDeleted = 0")
     suspend fun selectMainDiaryBook(uuid: String): DiaryBookEntity
 
-    @Query("SELECT * FROM diary_book WHERE localId = :bookId")
+    @Query("SELECT * FROM diary_book WHERE localId = :bookId AND isDeleted = 0")
     suspend fun selectDiaryBook(bookId: Long): DiaryBookEntity
 
     @Query("UPDATE diary_book SET remoteID = :remoteID ,updatedAt = :updateAt WHERE localId = :localId")
