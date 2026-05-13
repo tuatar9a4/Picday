@@ -16,7 +16,7 @@ Picday는 매일 한 장의 사진(16:9 비율 크롭)과 짧은 문장으로 �
 ## 🛠 Tech Stack
 - **Language:** Kotlin
 - **Architecture:** MVVM, Multi-Module, Clean Architecture
-- **UI:** Jetpack Compose (100%), Navigation Compose (Nav3)
+- **UI:** Jetpack Compose (100%)
 - **Asynchronous & Reactive:** Coroutines, Flow
 - **DI (Dependency Injection):** Dagger-Hilt
 - **Local Storage:** RoomDB
@@ -33,18 +33,28 @@ Picday는 매일 한 장의 사진(16:9 비율 크롭)과 짧은 문장으로 �
 📦 프로젝트 구조
  ┣ 📂 app (Hilt Application)
  ┣ 📂 core
- ┃  ┣ 📂 common (공통 UI, Theme, Base Component)
+ ┃  ┣ 📂 commonsystem (공통 UI, Theme, Base Component)
  ┃  ┣ 📂 data (Repository 구현체, API/DB/Cloud 연동)
  ┃  ┣ 📂 database (RoomDB, DAO)
- ┃  ┗ 📂 domain (Model, Repository Interface, UseCase)
+ ┃  ┣ 📂 datastore (DataStore)
+ ┃  ┣ 📂 firebase (FCM)
+ ┃  ┣ 📂 model (Data Class)
+ ┃  ┣ 📂 network (Api 통신 관련)
+ ┃  ┗ 📂 permission (권한 설정 기능)
  ┗ 📂 feature
+    ┣ 📂 bookcase (일기장 리스트)
+    ┣ 📂 calendar (달력 페이지)
+    ┣ 📂 diary (일기 리스트)
+    ┣ 📂 editor (일기 작성)
     ┣ 📂 home (메인 피드)
-    ┣ 📂 editor (카메라 촬영, 이미지 크롭 및 일기 작성)
+    ┣ 📂 intro (인트로, 권한 확인)
+    ┣ 📂 setting (설정 페이지)
     ┗ 📂 calendar (커스텀 캘린더 및 일기 조회)
 ```
 
-🤔 Decision Log & Troubleshooting
-1. 보안과 용량을 모두 잡은 클라우드 아키텍처 (OCI Serverless & PAR)
+## 🤔 Decision Log & Troubleshooting
+
+## 1. 보안과 용량을 모두 잡은 클라우드 아키텍처 (OCI Serverless & PAR)
 
 ### 이슈
 다이어리 앱 특성상 고화질 이미지가 지속적으로 누적되면 사용자의 기기 로컬 용량을 크게 점유하게 됩니다. 이를 클라우드 스토리지를 통해 해결하려 했으나, 클라이언트(앱) 앱 내부에 Cloud SDK 인증 키(Secret Key)를 하드코딩하면 보안 위협이 발생합니다.
@@ -53,8 +63,7 @@ Picday는 매일 한 장의 사진(16:9 비율 크롭)과 짧은 문장으로 �
 - 앱에서 이미지 업로드를 요청할 때마다 서버리스 함수가 작동하여, 해당 업로드 건에만 유효한 임시 PAR(Pre-Authenticated Request) URL을 동적으로 발급합니다.
 - 이를 통해 앱 내부에 인증 키를 노출하지 않고도 안전하게 Object Storage에 대용량 이미지를 적재하는 무결성 높은 업로드 환경을 구축했습니다.
 
-2. Compose 렌더링 최적화: GPU 가속과 리컴포지션 방어
-3. 
+## 2. Compose 렌더링 최적화: GPU 가속과 리컴포지션 방어
 ### 이슈
 Picday의 핵심 UI인 '커스텀 캘린더'는 사용자가 스와이프하면 1:1 비율의 썸네일이 9:16 비율의 상세 이미지로 전환되는 동적 레이아웃입니다. 초기 구현 시 스크롤 위치에 따라 UI 상태가 실시간으로 변경되면서 과도한 리컴포지션(Recomposition)이 발생해 프레임 드랍이 일어났습니다. 
 ### 해결
